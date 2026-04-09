@@ -788,6 +788,7 @@ const FORM_EMBED_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdKnigB3p7isTO0
 // Picks lock at first tee
 const REVEAL_DATE = new Date('2026-04-09T08:00:00-04:00');
 const FORCE_REVEAL = true;  // set true to bypass lock for testing
+const FORCE_LIVE = true;    // set true to force the Forecast view with demo data when ESPN reports pre-tournament (preview repo only)
 
 // ════════════════════════════════════════════════════════
 // Odds — Polymarket live + hardcoded fallback
@@ -1696,6 +1697,8 @@ function updateLockedNames(){
 async function doRefresh(){
   const[,espnRes]=await Promise.all([fetchPicks(),fetchESPN(),fetchPolymarket()]);
   if(!espnRes&&!hasScores())loadDemo();
+  // Preview/test override: force the Forecast view with demo data even when ESPN says pre-tournament
+  if(FORCE_LIVE&&(tourneyStatus==='pre'||tourneyStatus==='idle'))loadDemo();
   if(espnRes&&liveParts.length>0)warnUnmatched();
   if(isRevealed()){renderStandings();renderFieldLive();renderStats();}else{updateLockedNames();}
   renderOdds();
