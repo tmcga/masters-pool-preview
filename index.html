@@ -1209,6 +1209,36 @@ function runSimulations(){
   for(let t=0;t<teamPlans.length;t++)teamWinProbMap[teamPlans[t].name]=teamWins[t]/N;
 }
 
+// ── ODDS canonicalization ───────────────────────────────
+// Rebuild ODDS as a merge of OPENING_ODDS (FALLBACK baseline) + live Polymarket,
+// keyed by canonical ESPN names. This:
+//   • Drops stale Polymarket markets (Tiger Woods, "Player AJ", etc.)
+//   • Unifies Polymarket name variants (J. J. Spaun, Sung-Jae Im, ...) onto ESPN-canonical keys
+//   • Ensures every ESPN-field golfer gets SOME odds (Polymarket live > FALLBACK static)
+//   • Idempotent and pre-tournament safe (no-ops when scores is empty)
+function syncOddsToField(){
+  if(!hasScores())return;
+  // Snapshot the current live ODDS (which is either Polymarket data or FALLBACK if Polymarket failed)
+  const liveOdds=oddsSource==='polymarket'?{...ODDS}:{};
+  const cleaned={};
+  // 1. Seed with OPENING_ODDS (FALLBACK April 4 DraftKings snapshot) — every match becomes a baseline entry
+  for(const[name,odds]of Object.entries(OPENING_ODDS)){
+    const canonical=nameMap[normName(name)];
+    if(canonical&&scores[canonical])cleaned[canonical]=odds;
+  }
+  // 2. Overlay live Polymarket odds where available (canonical-keyed) — drops stale, unifies variants
+  let liveApplied=0,stale=0;
+  for(const[name,odds]of Object.entries(liveOdds)){
+    const canonical=nameMap[normName(name)];
+    if(canonical&&scores[canonical]){cleaned[canonical]=odds;liveApplied++;}
+    else stale++;
+  }
+  ODDS=cleaned;
+  if(liveApplied||stale){
+    console.log(`[Masters Pool] ODDS sync: ${Object.keys(cleaned).length} canonical entries (${liveApplied} live Polymarket, ${stale} stale dropped)`);
+  }
+}
+
 // ── ESPN fetch ───────────────────────────────────────────
 async function fetchESPN(){
   for(const url of['https://site.api.espn.com/apis/site/v2/sports/golf/leaderboard?league=pga','https://corsproxy.io/?url=https://site.api.espn.com/apis/site/v2/sports/golf/leaderboard?league=pga']){
@@ -1785,7 +1815,8 @@ function renderStats(){
   const freq={};
   for(const p of liveParts) for(const g of p.picks) freq[g]=(freq[g]||0)+1;
   const uniqueGolfers=Object.keys(freq).length;
-  const totalField=Object.keys(ODDS).length||89;
+  // Prefer ESPN field count; fall back to ODDS only pre-tournament
+  const totalField=Object.keys(scores).length||Object.keys(ODDS).length||89;
 
   // ── 1. Field Coverage donut ──
   const pct=totalField>0?uniqueGolfers/totalField:0;
@@ -1902,6 +1933,8 @@ async function doRefresh(){
     // Preview/test override: force the Forecast view with demo data even when ESPN says pre-tournament
     if(FORCE_LIVE&&(tourneyStatus==='pre'||tourneyStatus==='idle'))loadDemo();
     if(espnRes&&liveParts.length>0)warnUnmatched();
+    // Canonicalize ODDS to match the ESPN field — drops stale Polymarket markets and unifies name variants
+    syncOddsToField();
     // Run Monte Carlo simulations once per refresh to populate per-golfer + per-team win probabilities
     runSimulations();
     if(isRevealed()){renderStandings();renderFieldLive();renderStats();}else{updateLockedNames();}
