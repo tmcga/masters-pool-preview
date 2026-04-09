@@ -1,0 +1,34 @@
+name: Sync Picks from Google Sheet
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'   # every 10 minutes
+  push:
+    branches: [main]
+  workflow_dispatch:          # manual trigger from Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch sheet and write picks.json
+        run: node scripts/sync-picks.mjs
+
+      - name: Check for changes
+        id: diff
+        run: |
+          git diff --quiet data/picks.json && echo "changed=false" >> "$GITHUB_OUTPUT" || echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and push
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/picks.json
+          git commit -m "Update picks.json from Google Sheet"
+          git push
