@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Brian Sullivan's Masters Pool 2026</title>
+<meta name="description" content="Live leaderboard, picks, forecasts and trash talk for Brian Sullivan's 2026 Masters Pool.">
+<meta name="theme-color" content="#00573F">
+<meta property="og:title" content="Brian Sullivan's Masters Pool 2026">
+<meta property="og:description" content="Live leaderboard, picks, forecasts and trash talk for the 2026 Masters Tournament pool.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="Masters_Lockup1A_RGB.png">
+<meta name="twitter:card" content="summary_large_image">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -93,6 +100,8 @@ body { font-family:'Georgia',serif; background:#0a1f17; color:#fff; }
 .t tbody tr.pr:nth-child(odd)  { background:#fff; }
 .t tbody tr.pr:nth-child(even) { background:#f5f5f5; }
 .t tbody tr.pr:hover, .t tbody tr.pr.expanded { background:#e8f5e9 !important; }
+.t tbody tr.pr-mine td:first-child { box-shadow:inset 4px 0 0 var(--gold); }
+body.dark-mode .t tbody tr.pr-mine td:first-child { box-shadow:inset 4px 0 0 var(--gold); }
 .t td { padding:12px 13px; font-family:Arial,sans-serif; font-size:0.86rem; text-align:center; vertical-align:middle; color:#222; }
 .t td.L { text-align:left; }
 
@@ -871,9 +880,11 @@ function getOpeningOdds(name){
 }
 
 async function fetchPolymarket(){
+  // Cache-buster prevents stale CDN responses on repeated polls
+  const cb=Date.now();
   const urls=[
-    `${GAMMA_API}/events?slug=${POLYMARKET_SLUG}`,
-    `https://corsproxy.io/?url=${encodeURIComponent(`${GAMMA_API}/events?slug=${POLYMARKET_SLUG}`)}`
+    `${GAMMA_API}/events?slug=${POLYMARKET_SLUG}&_t=${cb}`,
+    `https://corsproxy.io/?url=${encodeURIComponent(`${GAMMA_API}/events?slug=${POLYMARKET_SLUG}&_t=${cb}`)}`
   ];
   for(const url of urls){
     try{
@@ -1171,13 +1182,14 @@ function runSimulations(){
     prize.fill(0);
     const cap=Math.min(idx.length,MASTERS_PAYOUTS.length);
     for(let r=0;r<cap;r++)prize[idx[r]]=MASTERS_PAYOUTS[r];
-    // Compute each team's total and find the team winner
+    // Compute each team's total and find the team winner.
+    // Random tiebreaker prevents earlier-team-in-iteration-order bias when totals tie.
     let bestTeam=-1,bestTotal=-1;
     for(let t=0;t<teamPlans.length;t++){
       const lp=teamPlans[t].liveIdxs;
       let total=0;
       for(let k=0;k<lp.length;k++)total+=prize[lp[k]];
-      if(total>bestTotal){bestTotal=total;bestTeam=t;}
+      if(total>bestTotal||(total===bestTotal&&Math.random()<0.5)){bestTotal=total;bestTeam=t;}
     }
     if(bestTeam>=0)teamWins[bestTeam]++;
   }
@@ -1260,6 +1272,7 @@ function renderStandings(){
   const pot=ranked.length*120;const payout1st=pot-500;const payout2nd=500;
   document.getElementById('pot-total').textContent='$'+pot;
   document.getElementById('payout-1st').textContent='$'+payout1st.toLocaleString();
+  const myName=getSavedTalkName();
   let h='<table class="t"><thead><tr><th style="width:50px">Pos</th><th class="L">Participant</th><th>Prize $</th><th>Score</th><th>Win %</th></tr></thead><tbody>';
   ranked.forEach((p,i)=>{
     const pos=i+1,medal=pos===1?'🥇':pos===2?'🥈':pos===3?'🥉':`<span class="rank-n">${pos}</span>`,exp=expanded.has(i);
@@ -1268,7 +1281,8 @@ function renderStandings(){
     const payoutTag=pos===1?`<span class="payout-tag">$${payout1st.toLocaleString()}</span>`:pos===2?`<span class="payout-tag">$${payout2nd}</span>`:'';
     const teamScore=isTourneyActive()?calcTeamScore(p):null;
     const scoreTxt=teamScore!==null?fmt(teamScore):'<span class="sna">—</span>';
-    h+=`<tr class="pr${exp?' expanded':''}" onclick="toggleRow(${i})">`;
+    const isMine=myName&&p.name===myName;
+    h+=`<tr class="pr${exp?' expanded':''}${isMine?' pr-mine':''}" onclick="toggleRow(${i})">`;
     h+=`<td>${medal}</td><td class="L"><span class="p-name">${esc(p.name)}</span>${payoutTag}<span class="chev${exp?' open':''}">▼</span></td>`;
     h+=`<td><span class="tot${pos===1&&isTourneyActive()?' lead':''}">${isTourneyActive()?fmtTeamTotal(p.total):'<span class="sna">—</span>'}</span>${p.ua?'<span class="alt-in">ALT IN</span>':''}</td>`;
     h+=`<td>${scoreTxt}</td>`;
@@ -1498,17 +1512,48 @@ function renderOdds(){
   const allScores=active.map(([,s])=>parseTp(s.tp)).filter(n=>!isNaN(n)).sort((a,b)=>a-b);
   const cutLine=allScores.length>=50?allScores[49]:(allScores[allScores.length-1]||0);
   const cutTxt=cutLine>=0?(cutLine===0?'E':'+'+cutLine):String(cutLine);
-  const leaderEntry=active.map(([n,s])=>{const v=parseTp(s.tp);return{n,s,v:isNaN(v)?99:v};}).sort((a,b)=>a.v-b.v)[0];
-  const leaderName=leaderEntry?leaderEntry.n:'—';
-  const leaderScore=leaderEntry?(leaderEntry.v<0?''+leaderEntry.v:leaderEntry.v===0?'E':'+'+leaderEntry.v):'—';
-  const refreshTxt=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  // Find leader and any tied co-leaders
+  const ranked=active.map(([n,s])=>{const v=parseTp(s.tp);return{n,s,v:isNaN(v)?99:v};}).sort((a,b)=>a.v-b.v);
+  const leaderEntry=ranked[0];
+  const tiedLeaders=leaderEntry?ranked.filter(g=>g.v===leaderEntry.v):[];
+  let leaderDisplay='—',leaderScore='—';
+  if(leaderEntry){
+    leaderScore=leaderEntry.v<0?''+leaderEntry.v:leaderEntry.v===0?'E':'+'+leaderEntry.v;
+    if(tiedLeaders.length===1)leaderDisplay=esc(leaderEntry.n);
+    else if(tiedLeaders.length===2)leaderDisplay=esc(tiedLeaders[0].n)+' &amp; '+esc(tiedLeaders[1].n);
+    else leaderDisplay=esc(tiedLeaders[0].n)+' &amp; '+(tiedLeaders.length-1)+' more';
+  }
+  // User's own team rank + win % + best in-money pick (only if name is selected)
+  let myStatHtml='';
+  if(myName){
+    const teamRanking=liveParts.map(p=>{const{t,ua}=calcTeam(p);return{...p,total:t,ua};}).sort((a,b)=>b.total-a.total);
+    const myIdx=teamRanking.findIndex(p=>p.name===myName);
+    if(myIdx>=0){
+      const me=teamRanking[myIdx];
+      const myWp=teamWinProbMap[myName]||0;
+      const wpTxt=(myWp*100).toFixed(1)+'%';
+      myStatHtml+=`<div class="forecast-stat"><div class="forecast-stat-icon">👤</div><div class="forecast-stat-body"><div class="forecast-stat-lbl">Your Rank</div><div class="forecast-stat-val">${myIdx+1}/${teamRanking.length} · <span class="smoney">${wpTxt}</span></div></div></div>`;
+      // Best in-money pick — highest current prize $ across the user's roster
+      let bestPick=null,bestMoney=0;
+      for(const g of (me.picks||[])){
+        const m=calcPrizeMoney(g);
+        if(m>bestMoney){bestMoney=m;bestPick=g;}
+      }
+      if(bestPick){
+        const moneyFmt=bestMoney>=1000000?'$'+(bestMoney/1000000).toFixed(2)+'M':'$'+(bestMoney/1000).toFixed(0)+'K';
+        myStatHtml+=`<div class="forecast-stat"><div class="forecast-stat-icon">💰</div><div class="forecast-stat-body"><div class="forecast-stat-lbl">Your Top Pick</div><div class="forecast-stat-val">${esc(bestPick.split(' ').slice(-1)[0])} <span class="smoney">${moneyFmt}</span></div></div></div>`;
+      }
+    }
+  }
+  const refreshTxt=lastSuccessfulRefresh?new Date(lastSuccessfulRefresh).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):'—';
   if(sumEl){
     sumEl.className='forecast-summary';
     sumEl.innerHTML=
-      `<div class="forecast-stat"><div class="forecast-stat-icon">👑</div><div class="forecast-stat-body"><div class="forecast-stat-lbl">Leader</div><div class="forecast-stat-val">${esc(leaderName)} <span class="smoney">(${leaderScore})</span></div></div></div>`+
+      `<div class="forecast-stat"><div class="forecast-stat-icon">👑</div><div class="forecast-stat-body"><div class="forecast-stat-lbl">Leader${tiedLeaders.length>1?'s':''}</div><div class="forecast-stat-val">${leaderDisplay} <span class="smoney">(${leaderScore})</span></div></div></div>`+
       `<div class="forecast-stat"><div class="forecast-stat-icon">🎯</div><div class="forecast-stat-body"><div class="forecast-stat-lbl">Round</div><div class="forecast-stat-val">${esc(roundLabel||'—')}</div></div></div>`+
       `<div class="forecast-stat"><div class="forecast-stat-icon">📉</div><div class="forecast-stat-body"><div class="forecast-stat-lbl">Under Par</div><div class="forecast-stat-val">${underPar} golfers</div></div></div>`+
       `<div class="forecast-stat"><div class="forecast-stat-icon">✂️</div><div class="forecast-stat-body"><div class="forecast-stat-lbl">Proj. Cut</div><div class="forecast-stat-val">${cutTxt}</div></div></div>`+
+      myStatHtml+
       `<div class="forecast-stat"><div class="forecast-stat-icon">⏱️</div><div class="forecast-stat-body"><div class="forecast-stat-lbl">Updated</div><div class="forecast-stat-val">${refreshTxt}</div></div></div>`;
   }
 
@@ -1828,18 +1873,37 @@ function updateLockedNames(){
 }
 
 // ── Main refresh ─────────────────────────────────────────
+let lastSuccessfulRefresh=0; // ms since epoch of last refresh where ESPN OR cached scores were available
+let refreshInFlight=false;   // guards visibilitychange handler from racing the interval timer
 async function doRefresh(){
-  const[,espnRes]=await Promise.all([fetchPicks(),fetchESPN(),fetchPolymarket()]);
-  if(!espnRes&&!hasScores())loadDemo();
-  // Preview/test override: force the Forecast view with demo data even when ESPN says pre-tournament
-  if(FORCE_LIVE&&(tourneyStatus==='pre'||tourneyStatus==='idle'))loadDemo();
-  if(espnRes&&liveParts.length>0)warnUnmatched();
-  // Run Monte Carlo simulations once per refresh to populate per-golfer + per-team win probabilities
-  runSimulations();
-  if(isRevealed()){renderStandings();renderFieldLive();renderStats();}else{updateLockedNames();}
-  renderOdds();
+  if(refreshInFlight)return;
+  refreshInFlight=true;
+  try{
+    const[,espnRes]=await Promise.all([fetchPicks(),fetchESPN(),fetchPolymarket()]);
+    if(!espnRes&&!hasScores())loadDemo();
+    // Preview/test override: force the Forecast view with demo data even when ESPN says pre-tournament
+    if(FORCE_LIVE&&(tourneyStatus==='pre'||tourneyStatus==='idle'))loadDemo();
+    if(espnRes&&liveParts.length>0)warnUnmatched();
+    // Run Monte Carlo simulations once per refresh to populate per-golfer + per-team win probabilities
+    runSimulations();
+    if(isRevealed()){renderStandings();renderFieldLive();renderStats();}else{updateLockedNames();}
+    renderOdds();
+    if(espnRes||hasScores())lastSuccessfulRefresh=Date.now();
+    updateRefreshLabel();
+  }finally{
+    refreshInFlight=false;
+  }
+}
+// Render the "Updated X ago" label, with a warning prefix when data is stale (>10 min)
+function updateRefreshLabel(){
   const lr=document.getElementById('last-refresh');
-  if(lr)lr.textContent='Updated '+new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  if(!lr)return;
+  if(!lastSuccessfulRefresh){lr.textContent='';return;}
+  const ageMs=Date.now()-lastSuccessfulRefresh;
+  const stale=ageMs>10*60*1000;
+  const time=new Date(lastSuccessfulRefresh).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  lr.textContent=(stale?'⚠️ Data may be stale · ':'')+'Updated '+time;
+  lr.style.color=stale?'#FF6B6B':'';
 }
 
 // ── Init ─────────────────────────────────────────────────
@@ -1863,6 +1927,14 @@ async function init(){
     updateCD();
     const cdInterval=setInterval(()=>{updateCD();if(isRevealed()){clearInterval(cdInterval);document.getElementById('lock-screen').style.display='none';document.getElementById('live-board').style.display='block';document.getElementById('tbtn-signup').style.display='none';doRefresh();setInterval(doRefresh,5*60*1000);}},1000);
   }
+  // Refresh as soon as user returns to the tab if our last successful fetch was >60s ago
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden)return;
+    if(!isRevealed())return;
+    if(Date.now()-lastSuccessfulRefresh>60*1000)doRefresh();
+  });
+  // Update the "Updated X · Stale" label every minute so the warning appears without waiting for next refresh
+  setInterval(updateRefreshLabel,60*1000);
 }
 
 // ════════════════════════════════════════════════════════
@@ -2346,7 +2418,7 @@ function renderTalkFeed(messages){
       const users=reactions[emoji]||[];
       const active=users.includes(authedName)?' active':'';
       const count=users.length;
-      h+=`<button class="talk-react-btn${active}" onclick="toggleReaction('${m.id}','${emoji}')" title="${users.join(', ')}">${emoji}${count?`<span class="talk-react-count">${count}</span>`:''}</button>`;
+      h+=`<button class="talk-react-btn${active}" onclick="toggleReaction('${esc(m.id)}','${emoji}')" title="${esc(users.join(', '))}">${emoji}${count?`<span class="talk-react-count">${count}</span>`:''}</button>`;
     }
     h+=`</div></div>`;
   }
