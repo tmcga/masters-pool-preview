@@ -209,10 +209,17 @@ body.dark-mode .forecast-value-meta { color:#aaa; }
 .forecast-value-money { font-size:0.85rem; font-weight:700; color:var(--green-dark); margin-top:3px; }
 body.dark-mode .forecast-value-money { color:#66BB6A; }
 
-.forecast-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.forecast-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; align-items:center; }
 .forecast-chip { background:rgba(255,255,255,0.05); border:1px solid rgba(242,197,92,0.25); color:rgba(255,255,255,0.75); padding:5px 13px; border-radius:14px; font-size:0.74rem; font-family:Arial,sans-serif; cursor:pointer; transition:all 0.15s; }
 .forecast-chip:hover { background:rgba(242,197,92,0.1); color:#fff; }
 .forecast-chip.active { background:var(--gold); color:#4a2c00; border-color:var(--gold-dark); font-weight:700; }
+.forecast-mine-row { display:inline-flex; align-items:center; gap:6px; flex-basis:100%; font-size:0.76rem; font-family:Arial,sans-serif; color:rgba(255,255,255,0.75); padding:4px 0 6px; }
+.forecast-mine-row strong { color:var(--gold); }
+.forecast-mine-hint { font-size:0.66rem; color:var(--muted); font-style:italic; }
+.forecast-mine-sel { background:rgba(255,255,255,0.06); border:1px solid rgba(242,197,92,0.25); color:#fff; padding:5px 10px; border-radius:6px; font-size:0.76rem; font-family:Arial,sans-serif; cursor:pointer; outline:none; max-width:280px; }
+.forecast-mine-sel option { background:#1a3a2e; }
+.forecast-mine-clear { background:transparent; border:none; color:rgba(255,255,255,0.5); cursor:pointer; font-size:0.85rem; padding:0 4px; }
+.forecast-mine-clear:hover { color:var(--red); }
 
 .forecast-table { width:100%; border-collapse:collapse; font-family:Arial,sans-serif; font-size:0.78rem; }
 .forecast-table thead tr { background:var(--green-dark); position:sticky; top:0; }
@@ -1283,9 +1290,23 @@ function renderFieldLive(){
 // State
 let oddsFilter='all'; // 'all' | 'contenders' | 'mine' | 'cut'
 function setOddsFilter(f){oddsFilter=f;renderOdds();}
-// Who is the "mine" — lifted from Clubhouse PIN auth (localStorage)
+// Whose picks to highlight — checks an explicit Forecast-tab selection first, then falls back to Clubhouse auth
 function getSavedTalkName(){
-  try{const s=localStorage.getItem('masters-talk-auth');if(!s)return'';const o=JSON.parse(s);return o?.name||'';}catch(e){return'';}
+  try{
+    const explicit=localStorage.getItem('masters-my-name');
+    if(explicit)return explicit;
+    const s=localStorage.getItem('masters-talk-auth');
+    if(!s)return'';
+    const o=JSON.parse(s);
+    return o?.name||'';
+  }catch(e){return'';}
+}
+function setMyName(name){
+  try{
+    if(name)localStorage.setItem('masters-my-name',name);
+    else localStorage.removeItem('masters-my-name');
+  }catch(e){}
+  renderOdds();
 }
 // Pick ownership map (normName → {count, pct, owners[]})
 function computeOwnership(){
@@ -1399,16 +1420,31 @@ function renderOdds(){
     valueEl.innerHTML=vHtml;
   }
 
-  // ── Filter chips ──
+  // ── Filter chips + "highlight my picks" selector ──
   if(chipEl){
     chipEl.className='forecast-chips';
+    // Selector: lets the user pick their name (saved per-device) so ⭐ highlights their golfers.
+    // Falls back to Clubhouse PIN auth if they're already logged in there.
+    const explicitName=(()=>{try{return localStorage.getItem('masters-my-name')||'';}catch(e){return'';}})();
+    let selectorHtml='';
+    if(explicitName){
+      selectorHtml=`<span class="forecast-mine-row">📌 Highlighting picks for: <strong>${esc(explicitName)}</strong> <button class="forecast-mine-clear" onclick="setMyName('')" title="Clear">✕</button></span>`;
+    }else if(!myName){
+      // No explicit selection AND no chat auth → show a dropdown with all participants
+      const opts=liveParts.map(p=>`<option value="${esc(p.name)}">${esc(p.name)}</option>`).join('');
+      selectorHtml=`<span class="forecast-mine-row">📌 <select class="forecast-mine-sel" onchange="setMyName(this.value)"><option value="">Select your name to highlight your picks…</option>${opts}</select></span>`;
+    }else{
+      // Auto-detected from Clubhouse auth
+      selectorHtml=`<span class="forecast-mine-row">📌 Highlighting picks for: <strong>${esc(myName)}</strong> <span class="forecast-mine-hint">(from Clubhouse)</span></span>`;
+    }
     const chips=[
       {id:'all',label:'All'},
       {id:'contenders',label:'Contenders'},
     ];
     if(myName&&myPicksSet.size>0)chips.push({id:'mine',label:'⭐ My Picks'});
     chips.push({id:'cut',label:'Cut / WD'});
-    chipEl.innerHTML=chips.map(c=>`<button class="forecast-chip${oddsFilter===c.id?' active':''}" onclick="setOddsFilter('${c.id}')">${c.label}</button>`).join('');
+    const chipsHtml=chips.map(c=>`<button class="forecast-chip${oddsFilter===c.id?' active':''}" onclick="setOddsFilter('${c.id}')">${c.label}</button>`).join('');
+    chipEl.innerHTML=selectorHtml+chipsHtml;
   }
 
   // ── Build entries — one row per golfer in ESPN scores (union with ODDS for pre-rounds) ──
