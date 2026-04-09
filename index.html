@@ -668,6 +668,13 @@ async function fetchPolymarket(){
 }
 
 function oddsColor(o){ const n=parseInt(o); if(isNaN(n))return'odds-field'; if(Math.abs(n)<=1200)return'odds-fav'; if(Math.abs(n)<=5000)return'odds-mid'; if(Math.abs(n)<=20000)return'odds-long'; return'odds-field'; }
+// Fuzzy odds lookup — tries direct, then normalized match against all odds keys
+function getOdds(name){
+  if(ODDS[name])return ODDS[name];
+  const norm=normName(name);
+  for(const k of Object.keys(ODDS)){if(normName(k)===norm)return ODDS[k];}
+  return'';
+}
 
 // ════════════════════════════════════════════════════════
 // State
@@ -692,6 +699,7 @@ const normName=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[ø
 // Alias groups: all normalized variants of the same golfer
 const NAME_ALIAS_GROUPS=[
   ['sungjae im','im sung-jae','im sungjae'],
+  ['fifa laopakdee','pongsapak laopakdee'],
   ['nicolai hojgaard','nicolai højgaard'],
 ];
 const nameMap={};
@@ -970,7 +978,7 @@ function renderFieldLive(){
     return(isNaN(parseInt(a.tp))?999:parseInt(a.tp))-(isNaN(parseInt(b.tp))?999:parseInt(b.tp));
   });
   let h='<div class="odds-grid">';
-  sorted.forEach((g,i)=>{const o=ODDS[g.n]||'';h+=`<div class="odds-item"><span class="odds-pos">${i+1}</span><span class="odds-name">${g.n}</span><span class="odds-thru">${g.thru||''}</span><span class="odds-val ${oddsColor(o)}">${o}</span><span style="margin-left:8px">${fmt(g.tp)}</span></div>`;});
+  sorted.forEach((g,i)=>{const o=getOdds(g.n);h+=`<div class="odds-item"><span class="odds-pos">${i+1}</span><span class="odds-name">${g.n}</span><span class="odds-thru">${g.thru||''}</span><span class="odds-val ${oddsColor(o)}">${o}</span><span style="margin-left:8px">${fmt(g.tp)}</span></div>`;});
   bd.innerHTML=h+'</div>';
 }
 
