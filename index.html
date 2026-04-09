@@ -689,18 +689,20 @@ function showTab(name,btn){
 
 // ── Name normalization ───────────────────────────────────
 const normName=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[øØ]/g,'o').toLowerCase().replace(/\s+/g,' ').trim();
-// Alias map for names that differ between picks, ESPN, and Polymarket
-const NAME_ALIASES={
-  'sungjae im':'Im Sung-jae','im sung-jae':'Im Sung-jae','im sungjae':'Im Sung-jae',
-  'nicolai hojgaard':'Nicolai Hojgaard','nicolai højgaard':'Nicolai Hojgaard',
-};
+// Alias groups: all normalized variants of the same golfer
+const NAME_ALIAS_GROUPS=[
+  ['sungjae im','im sung-jae','im sungjae'],
+  ['nicolai hojgaard','nicolai højgaard'],
+];
 const nameMap={};
 function buildNameMap(){
   for(const k of Object.keys(scores))nameMap[normName(k)]=k;
-  // Inject aliases so picks resolve to ESPN names
-  for(const[alias,canonical]of Object.entries(NAME_ALIASES)){
-    const espnName=nameMap[normName(canonical)];
-    if(espnName)nameMap[alias]=espnName;
+  // For each alias group, find the ESPN name and map all variants to it
+  for(const group of NAME_ALIAS_GROUPS){
+    const espnKey=group.find(g=>nameMap[g]);
+    if(!espnKey)continue;
+    const espnName=nameMap[espnKey];
+    for(const alias of group){if(!nameMap[alias])nameMap[alias]=espnName;}
   }
 }
 function resolveName(n){const norm=normName(n);return nameMap[norm]||n;}
