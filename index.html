@@ -2107,11 +2107,12 @@ function renderMomentumChart(){
 // ════════════════════════════════════════════════════════
 function renderCutTracker(){
   if(!isTourneyActive()||liveParts.length===0) return'';
-  // Estimate projected cut line (top 50 + ties after R2)
+  // Cut line: top 50 + ties after R2. During R1 it's a noisy estimate.
   const allScores=Object.entries(scores).filter(([,s])=>s.st!=='WD'&&s.st!=='CUT').map(([,s])=>parseTp(s.tp)).filter(n=>!isNaN(n)).sort((a,b)=>a-b);
   const cutLine=allScores.length>=50?allScores[49]:allScores[allScores.length-1]||0;
   const hasCuts=Object.values(scores).some(s=>s.st==='CUT');
-  let html=`<div class="cut-projected">Projected cut line: <strong>${cutLine>=0?(cutLine===0?'E':'+'+cutLine):cutLine}</strong>${hasCuts?' (official)':' (estimated at T50)'}</div>`;
+  const qualifier=hasCuts?' (official)':currentRound>=2?' (T50 after R2)':' (R1 estimate, noisy)';
+  let html=`<div class="cut-projected">Projected cut line: <strong>${cutLine>=0?(cutLine===0?'E':'+'+cutLine):cutLine}</strong>${qualifier}</div>`;
   html+='<div class="cut-tracker-grid">';
   const ranked=liveParts.map(p=>{
     let safe=0,danger=0,cut=0,wd=0;
