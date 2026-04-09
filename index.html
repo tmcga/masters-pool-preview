@@ -185,6 +185,106 @@ body { font-family:'Georgia',serif; background:#0a1f17; color:#fff; }
 .odds-field{ color:#bbb; font-size:0.75rem; }
 .odds-thru { font-size:0.7rem; color:#999; min-width:26px; text-align:center; }
 
+/* ══ FORECAST (live Field & Odds tab upgrade) ═══════════ */
+.forecast-summary { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:14px; }
+.forecast-stat { flex:1 1 140px; min-width:0; background:rgba(255,255,255,0.04); border:1px solid rgba(242,197,92,0.18); border-radius:8px; padding:9px 13px; font-family:Arial,sans-serif; display:flex; align-items:center; gap:10px; }
+.forecast-stat-icon { font-size:1.2rem; flex-shrink:0; }
+.forecast-stat-body { display:flex; flex-direction:column; min-width:0; flex:1; }
+.forecast-stat-lbl { font-size:0.58rem; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); margin-bottom:1px; }
+.forecast-stat-val { font-size:0.88rem; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.forecast-stat-val .smoney { color:#66BB6A; }
+@media(max-width:600px){ .forecast-stat { flex-basis:calc(50% - 5px); padding:7px 10px; } .forecast-stat-lbl { font-size:0.54rem; } .forecast-stat-val { font-size:0.78rem; } }
+
+.forecast-value-strip { background:#fff; border:1px solid #ddd; border-radius:10px; padding:10px 14px; margin-bottom:14px; box-shadow:0 4px 20px rgba(0,0,0,0.15); }
+body.dark-mode .forecast-value-strip { background:var(--green-row); border-color:rgba(242,197,92,0.15); }
+.forecast-value-hdr { font-size:0.62rem; text-transform:uppercase; letter-spacing:2px; color:var(--gold-dark); font-family:Arial,sans-serif; font-weight:700; margin-bottom:8px; }
+body.dark-mode .forecast-value-hdr { color:var(--gold); }
+.forecast-value-row { display:flex; gap:10px; overflow-x:auto; padding-bottom:4px; }
+.forecast-value-chip { flex:0 0 auto; background:rgba(0,87,63,0.06); border:1px solid rgba(0,87,63,0.25); border-left:4px solid var(--green-dark); border-radius:6px; padding:8px 12px; font-family:Arial,sans-serif; min-width:180px; }
+body.dark-mode .forecast-value-chip { background:rgba(0,107,79,0.15); border-color:rgba(0,107,79,0.35); border-left-color:#66bb6a; }
+.forecast-value-name { font-size:0.82rem; font-weight:700; color:#222; }
+body.dark-mode .forecast-value-name { color:#fff; }
+.forecast-value-meta { font-size:0.68rem; color:#888; margin-top:2px; }
+body.dark-mode .forecast-value-meta { color:#aaa; }
+.forecast-value-money { font-size:0.85rem; font-weight:700; color:var(--green-dark); margin-top:3px; }
+body.dark-mode .forecast-value-money { color:#66BB6A; }
+
+.forecast-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.forecast-chip { background:rgba(255,255,255,0.05); border:1px solid rgba(242,197,92,0.25); color:rgba(255,255,255,0.75); padding:5px 13px; border-radius:14px; font-size:0.74rem; font-family:Arial,sans-serif; cursor:pointer; transition:all 0.15s; }
+.forecast-chip:hover { background:rgba(242,197,92,0.1); color:#fff; }
+.forecast-chip.active { background:var(--gold); color:#4a2c00; border-color:var(--gold-dark); font-weight:700; }
+
+.forecast-table { width:100%; border-collapse:collapse; font-family:Arial,sans-serif; font-size:0.78rem; }
+.forecast-table thead tr { background:var(--green-dark); position:sticky; top:0; }
+.forecast-table th { padding:8px 6px; font-size:0.6rem; text-transform:uppercase; letter-spacing:1px; color:#fff; font-weight:600; text-align:center; white-space:nowrap; }
+.forecast-table th.L { text-align:left; padding-left:10px; }
+.forecast-table td { padding:7px 6px; color:#222; border-bottom:1px solid #eee; text-align:center; vertical-align:middle; }
+.forecast-table td.L { text-align:left; padding-left:10px; }
+.forecast-table tbody tr:hover { background:#f5f5f5; }
+body.dark-mode .forecast-table td { color:#e0e0e0; border-bottom-color:rgba(255,255,255,0.06); }
+body.dark-mode .forecast-table tbody tr:hover { background:rgba(255,255,255,0.04); }
+.fc-pos { color:#999; font-size:0.72rem; min-width:30px; }
+.fc-mv { font-size:0.68rem; font-weight:700; min-width:24px; display:inline-block; }
+.fc-mv.up { color:var(--green-dark); }
+.fc-mv.down { color:#c8102e; }
+.fc-mv.flat { color:#ccc; }
+body.dark-mode .fc-mv.up { color:#66BB6A; }
+.fc-player { display:flex; align-items:center; gap:6px; min-width:0; }
+.fc-photo { width:26px; height:26px; border-radius:50%; object-fit:cover; border:1.5px solid #e0e0e0; flex-shrink:0; }
+.fc-flag { width:14px; height:10px; object-fit:cover; border-radius:1px; flex-shrink:0; }
+.fc-name { font-weight:600; font-size:0.8rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.fc-own-star { color:var(--gold-dark); font-size:0.72rem; margin-left:2px; }
+body.dark-mode .fc-own-star { color:var(--gold); }
+.fc-own { font-size:0.72rem; color:#555; }
+body.dark-mode .fc-own { color:#bbb; }
+.fc-own-pct { font-weight:700; }
+.fc-own.hot { color:var(--green-dark); }
+body.dark-mode .fc-own.hot { color:#66BB6A; }
+.fc-score { font-weight:700; }
+.fc-today { font-weight:600; font-size:0.74rem; }
+.fc-thru { font-size:0.7rem; color:#888; }
+body.dark-mode .fc-thru { color:#aaa; }
+.fc-rounds { display:inline-flex; gap:3px; justify-content:center; }
+.fc-rd { display:inline-block; min-width:22px; padding:2px 4px; border-radius:3px; font-size:0.68rem; background:#f0f0f0; color:#666; }
+.fc-rd.done { background:rgba(0,87,63,0.12); color:var(--green-dark); font-weight:700; }
+body.dark-mode .fc-rd { background:rgba(255,255,255,0.06); color:#888; }
+body.dark-mode .fc-rd.done { background:rgba(0,107,79,0.25); color:#a5d6a7; }
+.fc-winprob { font-weight:700; font-size:0.82rem; color:#666; }
+.fc-winprob.warm { color:var(--gold-dark); }
+.fc-winprob.hot { color:var(--green-dark); }
+body.dark-mode .fc-winprob { color:#bbb; }
+body.dark-mode .fc-winprob.warm { color:var(--gold); }
+body.dark-mode .fc-winprob.hot { color:#66BB6A; }
+.fc-prize { font-weight:700; font-size:0.76rem; }
+.fc-odds { font-weight:700; font-size:0.76rem; }
+.fc-delta { font-size:0.68rem; font-weight:700; display:inline-block; min-width:36px; }
+.fc-delta.shorten { color:var(--green-dark); }
+.fc-delta.drift { color:#c8102e; }
+.fc-delta.flat { color:#bbb; }
+body.dark-mode .fc-delta.shorten { color:#66BB6A; }
+.fc-empty { text-align:center; padding:28px 16px; color:#999; font-family:Arial,sans-serif; font-size:0.85rem; }
+body.dark-mode .fc-empty { color:#888; }
+tr.fc-mine { background:rgba(242,197,92,0.08); }
+body.dark-mode tr.fc-mine { background:rgba(242,197,92,0.1); }
+tr.fc-mine:hover { background:rgba(242,197,92,0.15); }
+tr.fc-cut td { opacity:0.6; }
+
+@media(max-width:900px){
+  .forecast-table th.hide-tab,.forecast-table td.hide-tab{display:none;}
+  .forecast-table th,.forecast-table td{padding:6px 4px;}
+}
+@media(max-width:600px){
+  .forecast-table th.hide-m,.forecast-table td.hide-m{display:none;}
+  .forecast-table th,.forecast-table td{padding:5px 3px;font-size:0.7rem;}
+  .forecast-table th{font-size:0.52rem;letter-spacing:0.5px;}
+  .fc-photo{width:22px;height:22px;}
+  .fc-flag{display:none;}
+  .fc-name{font-size:0.74rem;}
+  .fc-winprob{font-size:0.74rem;}
+  .forecast-chip{padding:4px 10px;font-size:0.68rem;}
+  .forecast-value-chip{min-width:150px;padding:7px 10px;}
+}
+
 /* ══ FIELD LEADERBOARD (Masters LB on standings tab) ════ */
 .field-lb { width:100%; border-collapse:collapse; font-family:Arial,sans-serif; }
 .field-lb thead tr { background:var(--green-dark); }
@@ -620,14 +720,21 @@ body.dark-mode .value-badge { background:rgba(0,107,79,0.2); color:#66bb6a; bord
 <div class="tab-panel" id="tab-odds">
 <div class="wrap">
   <div class="sec-lbl" id="odds-label">2026 Masters Field — Odds to Win</div>
+  <div id="forecast-summary"></div>
+  <div id="forecast-value-card"></div>
   <div class="odds-controls">
     <input class="odds-search" type="text" id="odds-search" placeholder="Search player…" oninput="renderOdds()">
-    <select class="odds-sort" id="odds-sort" onchange="renderOdds()">
+    <select class="odds-sort" id="odds-sort" onchange="renderOdds._userTouched=true;renderOdds()">
       <option value="odds">Sort by Odds</option>
-      <option value="name">Sort A–Z</option>
+      <option value="winprob">Sort by Win %</option>
       <option value="score">Sort by Score</option>
+      <option value="today">Sort by Today</option>
+      <option value="prize">Sort by Prize $</option>
+      <option value="own">Sort by Pick %</option>
+      <option value="name">Sort A–Z</option>
     </select>
   </div>
+  <div id="forecast-chips"></div>
   <div class="card"><div id="odds-board"><div class="loading"><div class="spinner"></div></div></div></div>
 </div>
 </div>
@@ -734,6 +841,25 @@ function probToAmerican(p){
   // American odds: underdog (p<0.5) = +((1/p - 1) * 100), favorite (p>=0.5) = -(p/(1-p) * 100)
   if(p>=0.5){const v=Math.round((p/(1-p))*100);return'-'+v;}
   const v=Math.round(((1-p)/p)*100);return'+'+v;
+}
+// Convert American odds (string like "+410" or "-120") to implied probability (0-1)
+function americanToProb(a){
+  if(a===null||a===undefined||a==='')return 0;
+  const n=parseInt(String(a).replace(/[^\d-]/g,''));
+  if(isNaN(n)||n===0)return 0;
+  if(String(a).trim().startsWith('-')||n<0)return Math.abs(n)/(Math.abs(n)+100);
+  return 100/(n+100);
+}
+// Opening odds snapshot — captured from FALLBACK_ODDS at page load, used as baseline for Δ Odds
+const OPENING_ODDS={...FALLBACK_ODDS};
+// Sync alias entries into opening snapshot
+if(!OPENING_ODDS["Sungjae Im"]&&OPENING_ODDS["Im Sung-jae"])OPENING_ODDS["Sungjae Im"]=OPENING_ODDS["Im Sung-jae"];
+if(!OPENING_ODDS["Nicolai Højgaard"]&&OPENING_ODDS["Nicolai Hojgaard"])OPENING_ODDS["Nicolai Højgaard"]=OPENING_ODDS["Nicolai Hojgaard"];
+function getOpeningOdds(name){
+  if(OPENING_ODDS[name])return OPENING_ODDS[name];
+  const norm=normName(name);
+  for(const k of Object.keys(OPENING_ODDS)){if(normName(k)===norm)return OPENING_ODDS[k];}
+  return'';
 }
 
 async function fetchPolymarket(){
@@ -917,6 +1043,40 @@ function calcWinProbs(ranked){
   const raw=ranked.map(p=>{const gap=p.total-leader;return normalCDF(gap/remSigma);});
   const sum=raw.reduce((a,b)=>a+b,0);
   return raw.map(r=>sum>0?r/sum:1/n);
+}
+// Per-golfer win probability — model based on current score vs leader + rounds remaining.
+// Lower score is better. Uses normal CDF on strokes, with stdev ~3 strokes per round per golfer.
+// Returns { golferName: probability (0-1) } with probabilities summing to 1 across the active field.
+let golferWinProbMap={};
+// Parse a score-to-par value that could be "-5", "+3", "E", 0, or null → numeric strokes
+function parseTp(tp){
+  if(tp===null||tp===undefined)return NaN;
+  if(typeof tp==='number')return tp;
+  const s=String(tp).trim().toUpperCase();
+  if(s==='E')return 0;
+  if(s==='WD'||s==='CUT'||s==='MC')return NaN;
+  const n=parseInt(s);
+  return isNaN(n)?NaN:n;
+}
+function calcGolferWinProbs(){
+  golferWinProbMap={};
+  if(!hasScores()||!isTourneyActive())return golferWinProbMap;
+  const active=Object.entries(scores).filter(([,s])=>s.st!=='WD'&&s.st!=='CUT').map(([n,s])=>{const v=parseTp(s.tp);return{n,score:isNaN(v)?99:v};}).sort((a,b)=>a.score-b.score);
+  if(active.length===0)return golferWinProbMap;
+  if(tourneyStatus==='final'){golferWinProbMap[active[0].n]=1;return golferWinProbMap;}
+  // Remaining rounds: if currentRound=2 mid-play, ~2.5 rounds to go. Use 4-currentRound+0.5 floor 0.5.
+  const remRounds=Math.max(4-currentRound+0.5,0.5);
+  const golferSigma=3; // strokes stdev per round per golfer
+  // Difference between two golfers has sigma = sigma * sqrt(2 * remRounds)
+  const diffSigma=Math.sqrt(2*remRounds)*golferSigma;
+  const leader=active[0].score;
+  const raw=active.map(g=>{
+    const gap=leader-g.score; // ≤0; leader has gap=0 → CDF=0.5, everyone else < 0.5
+    return normalCDF(gap/diffSigma);
+  });
+  const sum=raw.reduce((a,b)=>a+b,0);
+  active.forEach((g,i)=>{golferWinProbMap[g.n]=sum>0?raw[i]/sum:1/active.length;});
+  return golferWinProbMap;
 }
 
 // ── ESPN fetch ───────────────────────────────────────────
@@ -1118,21 +1278,300 @@ function renderFieldLive(){
   bd.innerHTML=h+'</tbody></table>';
 }
 
-// ── Odds tab ─────────────────────────────────────────────
+// ── Odds / Forecast tab ──────────────────────────────────
+// State
+let oddsFilter='all'; // 'all' | 'contenders' | 'mine' | 'cut'
+function setOddsFilter(f){oddsFilter=f;renderOdds();}
+// Who is the "mine" — lifted from Clubhouse PIN auth (localStorage)
+function getSavedTalkName(){
+  try{const s=localStorage.getItem('masters-talk-auth');if(!s)return'';const o=JSON.parse(s);return o?.name||'';}catch(e){return'';}
+}
+// Pick ownership map (normName → {count, pct, owners[]})
+function computeOwnership(){
+  const m={};
+  if(!isRevealed())return m;
+  const total=liveParts.length;
+  for(const p of liveParts){
+    for(const g of (p.picks||[])){
+      const k=normName(g);
+      if(!m[k])m[k]={count:0,owners:[]};
+      m[k].count++;m[k].owners.push(p.name);
+    }
+  }
+  for(const k of Object.keys(m))m[k].pct=total>0?m[k].count/total:0;
+  return m;
+}
+// Format Δ odds (live implied prob - opening implied prob) as a signed % in implied prob points
+function fmtOddsDelta(curOdds,openOdds){
+  if(!curOdds||!openOdds)return'<span class="fc-delta flat">—</span>';
+  const cp=americanToProb(curOdds),op=americanToProb(openOdds);
+  if(!cp||!op)return'<span class="fc-delta flat">—</span>';
+  const d=cp-op; // positive = shortening (more likely to win)
+  const pct=(d*100);
+  if(Math.abs(pct)<0.2)return'<span class="fc-delta flat">±0</span>';
+  const cls=pct>0?'shorten':'drift';
+  const arrow=pct>0?'▲':'▼';
+  return`<span class="fc-delta ${cls}">${arrow}${Math.abs(pct).toFixed(1)}pp</span>`;
+}
+
 function renderOdds(){
   const lbl=document.getElementById('odds-label');
-  if(oddsSource==='polymarket')lbl.textContent='2026 Masters Field — Live Odds via Polymarket';
-  else lbl.textContent='2026 Masters Field — Odds to Win (static fallback)';
+  const sumEl=document.getElementById('forecast-summary');
+  const chipEl=document.getElementById('forecast-chips');
+  const valueEl=document.getElementById('forecast-value-card');
+  const tabBtn=document.getElementById('tbtn-odds');
+  const live=isTourneyActive();
+  // Dynamic tab label
+  if(tabBtn){
+    const full=tabBtn.querySelector('.tab-full'),short=tabBtn.querySelector('.tab-short');
+    if(live){if(full)full.innerHTML='📊 Forecast';if(short)short.innerHTML='📊 Forecast';}
+    else{if(full)full.innerHTML='🎯 Field &amp; Odds';if(short)short.innerHTML='🎯 Field &amp; Odds';}
+  }
+  // Dynamic heading
+  if(live){
+    lbl.textContent=`Forecast · ${roundLabel||'Live'}`+(oddsSource==='polymarket'?' · Live odds via Polymarket':'');
+  }else if(oddsSource==='polymarket'){
+    lbl.textContent='2026 Masters Field — Live Odds via Polymarket';
+  }else{
+    lbl.textContent='2026 Masters Field — Odds to Win (static fallback)';
+  }
+
   const q=(document.getElementById('odds-search').value||'').toLowerCase();
-  const sortBy=document.getElementById('odds-sort').value;
-  let entries=Object.entries(ODDS).map(([n,o])=>{const s=getScore(n);return{n,o,score:s?.tp??null,thru:s?.thru||'',headshot:s?.headshot||'',flag:s?.flag||'',country:s?.country||''};});
-  if(q)entries=entries.filter(e=>e.n.toLowerCase().includes(q));
-  if(sortBy==='name')entries.sort((a,b)=>a.n.localeCompare(b.n));
-  else if(sortBy==='score')entries.sort((a,b)=>(isNaN(parseInt(a.score))?999:parseInt(a.score))-(isNaN(parseInt(b.score))?999:parseInt(b.score)));
-  else entries.sort((a,b)=>(isNaN(parseInt(a.o))?9999:parseInt(a.o))-(isNaN(parseInt(b.o))?9999:parseInt(b.o)));
-  let h='<div class="odds-grid">';
-  entries.forEach((e,i)=>{const img=e.headshot?`<img class="odds-headshot" src="${e.headshot}" alt="" loading="lazy">`:'';const fl=e.flag?`<img class="odds-flag" src="${e.flag}" alt="${e.country}" title="${e.country}" loading="lazy">`:'';h+=`<div class="odds-item"><span class="odds-pos">${i+1}</span>${img}<span class="odds-name">${e.n}</span>${fl}<span class="odds-thru">${e.thru||''}</span><span class="odds-val ${oddsColor(e.o)}">${e.o}</span>${e.score!==null?`<span style="margin-left:8px">${fmt(e.score)}</span>`:''}</div>`;});
-  document.getElementById('odds-board').innerHTML=h+'</div>';
+  let sortBy=document.getElementById('odds-sort').value;
+  // Default-flip: pre→odds, live→winprob (only on first live render; respect explicit user selection otherwise)
+  if(live&&sortBy==='odds'&&!renderOdds._userTouched)sortBy='winprob';
+
+  // Pre-tournament → keep the original simple grid layout, hide summary/chips/value-card
+  if(!live){
+    if(sumEl)sumEl.innerHTML='';
+    if(chipEl)chipEl.innerHTML='';
+    if(valueEl)valueEl.innerHTML='';
+    let entries=Object.entries(ODDS).map(([n,o])=>{const s=getScore(n);return{n,o,score:s?.tp??null,thru:s?.thru||'',headshot:s?.headshot||'',flag:s?.flag||'',country:s?.country||''};});
+    if(q)entries=entries.filter(e=>e.n.toLowerCase().includes(q));
+    if(sortBy==='name')entries.sort((a,b)=>a.n.localeCompare(b.n));
+    else if(sortBy==='score')entries.sort((a,b)=>(isNaN(parseInt(a.score))?999:parseInt(a.score))-(isNaN(parseInt(b.score))?999:parseInt(b.score)));
+    else entries.sort((a,b)=>(isNaN(parseInt(a.o))?9999:parseInt(a.o))-(isNaN(parseInt(b.o))?9999:parseInt(b.o)));
+    let h='<div class="odds-grid">';
+    entries.forEach((e,i)=>{
+      const img=e.headshot?`<img class="odds-headshot" src="${e.headshot}" alt="" loading="lazy">`:'';
+      const fl=e.flag?`<img class="odds-flag" src="${e.flag}" alt="${esc(e.country)}" title="${esc(e.country)}" loading="lazy">`:'';
+      h+=`<div class="odds-item"><span class="odds-pos">${i+1}</span>${img}<span class="odds-name">${esc(e.n)}</span>${fl}<span class="odds-thru">${esc(e.thru||'')}</span><span class="odds-val ${oddsColor(e.o)}">${esc(e.o)}</span>${e.score!==null?`<span style="margin-left:8px">${fmt(e.score)}</span>`:''}</div>`;
+    });
+    document.getElementById('odds-board').innerHTML=h+'</div>';
+    return;
+  }
+
+  // ── LIVE / FINAL forecast view ──
+  // Recompute live helpers
+  calcGolferWinProbs();
+  const own=computeOwnership();
+  const myName=getSavedTalkName();
+  const myPicksSet=new Set();
+  if(myName){
+    const me=liveParts.find(p=>p.name===myName);
+    if(me){for(const g of me.picks||[])myPicksSet.add(normName(g));if(me.alternate)myPicksSet.add(normName(me.alternate));}
+  }
+
+  // ── Header summary strip ──
+  const active=Object.entries(scores).filter(([,s])=>s.st!=='WD'&&s.st!=='CUT');
+  const underPar=active.filter(([,s])=>{const v=parseTp(s.tp);return!isNaN(v)&&v<0;}).length;
+  const allScores=active.map(([,s])=>parseTp(s.tp)).filter(n=>!isNaN(n)).sort((a,b)=>a-b);
+  const cutLine=allScores.length>=50?allScores[49]:(allScores[allScores.length-1]||0);
+  const cutTxt=cutLine>=0?(cutLine===0?'E':'+'+cutLine):String(cutLine);
+  const leaderEntry=active.map(([n,s])=>{const v=parseTp(s.tp);return{n,s,v:isNaN(v)?99:v};}).sort((a,b)=>a.v-b.v)[0];
+  const leaderName=leaderEntry?leaderEntry.n:'—';
+  const leaderScore=leaderEntry?(leaderEntry.v<0?''+leaderEntry.v:leaderEntry.v===0?'E':'+'+leaderEntry.v):'—';
+  const refreshTxt=new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  if(sumEl){
+    sumEl.className='forecast-summary';
+    sumEl.innerHTML=
+      `<div class="forecast-stat"><div class="forecast-stat-icon">👑</div><div class="forecast-stat-body"><div class="forecast-stat-lbl">Leader</div><div class="forecast-stat-val">${esc(leaderName)} <span class="smoney">(${leaderScore})</span></div></div></div>`+
+      `<div class="forecast-stat"><div class="forecast-stat-icon">🎯</div><div class="forecast-stat-body"><div class="forecast-stat-lbl">Round</div><div class="forecast-stat-val">${esc(roundLabel||'—')}</div></div></div>`+
+      `<div class="forecast-stat"><div class="forecast-stat-icon">📉</div><div class="forecast-stat-body"><div class="forecast-stat-lbl">Under Par</div><div class="forecast-stat-val">${underPar} golfers</div></div></div>`+
+      `<div class="forecast-stat"><div class="forecast-stat-icon">✂️</div><div class="forecast-stat-body"><div class="forecast-stat-lbl">Proj. Cut</div><div class="forecast-stat-val">${cutTxt}</div></div></div>`+
+      `<div class="forecast-stat"><div class="forecast-stat-icon">⏱️</div><div class="forecast-stat-body"><div class="forecast-stat-lbl">Updated</div><div class="forecast-stat-val">${refreshTxt}</div></div></div>`;
+  }
+
+  // ── Value picks strip ──
+  if(valueEl){
+    const vHtml=renderValuePicksStrip();
+    valueEl.innerHTML=vHtml;
+  }
+
+  // ── Filter chips ──
+  if(chipEl){
+    chipEl.className='forecast-chips';
+    const chips=[
+      {id:'all',label:'All'},
+      {id:'contenders',label:'Contenders'},
+    ];
+    if(myName&&myPicksSet.size>0)chips.push({id:'mine',label:'⭐ My Picks'});
+    chips.push({id:'cut',label:'Cut / WD'});
+    chipEl.innerHTML=chips.map(c=>`<button class="forecast-chip${oddsFilter===c.id?' active':''}" onclick="setOddsFilter('${c.id}')">${c.label}</button>`).join('');
+  }
+
+  // ── Build entries — one row per golfer in ESPN scores (union with ODDS for pre-rounds) ──
+  const seen=new Set();
+  const entries=[];
+  // Start from ESPN scores (they have positions and live data)
+  for(const [n,s] of Object.entries(scores)){
+    seen.add(normName(n));
+    entries.push({
+      n,
+      s,
+      o:getOdds(n),
+      opening:getOpeningOdds(n),
+      score:parseTp(s.tp),
+      wp:golferWinProbMap[n]||0,
+      own:own[normName(n)]||null,
+      mine:myPicksSet.has(normName(n)),
+    });
+  }
+  // Add any odds-only entries (golfers on the odds list but not yet in ESPN data — rare)
+  for(const [n,o] of Object.entries(ODDS)){
+    if(seen.has(normName(n)))continue;
+    entries.push({n,s:null,o,opening:OPENING_ODDS[n]||'',score:NaN,wp:0,own:own[normName(n)]||null,mine:myPicksSet.has(normName(n))});
+  }
+
+  // Filters
+  let rows=entries;
+  if(q)rows=rows.filter(e=>e.n.toLowerCase().includes(q));
+  if(oddsFilter==='contenders'){
+    // Top 20 by position, or within 10 strokes of leader
+    const lead=leaderEntry?leaderEntry.v:0;
+    rows=rows.filter(e=>{
+      if(!e.s||e.s.st==='WD'||e.s.st==='CUT')return false;
+      const v=parseTp(e.s.tp);if(isNaN(v))return false;
+      if(v-lead<=10)return true;
+      const p=parsePos(e.s.pos);return p&&p.pos<=20;
+    });
+  }else if(oddsFilter==='mine'){
+    rows=rows.filter(e=>e.mine);
+  }else if(oddsFilter==='cut'){
+    rows=rows.filter(e=>e.s&&(e.s.st==='WD'||e.s.st==='CUT'));
+  }
+
+  // Sort
+  const scoreKey=e=>{if(!e.s||e.s.st==='WD')return 9999;if(e.s.st==='CUT')return 998;const v=parseTp(e.s.tp);return isNaN(v)?999:v;};
+  const oddsKey=e=>{const n=parseInt(String(e.o||'').replace(/[^\d-]/g,''));return isNaN(n)?99999:n;};
+  const todayKey=e=>{if(!e.s)return 999;const rd=(e.s.rounds||[]).find(r=>r.rd===currentRound);if(!rd)return 999;const tp=parseTp(rd.toPar);return isNaN(tp)?999:tp;};
+  const prizeKey=e=>-calcPrizeMoney(e.n);
+  const ownKey=e=>-(e.own?e.own.count:0);
+  if(sortBy==='name')rows.sort((a,b)=>a.n.localeCompare(b.n));
+  else if(sortBy==='score')rows.sort((a,b)=>scoreKey(a)-scoreKey(b));
+  else if(sortBy==='today')rows.sort((a,b)=>todayKey(a)-todayKey(b));
+  else if(sortBy==='prize')rows.sort((a,b)=>prizeKey(a)-prizeKey(b));
+  else if(sortBy==='own')rows.sort((a,b)=>ownKey(a)-ownKey(b)||scoreKey(a)-scoreKey(b));
+  else if(sortBy==='winprob')rows.sort((a,b)=>(b.wp||0)-(a.wp||0)||scoreKey(a)-scoreKey(b));
+  else rows.sort((a,b)=>oddsKey(a)-oddsKey(b));
+
+  // Render table
+  let h=`<table class="forecast-table"><thead><tr>`+
+    `<th style="width:40px">Pos</th>`+
+    `<th class="hide-tab" style="width:28px">Δ</th>`+
+    `<th class="L">Player</th>`+
+    `<th class="hide-m">Own%</th>`+
+    `<th>Score</th>`+
+    `<th>Today</th>`+
+    `<th>Thru</th>`+
+    `<th class="hide-tab">R1</th><th class="hide-tab">R2</th><th class="hide-tab">R3</th><th class="hide-tab">R4</th>`+
+    `<th>Win%</th>`+
+    `<th class="hide-m">Prize</th>`+
+    `<th>Odds</th>`+
+    `<th class="hide-m">Δ Odds</th>`+
+    `</tr></thead><tbody>`;
+  if(rows.length===0){
+    h+=`<tr><td colspan="14" class="fc-empty">No golfers match this filter.</td></tr>`;
+  }
+  rows.forEach((e,i)=>{
+    const s=e.s;
+    const isOut=s&&(s.st==='WD'||s.st==='CUT');
+    const pos=s&&s.pos&&s.pos!=='-'?esc(s.pos):(i+1);
+    const mv=s?s.mv||0:0;
+    const mvHtml=mv>0?`<span class="fc-mv up">↑${mv}</span>`:mv<0?`<span class="fc-mv down">↓${Math.abs(mv)}</span>`:`<span class="fc-mv flat">—</span>`;
+    const img=s&&s.headshot?`<img class="fc-photo" src="${s.headshot}" alt="" loading="lazy">`:'<div class="fc-photo" style="background:#eee"></div>';
+    const fl=s&&s.flag?`<img class="fc-flag" src="${s.flag}" alt="${esc(s.country||'')}" title="${esc(s.country||'')}" loading="lazy">`:'';
+    const star=e.mine?`<span class="fc-own-star" title="On your team">⭐</span>`:'';
+    const ownPct=e.own?Math.round(e.own.pct*100):0;
+    const ownCls=ownPct>=50?'hot':'';
+    const ownTxt=e.own?`<span class="fc-own ${ownCls}"><span class="fc-own-pct">${ownPct}%</span> <span style="font-size:0.62rem;color:#aaa">(${e.own.count})</span></span>`:'<span class="fc-own">—</span>';
+    const scoreHtml=s?fmt(s.tp):'<span class="sna">—</span>';
+    // Today
+    let todayHtml='<span class="sna">—</span>';
+    if(s&&!isOut&&currentRound>=1){
+      const rd=(s.rounds||[]).find(r=>r.rd===currentRound);
+      if(rd)todayHtml=`<span class="fc-today">${fmt(rd.toPar)}</span>`;
+    }
+    // Thru
+    let thruHtml='<span class="sna">—</span>';
+    if(s){
+      if(isOut)thruHtml=s.st==='WD'?'<span class="swd">WD</span>':'<span class="scut">CUT</span>';
+      else if(s.hole)thruHtml=`<span class="fc-thru">H${s.hole}</span>`;
+      else thruHtml=`<span class="fc-thru">${esc(s.thru||'')}</span>`;
+    }
+    // Rounds R1-R4
+    const rdCells=[1,2,3,4].map(r=>{
+      const rd=s&&(s.rounds||[]).find(x=>x.rd===r);
+      if(rd&&rd.score)return`<span class="fc-rd done" title="To par: ${esc(rd.toPar||'')}">${esc(String(rd.score))}</span>`;
+      return`<span class="fc-rd">—</span>`;
+    }).map(c=>`<td class="hide-tab">${c}</td>`).join('');
+    // Win %
+    let wpHtml='<span class="fc-winprob">—</span>';
+    if(!isOut&&e.wp>0){
+      const pct=e.wp*100;
+      const cls=pct>=20?'hot':pct>=5?'warm':'';
+      wpHtml=`<span class="fc-winprob ${cls}">${pct<1?pct.toFixed(1):pct.toFixed(1)}%</span>`;
+    }
+    // Prize
+    const money=s?calcPrizeMoney(e.n):0;
+    const prizeHtml=money>0?`<span class="fc-prize smoney">$${money>=1000000?(money/1000000).toFixed(2)+'M':(money/1000).toFixed(0)+'K'}</span>`:'<span class="sna">—</span>';
+    // Odds + Δ
+    const oddsHtml=`<span class="fc-odds ${oddsColor(e.o)}">${esc(e.o||'—')}</span>`;
+    const deltaHtml=fmtOddsDelta(e.o,e.opening);
+
+    h+=`<tr class="${e.mine?'fc-mine':''} ${isOut?'fc-cut':''}">`;
+    h+=`<td class="fc-pos">${pos}</td>`;
+    h+=`<td class="hide-tab">${mvHtml}</td>`;
+    h+=`<td class="L"><div class="fc-player">${img}<span class="fc-name">${esc(e.n)}${star}</span>${fl}</div></td>`;
+    h+=`<td class="hide-m">${ownTxt}</td>`;
+    h+=`<td class="fc-score">${scoreHtml}</td>`;
+    h+=`<td>${todayHtml}</td>`;
+    h+=`<td>${thruHtml}</td>`;
+    h+=rdCells;
+    h+=`<td>${wpHtml}</td>`;
+    h+=`<td class="hide-m">${prizeHtml}</td>`;
+    h+=`<td>${oddsHtml}</td>`;
+    h+=`<td class="hide-m">${deltaHtml}</td>`;
+    h+=`</tr>`;
+  });
+  h+='</tbody></table>';
+  document.getElementById('odds-board').innerHTML=h;
+}
+
+// Value Picks as a horizontally-scrollable strip for the Forecast tab (moved from Stats tab)
+function renderValuePicksStrip(){
+  if(!isTourneyActive())return'';
+  const oddsEntries=Object.entries(OPENING_ODDS).map(([n,o])=>({name:n,odds:parseInt(o)||99999})).sort((a,b)=>a.odds-b.odds);
+  const oddsRank={};oddsEntries.forEach((e,i)=>oddsRank[e.name]=i+1);
+  const moneyList=Object.entries(scores).filter(([,s])=>s.st!=='WD'&&s.st!=='CUT').map(([n])=>({name:n,money:calcPrizeMoney(n)})).filter(g=>g.money>0).sort((a,b)=>b.money-a.money);
+  const moneyRank={};moneyList.forEach((e,i)=>moneyRank[e.name]=i+1);
+  // Match odds ranks via normName (ESPN names may differ from OPENING_ODDS keys)
+  const oddsRankResolved={};
+  for(const k of Object.keys(oddsRank))oddsRankResolved[normName(k)]=oddsRank[k];
+  const values=moneyList.map(g=>{
+    const nk=normName(g.name);
+    const oRank=oddsRankResolved[nk]||moneyList.length+50;
+    const mRank=moneyRank[g.name]||moneyList.length;
+    const delta=oRank-mRank;
+    return{...g,oddsRank:oRank,moneyRank:mRank,delta};
+  }).filter(g=>g.oddsRank>15&&g.delta>10).sort((a,b)=>b.delta-a.delta).slice(0,6);
+  if(values.length===0)return'';
+  let h='<div class="forecast-value-strip"><div class="forecast-value-hdr">🔥 Value Picks — Outperforming Their Opening Line</div><div class="forecast-value-row">';
+  for(const v of values){
+    const moneyFmt=v.money>=1000000?'$'+(v.money/1000000).toFixed(2)+'M':'$'+(v.money/1000).toFixed(0)+'K';
+    h+=`<div class="forecast-value-chip"><div class="forecast-value-name">${esc(v.name)}</div><div class="forecast-value-meta">Opened #${v.oddsRank} · Now #${v.moneyRank} (+${v.delta})</div><div class="forecast-value-money">${moneyFmt}</div></div>`;
+  }
+  return h+'</div></div>';
 }
 
 // ── Statistics tab ───────────────────────────────────────
@@ -1230,7 +1669,8 @@ function renderStats(){
   }
 
   // ── Assemble ──
-  el.innerHTML=`<div class="stats-grid"><div><div class="sec-lbl">Field Coverage</div><div class="card">${coverageHtml}</div></div><div class="stats-full"><div class="sec-lbl">Winner Predictions</div><div class="card">${winnerHtml}</div></div><div class="stats-full"><div class="sec-lbl">Pick Popularity</div><div class="card">${popHtml}</div></div><div><div class="sec-lbl">Contrarian Picks</div><div class="card">${contHtml}</div></div><div class="stats-full"><div class="sec-lbl">Pick Overlap</div><div class="card">${matHtml}</div></div>${liveHtml}</div>`;
+  const popHint=isTourneyActive()?'<div style="font-size:0.68rem;color:var(--muted);font-family:Arial,sans-serif;padding:2px 4px 8px">Tip: use the <strong>📊 Forecast</strong> tab to sort golfers by ownership alongside live scores, win % and prize money.</div>':'';
+  el.innerHTML=`<div class="stats-grid"><div><div class="sec-lbl">Field Coverage</div><div class="card">${coverageHtml}</div></div><div class="stats-full"><div class="sec-lbl">Winner Predictions</div><div class="card">${winnerHtml}</div></div><div class="stats-full"><div class="sec-lbl">Pick Popularity</div>${popHint}<div class="card">${popHtml}</div></div><div><div class="sec-lbl">Contrarian Picks</div><div class="card">${contHtml}</div></div><div class="stats-full"><div class="sec-lbl">Pick Overlap</div><div class="card">${matHtml}</div></div>${liveHtml}</div>`;
 }
 
 // ── Countdown ────────────────────────────────────────────
@@ -1602,14 +2042,7 @@ renderStats=function(){
   momentumSection.className='stats-full';
   momentumSection.innerHTML=`<div class="sec-lbl">Momentum Chart</div><div class="card">${renderMomentumChart()}</div>`;
   grid.appendChild(momentumSection);
-  // Add Value Picks
-  const valueHtml=renderValuePicks();
-  if(valueHtml){
-    const valueSection=document.createElement('div');
-    valueSection.className='stats-full';
-    valueSection.innerHTML=`<div class="sec-lbl">🔥 Value Picks — Outperforming Their Odds</div><div class="card">${valueHtml}</div>`;
-    grid.appendChild(valueSection);
-  }
+  // Value Picks lives on the Forecast tab — not duplicated here.
   // Add Cut Tracker
   const cutHtml=renderCutTracker();
   if(cutHtml){
