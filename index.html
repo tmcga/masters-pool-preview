@@ -1094,8 +1094,10 @@ function runSimulations(){
   golferWinProbMap={};
   teamWinProbMap={};
   if(!hasScores()||!isTourneyActive())return;
-  // Active = golfers still capable of earning prize money
-  const active=Object.entries(scores).filter(([,s])=>s.st!=='WD'&&s.st!=='CUT').map(([n,s])=>{const v=parseTp(s.tp);return{n,score:isNaN(v)?99:v,skill:golferSkillBonus(n)};});
+  // Active = golfers still capable of earning prize money.
+  // Unstarted golfers (tp = "-" / null → NaN) are treated as score=0 (par, all rounds ahead),
+  // not 99 over par — otherwise they'd never win in any sim and silently penalize teams that picked them.
+  const active=Object.entries(scores).filter(([,s])=>s.st!=='WD'&&s.st!=='CUT').map(([n,s])=>{const v=parseTp(s.tp);return{n,score:isNaN(v)?0:v,skill:golferSkillBonus(n)};});
   if(active.length===0)return;
 
   // Final state — deterministic, no randomness needed
