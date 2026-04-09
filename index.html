@@ -952,12 +952,19 @@ function buildGolferDetail(g){
     }
     h+='</tbody></table>';
   }
+  // Tee time (pre-tournament)
+  const tee=fmtTeeTime(s.teeTime);
+  if(tee&&!isTourneyActive())h+=`<div class="sq-status-line">Tee Time: <strong>${tee} ET</strong></div>`;
+  // Prize money
+  const pm=calcPrizeMoney(g);
+  if(isTourneyActive()&&pm>0)h+=`<div class="sq-status-line">Prize Money: <strong>$${pm.toLocaleString()}</strong></div>`;
+  // Status
   let status='';
   if(s.st==='WD')status='Withdrawn';
   else if(s.st==='CUT')status='Missed Cut';
   else if(s.hole)status=`On hole ${s.hole}`;
   else if(tourneyStatus==='final')status='Tournament Complete';
-  else status=s.thru||'';
+  else if(isTourneyActive())status=s.thru||'';
   if(status)h+=`<div class="sq-status-line">${esc(status)}</div>`;
   return h+'</div>';
 }
@@ -970,8 +977,9 @@ function buildSquad(p){
   else wCard+='<div class="squad-winner-img" style="background:var(--green-dark);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:1.2rem;font-weight:700">🏆</div>';
   wCard+=`<div class="squad-winner-info"><div class="squad-winner-label">Winner Pick</div><div class="squad-winner-name">${esc(p.winner)}`;
   if(ws&&ws.flag)wCard+=` <img class="sq-flag" src="${ws.flag}" alt="${esc(ws.country||'')}" loading="lazy">`;
-  wCard+=`</div><div class="squad-winner-meta">${esc(wo)}${ws&&ws.pos?' · '+esc(ws.pos):''}</div></div>`;
-  wCard+=`<div class="squad-winner-score"><div class="squad-winner-tp">${hasScores()?fmtGolfer(p.winner):'—'}</div>${ws&&ws.thru?`<div class="squad-winner-pos">${esc(ws.thru)}</div>`:''}</div>`;
+  const wTee=ws?fmtTeeTime(ws.teeTime):'';
+  wCard+=`</div><div class="squad-winner-meta">${esc(wo)}${ws&&ws.pos&&ws.pos!=='-'?' · '+esc(ws.pos):''}${wTee&&!isTourneyActive()?' · '+wTee+' ET':''}</div></div>`;
+  wCard+=`<div class="squad-winner-score"><div class="squad-winner-tp">${hasScores()?fmtGolfer(p.winner):'—'}</div>${ws&&ws.thru&&isTourneyActive()?`<div class="squad-winner-pos">${esc(ws.thru)}</div>`:''}</div>`;
   wCard+='</div>';
   let h=`<div class="squad-p"><div class="squad-ttl">Squad</div>${wCard}<div class="squad-grid">`;
   p.picks.forEach(g=>{
@@ -979,14 +987,16 @@ function buildSquad(p){
     const gwd=isWD(g);let cls=isWinner?'win':'',badge=isWinner?'<span class="sq-badge w">Win</span>':'';
     if(gwd&&!ua){cls='wdc';badge='<span class="sq-badge s">→Alt</span>';ua=true;}
     const go=ODDS[g]||'';
+    const gs=getScore(g);const gTee=gs?fmtTeeTime(gs.teeTime):'';
     const gKey=normName(g),isExp=expandedGolfers.has(gKey);
-    h+=`<div><div class="sq ${cls}" onclick="toggleGolfer('${gKey.replace(/'/g,"\\'")}',event)"><span>${badge}${esc(g)}</span><div class="sq-right"><span class="sq-score">${fmtGolfer(g)}</span><span class="sq-odds">${esc(go)}</span></div></div>`;
+    h+=`<div><div class="sq ${cls}" onclick="toggleGolfer('${gKey.replace(/'/g,"\\'")}',event)"><span>${badge}${esc(g)}</span><div class="sq-right"><span class="sq-score">${fmtGolfer(g)}</span><span class="sq-odds">${!isTourneyActive()&&gTee?gTee:esc(go)}</span></div></div>`;
     if(isExp)h+=buildGolferDetail(g);
     h+='</div>';
   });
   const ao=ODDS[p.alternate]||'';
+  const as=getScore(p.alternate);const aTee=as?fmtTeeTime(as.teeTime):'';
   const aKey=normName(p.alternate),aExp=expandedGolfers.has(aKey);
-  h+=`<div><div class="sq alt" onclick="toggleGolfer('${aKey.replace(/'/g,"\\'")}',event)"><span><span class="sq-badge a">Alt</span>${esc(p.alternate)}</span><div class="sq-right"><span class="sq-score">${fmtGolfer(p.alternate)}</span><span class="sq-odds">${esc(ao)}</span></div></div>`;
+  h+=`<div><div class="sq alt" onclick="toggleGolfer('${aKey.replace(/'/g,"\\'")}',event)"><span><span class="sq-badge a">Alt</span>${esc(p.alternate)}</span><div class="sq-right"><span class="sq-score">${fmtGolfer(p.alternate)}</span><span class="sq-odds">${!isTourneyActive()&&aTee?aTee:esc(ao)}</span></div></div>`;
   if(aExp)h+=buildGolferDetail(p.alternate);
   h+='</div>';
   return h+'</div></div>';
