@@ -76,7 +76,7 @@ body { font-family:'Georgia',serif; background:#0a1f17; color:#fff; }
 .sec-lbl { font-size:0.66rem; text-transform:uppercase; letter-spacing:3px; color:var(--gold); font-family:Arial,sans-serif; margin-bottom:8px; padding-left:2px; font-weight:700; }
 
 /* ══ CARD ════════════════════════════════════════════════ */
-.card { background:#fff; border:1px solid #ddd; border-radius:10px; overflow:hidden; margin-bottom:24px; box-shadow:0 4px 20px rgba(0,0,0,0.15); }
+.card { background:#fff; border:1px solid #ddd; border-radius:10px; overflow:auto; margin-bottom:24px; box-shadow:0 4px 20px rgba(0,0,0,0.15); }
 
 /* ══ STANDINGS TABLE ═════════════════════════════════════ */
 .t { width:100%; border-collapse:collapse; }
@@ -202,16 +202,16 @@ body { font-family:'Georgia',serif; background:#0a1f17; color:#fff; }
 .pop-list { padding:12px 16px; }
 .pop-row { display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px solid #f0f0f0; }
 .pop-row:last-child { border-bottom:none; }
-.pop-name { min-width:140px; font-size:0.82rem; font-family:Arial,sans-serif; color:#222; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pop-name { min-width:0; flex:0 1 140px; font-size:0.82rem; font-family:Arial,sans-serif; color:#222; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .pop-odds { min-width:52px; font-size:0.72rem; font-weight:700; text-align:right; }
-.pop-score-wrap { min-width:90px; text-align:right; font-size:0.74rem; }
+.pop-score-wrap { min-width:0; flex:0 1 90px; text-align:right; font-size:0.74rem; }
 .pop-bar-wrap { flex:1; height:22px; background:#f0f0f0; border-radius:4px; overflow:hidden; }
 .pop-bar { height:100%; border-radius:4px; transition:width 0.4s ease; min-width:2px; }
 .pop-bar.tier-high { background:linear-gradient(90deg,#00573F,#00875F); }
 .pop-bar.tier-mid  { background:linear-gradient(90deg,#C9963B,#F2C55C); }
 .pop-bar.tier-low  { background:#d0d0d0; }
 .pop-count { min-width:36px; font-size:0.82rem; font-weight:700; color:#222; text-align:center; font-family:Arial,sans-serif; }
-.pop-score-wrap { min-width:90px; text-align:right; font-size:0.74rem; }
+.pop-score-wrap { min-width:0; flex:0 1 90px; text-align:right; font-size:0.74rem; }
 
 .cont-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:8px; padding:12px 16px; }
 .cont-item { background:#fdf6e3; border:1px solid rgba(242,197,92,0.3); border-radius:8px; padding:12px 14px; }
@@ -230,8 +230,8 @@ body { font-family:'Georgia',serif; background:#0a1f17; color:#fff; }
 .matrix-wrap { overflow-x:auto; padding:12px 16px; }
 .matrix { border-collapse:collapse; width:100%; }
 .matrix th { font-size:0.7rem; font-family:Arial,sans-serif; padding:8px 6px; color:#666; font-weight:600; }
-.matrix th.rotate { writing-mode:vertical-lr; text-orientation:mixed; transform:rotate(180deg); min-width:36px; white-space:nowrap; }
-.matrix td { text-align:center; padding:8px; font-size:0.85rem; font-weight:700; font-family:Arial,sans-serif; border:1px solid #eee; min-width:50px; }
+.matrix th.rotate { writing-mode:vertical-lr; text-orientation:mixed; transform:rotate(180deg); min-width:30px; white-space:nowrap; }
+.matrix td { text-align:center; padding:5px 4px; font-size:0.78rem; font-weight:700; font-family:Arial,sans-serif; border:1px solid #eee; min-width:40px; }
 .matrix td.heat-0 { background:#f9f9f9;    color:#ccc; }
 .matrix td.heat-1 { background:#e8f5e9;    color:#388e3c; }
 .matrix td.heat-2 { background:#a5d6a7;    color:#1b5e20; }
@@ -252,6 +252,15 @@ body { font-family:'Georgia',serif; background:#0a1f17; color:#fff; }
 .spinner { width:30px; height:30px; border:3px solid rgba(255,255,255,0.1); border-top-color:var(--gold); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 12px; }
 @keyframes spin{to{transform:rotate(360deg)}}
 .footer { text-align:center; padding:20px; font-size:0.72rem; color:rgba(255,255,255,0.2); font-family:Arial,sans-serif; letter-spacing:1px; border-top:1px solid rgba(242,197,92,0.1); }
+@media(max-width:900px){
+  .stats-grid{grid-template-columns:1fr;gap:16px;}
+  .matrix td{min-width:32px;padding:4px 2px;font-size:0.7rem;}
+  .matrix th.rotate{min-width:24px;font-size:0.55rem;}
+  .matrix th{padding:6px 3px;font-size:0.58rem;}
+  .pop-name{flex:0 1 100px;}
+  .live-stats-grid{grid-template-columns:1fr;}
+  .winner-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));}
+}
 @media(max-width:600px){
   /* ── Header ── */
   .hdr-host{font-size:0.72rem;letter-spacing:4px;}
@@ -611,6 +620,9 @@ const FALLBACK_ODDS = {
   "Fred Couples":"+500000","José María Olazábal":"+500000"
 };
 let ODDS = {...FALLBACK_ODDS};
+// Sync odds for name variants
+if(!ODDS["Sungjae Im"]&&ODDS["Im Sung-jae"])ODDS["Sungjae Im"]=ODDS["Im Sung-jae"];
+if(!ODDS["Nicolai Højgaard"]&&ODDS["Nicolai Hojgaard"])ODDS["Nicolai Højgaard"]=ODDS["Nicolai Hojgaard"];
 
 // Convert decimal probability to American odds string
 function probToAmerican(p){
@@ -642,6 +654,11 @@ async function fetchPolymarket(){
       }
       if(Object.keys(newOdds).length>5){
         ODDS=newOdds;oddsSource='polymarket';
+        // Sync name variants in polymarket odds
+        if(!ODDS["Im Sung-jae"]&&ODDS["Sungjae Im"])ODDS["Im Sung-jae"]=ODDS["Sungjae Im"];
+        if(!ODDS["Sungjae Im"]&&ODDS["Im Sung-jae"])ODDS["Sungjae Im"]=ODDS["Im Sung-jae"];
+        if(!ODDS["Nicolai Hojgaard"]&&ODDS["Nicolai Højgaard"])ODDS["Nicolai Hojgaard"]=ODDS["Nicolai Højgaard"];
+        if(!ODDS["Nicolai Højgaard"]&&ODDS["Nicolai Hojgaard"])ODDS["Nicolai Højgaard"]=ODDS["Nicolai Hojgaard"];
         console.log(`[Masters Pool] Polymarket odds loaded: ${Object.keys(newOdds).length} golfers`);
         return true;
       }
@@ -671,10 +688,22 @@ function showTab(name,btn){
 }
 
 // ── Name normalization ───────────────────────────────────
-const normName=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
+const normName=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[øØ]/g,'o').toLowerCase().replace(/\s+/g,' ').trim();
+// Alias map for names that differ between picks, ESPN, and Polymarket
+const NAME_ALIASES={
+  'sungjae im':'Im Sung-jae','im sung-jae':'Im Sung-jae','im sungjae':'Im Sung-jae',
+  'nicolai hojgaard':'Nicolai Hojgaard','nicolai højgaard':'Nicolai Hojgaard',
+};
 const nameMap={};
-function buildNameMap(){for(const k of Object.keys(scores))nameMap[normName(k)]=k;}
-function resolveName(n){return nameMap[normName(n)]||n;}
+function buildNameMap(){
+  for(const k of Object.keys(scores))nameMap[normName(k)]=k;
+  // Inject aliases so picks resolve to ESPN names
+  for(const[alias,canonical]of Object.entries(NAME_ALIASES)){
+    const espnName=nameMap[normName(canonical)];
+    if(espnName)nameMap[alias]=espnName;
+  }
+}
+function resolveName(n){const norm=normName(n);return nameMap[norm]||n;}
 function warnUnmatched(){
   if(!hasScores())return;
   for(const p of liveParts){
