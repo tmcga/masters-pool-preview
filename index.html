@@ -700,6 +700,7 @@ const isWD=n=>{const s=getScore(n);return s&&(s.st==='WD'||String(s.tp).toUpperC
 const isCut=n=>{const s=getScore(n);return s&&s.st==='CUT';};
 function fmtGolfer(n){
   if(!hasScores())return'—';const s=getScore(n);if(!s)return'<span class="sna">—</span>';
+  if(!isTourneyActive())return'<span class="sna">—</span>';
   const money=calcPrizeMoney(n);
   const parVal=parseInt(s.tp);const parStr=isWD(n)?'WD':isCut(n)?'CUT':isNaN(parVal)?'—':parVal<0?''+parVal:parVal===0?'E':'+'+parVal;
   if(money>0)return`<span class="smoney">$${money.toLocaleString()}</span> <span class="sq-score-par">(${parStr})</span>`;
@@ -713,6 +714,7 @@ function numScore(n){const s=getScore(n);if(!s||isWD(n))return 0;const v=parseIn
 function num(n){return calcPrizeMoney(n);}
 function calcTeam(p){const sc=[...p.picks];let t=0,ua=false;for(const g of sc){if(isWD(g)&&!ua){t+=num(p.alternate);ua=true;}else t+=num(g);}return{t,ua};}
 const hasScores=()=>Object.keys(scores).length>0;
+const isTourneyActive=()=>tourneyStatus==='live'||tourneyStatus==='final'||tourneyStatus==='demo';
 
 // ── Prize money (2025 Masters actuals — update when 2026 purse announced) ──
 const MASTERS_PURSE=21000000;
@@ -843,16 +845,16 @@ function renderStandings(){
   document.getElementById('entry-count').textContent=ranked.length;
   const pot=ranked.length*120;const payout1st=pot-500;const payout2nd=500;
   document.getElementById('pot-total').textContent='$'+pot;
-  const winProbs=hasScores()?calcWinProbs(ranked):[];
+  const winProbs=isTourneyActive()?calcWinProbs(ranked):[];
   let h='<table class="t"><thead><tr><th style="width:50px">Pos</th><th class="L">Participant</th><th>Prize $</th><th>Win %</th></tr></thead><tbody>';
   ranked.forEach((p,i)=>{
     const pos=i+1,medal=pos===1?'🥇':pos===2?'🥈':pos===3?'🥉':`<span class="rank-n">${pos}</span>`,exp=expanded.has(i);
     const wp=winProbs[i];
-    const wpTxt=hasScores()?`<span class="wp${wp>=0.25?' wp-hot':wp>=0.10?' wp-warm':''}">${(wp*100).toFixed(1)}%</span>`:'<span class="sna">—</span>';
+    const wpTxt=isTourneyActive()?`<span class="wp${wp>=0.25?' wp-hot':wp>=0.10?' wp-warm':''}">${(wp*100).toFixed(1)}%</span>`:'<span class="sna">—</span>';
     const payoutTag=pos===1?`<span class="payout-tag">$${payout1st.toLocaleString()}</span>`:pos===2?`<span class="payout-tag">$${payout2nd}</span>`:'';
     h+=`<tr class="pr${exp?' expanded':''}" onclick="toggleRow(${i})">`;
     h+=`<td>${medal}</td><td class="L"><span class="p-name">${esc(p.name)}</span>${payoutTag}<span class="chev${exp?' open':''}">▼</span></td>`;
-    h+=`<td><span class="tot${pos===1&&hasScores()?' lead':''}">${hasScores()?fmtTeamTotal(p.total):'<span class="sna">—</span>'}</span>${p.ua?'<span class="alt-in">ALT IN</span>':''}</td>`;
+    h+=`<td><span class="tot${pos===1&&isTourneyActive()?' lead':''}">${isTourneyActive()?fmtTeamTotal(p.total):'<span class="sna">—</span>'}</span>${p.ua?'<span class="alt-in">ALT IN</span>':''}</td>`;
     h+=`<td>${wpTxt}</td></tr>`;
     if(exp)h+=`<tr class="squad-tr"><td colspan="4">${buildSquad(p)}</td></tr>`;
   });
@@ -981,7 +983,7 @@ function renderStats(){
   let winnerHtml='<div class="winner-grid">';
   for(const[g,pickers]of winners){
     const o=ODDS[g]||'';
-    winnerHtml+=`<div class="winner-card"><div class="winner-name">${esc(g)}</div><div class="winner-odds ${oddsColor(o)}">${esc(o)}</div>${hasScores()?`<div style="margin-top:4px">${fmtGolfer(g)}</div>`:''}`;
+    winnerHtml+=`<div class="winner-card"><div class="winner-name">${esc(g)}</div><div class="winner-odds ${oddsColor(o)}">${esc(o)}</div>${isTourneyActive()?`<div style="margin-top:4px">${fmtGolfer(g)}</div>`:''}`;
     winnerHtml+=`<div class="winner-pickers">${pickers.map(n=>esc(n)).join('<br>')}</div>`;
     if(pickers.length>1)winnerHtml+=`<div class="winner-count">${pickers.length} picks</div>`;
     winnerHtml+='</div>';
@@ -995,7 +997,7 @@ function renderStats(){
     const pctBar=(count/totalParts*100).toFixed(0);
     const tier=count>=totalParts*0.75?'tier-high':count>=totalParts*0.25?'tier-mid':'tier-low';
     const o=ODDS[g]||'';
-    popHtml+=`<div class="pop-row"><span class="pop-name">${esc(g)}</span><span class="pop-odds ${oddsColor(o)}">${esc(o)}</span><div class="pop-bar-wrap"><div class="pop-bar ${tier}" style="width:${pctBar}%"></div></div><span class="pop-count">${count}/${totalParts}</span>${hasScores()?`<span class="pop-score-wrap">${fmtGolfer(g)}</span>`:''}</div>`;
+    popHtml+=`<div class="pop-row"><span class="pop-name">${esc(g)}</span><span class="pop-odds ${oddsColor(o)}">${esc(o)}</span><div class="pop-bar-wrap"><div class="pop-bar ${tier}" style="width:${pctBar}%"></div></div><span class="pop-count">${count}/${totalParts}</span>${isTourneyActive()?`<span class="pop-score-wrap">${fmtGolfer(g)}</span>`:''}</div>`;
   }
   popHtml+='</div>';
 
@@ -1007,7 +1009,7 @@ function renderStats(){
   let contHtml='<div class="cont-grid">';
   for(const c of contrarians){
     const o=ODDS[c.golfer]||'';
-    contHtml+=`<div class="cont-item"><div class="cont-golfer">${esc(c.golfer)} <span class="cont-odds ${oddsColor(o)}">${esc(o)}</span></div><div class="cont-owner">Only ${esc(c.owner)}</div>${hasScores()?`<div class="cont-score">${fmtGolfer(c.golfer)}</div>`:''}</div>`;
+    contHtml+=`<div class="cont-item"><div class="cont-golfer">${esc(c.golfer)} <span class="cont-odds ${oddsColor(o)}">${esc(o)}</span></div><div class="cont-owner">Only ${esc(c.owner)}</div>${isTourneyActive()?`<div class="cont-score">${fmtGolfer(c.golfer)}</div>`:''}</div>`;
   }
   contHtml+='</div>';
 
@@ -1034,7 +1036,7 @@ function renderStats(){
 
   // ── 6. Live tournament stats (conditional) ──
   let liveHtml='';
-  if(hasScores()){
+  if(isTourneyActive()){
     const golferVal=Object.entries(freq).filter(([g])=>!isWD(g)).map(([g,count])=>{const s=num(g);return{golfer:g,count,score:s,impact:s*count};});
     const best=golferVal.slice().sort((a,b)=>b.impact-a.impact)[0];
     const worst=golferVal.slice().sort((a,b)=>a.impact-b.impact)[0];
@@ -1201,7 +1203,7 @@ function renderMomentumChart(){
 // ██  CUT TRACKER  ██
 // ════════════════════════════════════════════════════════
 function renderCutTracker(){
-  if(!hasScores()||liveParts.length===0) return'';
+  if(!isTourneyActive()||liveParts.length===0) return'';
   // Estimate projected cut line (top 50 + ties after R2)
   const allScores=Object.entries(scores).filter(([,s])=>s.st!=='WD'&&s.st!=='CUT').map(([,s])=>parseInt(s.tp)).filter(n=>!isNaN(n)).sort((a,b)=>a-b);
   const cutLine=allScores.length>=50?allScores[49]:allScores[allScores.length-1]||0;
@@ -1237,7 +1239,7 @@ function renderCutTracker(){
 // ██  VALUE PICKS  ██
 // ════════════════════════════════════════════════════════
 function renderValuePicks(){
-  if(!hasScores()) return'';
+  if(!isTourneyActive()) return'';
   // Find golfers earning much more prize money than their odds implied
   const oddsEntries=Object.entries(ODDS).map(([n,o])=>({name:n,odds:parseInt(o)||99999})).sort((a,b)=>a.odds-b.odds);
   const oddsRank={};oddsEntries.forEach((e,i)=>oddsRank[e.name]=i+1);
