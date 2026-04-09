@@ -576,7 +576,7 @@ const FORM_EMBED_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdKnigB3p7isTO0
 
 // Picks lock at first tee
 const REVEAL_DATE = new Date('2026-04-09T08:00:00-04:00');
-const FORCE_REVEAL = true;  // preview mode
+const FORCE_REVEAL = true;  // set true to bypass lock for testing
 
 // ════════════════════════════════════════════════════════
 // Odds — Polymarket live + hardcoded fallback
@@ -878,7 +878,7 @@ function renderStandings(){
   const pot=ranked.length*120;const payout1st=pot-500;const payout2nd=500;
   document.getElementById('pot-total').textContent='$'+pot;
   const winProbs=isTourneyActive()?calcWinProbs(ranked):[];
-  let h='<table class="t"><thead><tr><th style="width:50px">Pos</th><th class="L">Participant</th><th>Prize $</th><th class="hide-m">Score</th><th>Win %</th></tr></thead><tbody>';
+  let h='<table class="t"><thead><tr><th style="width:50px">Pos</th><th class="L">Participant</th><th>Prize $</th><th>Score</th><th>Win %</th></tr></thead><tbody>';
   ranked.forEach((p,i)=>{
     const pos=i+1,medal=pos===1?'🥇':pos===2?'🥈':pos===3?'🥉':`<span class="rank-n">${pos}</span>`,exp=expanded.has(i);
     const wp=winProbs[i];
@@ -889,7 +889,7 @@ function renderStandings(){
     h+=`<tr class="pr${exp?' expanded':''}" onclick="toggleRow(${i})">`;
     h+=`<td>${medal}</td><td class="L"><span class="p-name">${esc(p.name)}</span>${payoutTag}<span class="chev${exp?' open':''}">▼</span></td>`;
     h+=`<td><span class="tot${pos===1&&isTourneyActive()?' lead':''}">${isTourneyActive()?fmtTeamTotal(p.total):'<span class="sna">—</span>'}</span>${p.ua?'<span class="alt-in">ALT IN</span>':''}</td>`;
-    h+=`<td class="hide-m">${scoreTxt}</td>`;
+    h+=`<td>${scoreTxt}</td>`;
     h+=`<td>${wpTxt}</td></tr>`;
     if(exp)h+=`<tr class="squad-tr"><td colspan="5">${buildSquad(p)}</td></tr>`;
   });
