@@ -1264,8 +1264,15 @@ function parseESPN(data){
   if(!evt){console.log('[Masters Pool] Masters not found in ESPN feed yet — skipping');return;}
   const comp=(evt.competitions||[])[0]||{};
   const st=(comp.status||{}).type||{};
-  if(st.name==='STATUS_IN_PROGRESS'){tourneyStatus='live';currentRound=comp.status?.period||1;roundLabel=`Round ${currentRound} · Live`;}
-  else if(st.name?.includes('FINAL')){tourneyStatus='final';currentRound=4;roundLabel='Final';}
+  // Treat any "in" state as live — covers STATUS_IN_PROGRESS during play AND any
+  // between-round/end-of-period lulls (e.g. R1 wrapped but R2 not started yet),
+  // which otherwise would flip us back to 'pre' and collapse the Forecast view.
+  if(st.state==='in'||st.name==='STATUS_IN_PROGRESS'||st.name?.includes('END_OF')){
+    tourneyStatus='live';
+    currentRound=comp.status?.period||1;
+    roundLabel=st.detail||`Round ${currentRound} · Live`;
+  }
+  else if(st.name?.includes('FINAL')||st.state==='post'){tourneyStatus='final';currentRound=4;roundLabel='Final';}
   else{tourneyStatus='pre';currentRound=0;roundLabel=(st.name||'').replace('STATUS_','').replace(/_/g,' ');}
   const ns={};
   for(const c of(comp.competitors||[])){
