@@ -1438,7 +1438,7 @@ function renderFieldLive(){
     const tee=fmtTeeTime(g.teeTime);
     h+=`<tr>`;
     h+=`<td class="field-lb-pos">${g.pos&&g.pos!=='-'?esc(g.pos):(i+1)}</td>`;
-    h+=`<td class="L">${img} <span class="field-lb-name">${esc(g.n)}</span>${fl}</td>`;
+    h+=`<td class="L">${img} <span class="field-lb-name">${esc(g.n)}${g.amateur?' <span class="amateur-tag">(a)</span>':''}</span>${fl}</td>`;
     h+=`<td class="field-lb-score">${fmt(g.tp)}</td>`;
     // When live: show hole if playing, tee time if not started yet, else thru text
     const notStarted = !g.hole && (parseTp(g.tp)===null||isNaN(parseTp(g.tp))) && (!g.thru || /scheduled|teeing/i.test(g.thru));
@@ -1768,7 +1768,8 @@ function renderOdds(){
     h+=`<tr class="${e.mine?'fc-mine':''} ${isOut?'fc-cut':''}">`;
     h+=`<td class="fc-pos">${pos}</td>`;
     h+=`<td class="hide-tab">${mvHtml}</td>`;
-    h+=`<td class="L"><div class="fc-player">${img}<span class="fc-name">${esc(e.n)}${star}</span>${fl}</div></td>`;
+    const amTag=s&&s.amateur?' <span class="amateur-tag">(a)</span>':'';
+    h+=`<td class="L"><div class="fc-player">${img}<span class="fc-name">${esc(e.n)}${star}${amTag}</span>${fl}</div></td>`;
     h+=`<td class="hide-m">${ownTxt}</td>`;
     h+=`<td class="fc-score">${scoreHtml}</td>`;
     h+=`<td>${todayHtml}</td>`;
