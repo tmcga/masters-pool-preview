@@ -933,7 +933,7 @@ function getOdds(name){
 // ════════════════════════════════════════════════════════
 // State
 // ════════════════════════════════════════════════════════
-let scores={}, tourneyStatus='idle', roundLabel='', currentRound=0, expanded=new Set(), expandedGolfers=new Set(), liveParts=[];
+let scores={}, tourneyStatus='idle', roundLabel='', currentRound=0, expanded=new Set(), expandedGolfers=new Set(), liveParts=[], espnCutScore=null;
 
 // ── HTML escape (prevent XSS from user-submitted names) ──
 const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -1274,6 +1274,10 @@ function parseESPN(data){
   }
   else if(st.name?.includes('FINAL')||st.state==='post'){tourneyStatus='final';currentRound=4;roundLabel='Final';}
   else{tourneyStatus='pre';currentRound=0;roundLabel=(st.name||'').replace('STATUS_','').replace(/_/g,' ');}
+  // ESPN-provided projected cut line (top 50 + ties, recomputed server-side per refresh).
+  // evt.tournament.cutScore is the score-to-par of the current 50th-place bubble.
+  // Null until ESPN populates it. renderCutTracker + Forecast header prefer this over our local estimate.
+  espnCutScore=(typeof evt.tournament?.cutScore==='number')?evt.tournament.cutScore:null;
   const ns={};
   for(const c of(comp.competitors||[])){
     const name=c.athlete?.displayName||'';if(!name)continue;
@@ -1573,7 +1577,9 @@ function renderOdds(){
   const active=Object.entries(scores).filter(([,s])=>s.st!=='WD'&&s.st!=='CUT');
   const underPar=active.filter(([,s])=>{const v=parseTp(s.tp);return!isNaN(v)&&v<0;}).length;
   const allScores=active.map(([,s])=>parseTp(s.tp)).filter(n=>!isNaN(n)).sort((a,b)=>a-b);
-  const cutLine=allScores.length>=50?allScores[49]:(allScores[allScores.length-1]||0);
+  // Prefer ESPN's server-side cut projection when available, else local estimate
+  const localCutLine=allScores.length>=50?allScores[49]:(allScores[allScores.length-1]||0);
+  const cutLine=(espnCutScore!==null)?espnCutScore:localCutLine;
   const cutTxt=cutLine>=0?(cutLine===0?'E':'+'+cutLine):String(cutLine);
   // Find leader and any tied co-leaders
   const ranked=active.map(([n,s])=>{const v=parseTp(s.tp);return{n,s,v:isNaN(v)?99:v};}).sort((a,b)=>a.v-b.v);
@@ -2107,11 +2113,13 @@ function renderMomentumChart(){
 // ════════════════════════════════════════════════════════
 function renderCutTracker(){
   if(!isTourneyActive()||liveParts.length===0) return'';
-  // Cut line: top 50 + ties after R2. During R1 it's a noisy estimate.
+  // Prefer ESPN's official projected cut line (tournament.cutScore — top 50 + ties,
+  // recomputed server-side). Fall back to our local estimate if ESPN hasn't populated it yet.
   const allScores=Object.entries(scores).filter(([,s])=>s.st!=='WD'&&s.st!=='CUT').map(([,s])=>parseTp(s.tp)).filter(n=>!isNaN(n)).sort((a,b)=>a-b);
-  const cutLine=allScores.length>=50?allScores[49]:allScores[allScores.length-1]||0;
+  const localCut=allScores.length>=50?allScores[49]:allScores[allScores.length-1]||0;
+  const cutLine=(espnCutScore!==null)?espnCutScore:localCut;
   const hasCuts=Object.values(scores).some(s=>s.st==='CUT');
-  const qualifier=hasCuts?' (official)':currentRound>=2?' (T50 after R2)':' (R1 estimate, noisy)';
+  const qualifier=hasCuts?' (official)':(espnCutScore!==null)?' (ESPN projection, top 50 + ties)':currentRound>=2?' (T50 after R2)':' (R1 estimate, noisy)';
   let html=`<div class="cut-projected">Projected cut line: <strong>${cutLine>=0?(cutLine===0?'E':'+'+cutLine):cutLine}</strong>${qualifier}</div>`;
   html+='<div class="cut-tracker-grid">';
   const ranked=liveParts.map(p=>{
