@@ -57,7 +57,7 @@ body { font-family:'Georgia',serif; background:#0a1f17; color:#fff; }
 /* ══ MAIN ════════════════════════════════════════════════ */
 .tab-panel { display:none; }
 .tab-panel.active { display:block; }
-.wrap { max-width:1100px; margin:0 auto; padding:24px 16px 60px; }
+.wrap { max-width:1100px; margin:0 auto; padding:24px 16px 60px; overflow-x:hidden; }
 
 /* ══ LOCK SCREEN ═════════════════════════════════════════ */
 .lock-box { background:linear-gradient(135deg,var(--green-deep),var(--green-row)); border:1px solid rgba(242,197,92,0.3); border-radius:12px; max-width:600px; margin:32px auto; padding:36px 28px; text-align:center; }
@@ -188,7 +188,7 @@ body { font-family:'Georgia',serif; background:#0a1f17; color:#fff; }
 .form-frame-wrap iframe { width:100%; height:3200px; border:none; display:block; }
 
 /* ══ STATS TAB ══════════════════════════════════════════ */
-.stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:24px; }
+.stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:24px; max-width:100%; overflow:hidden; }
 .stats-full { grid-column:1 / -1; }
 
 .coverage-body { text-align:center; padding:24px 20px; }
@@ -200,18 +200,17 @@ body { font-family:'Georgia',serif; background:#0a1f17; color:#fff; }
 .coverage-sub { font-size:0.78rem; color:#666; font-family:Arial,sans-serif; margin-top:8px; }
 
 .pop-list { padding:12px 16px; }
-.pop-row { display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px solid #f0f0f0; }
+.pop-row { display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid #f0f0f0; }
 .pop-row:last-child { border-bottom:none; }
-.pop-name { min-width:0; flex:0 1 140px; font-size:0.82rem; font-family:Arial,sans-serif; color:#222; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.pop-odds { min-width:52px; font-size:0.72rem; font-weight:700; text-align:right; }
-.pop-score-wrap { min-width:0; flex:0 1 90px; text-align:right; font-size:0.74rem; }
-.pop-bar-wrap { flex:1; height:22px; background:#f0f0f0; border-radius:4px; overflow:hidden; }
+.pop-name { width:130px; flex-shrink:0; font-size:0.82rem; font-family:Arial,sans-serif; color:#222; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.pop-odds { width:50px; flex-shrink:0; font-size:0.72rem; font-weight:700; text-align:right; }
+.pop-score-wrap { width:80px; flex-shrink:0; text-align:right; font-size:0.74rem; }
+.pop-bar-wrap { flex:1; min-width:40px; height:22px; background:#f0f0f0; border-radius:4px; overflow:hidden; }
 .pop-bar { height:100%; border-radius:4px; transition:width 0.4s ease; min-width:2px; }
 .pop-bar.tier-high { background:linear-gradient(90deg,#00573F,#00875F); }
 .pop-bar.tier-mid  { background:linear-gradient(90deg,#C9963B,#F2C55C); }
 .pop-bar.tier-low  { background:#d0d0d0; }
-.pop-count { min-width:36px; font-size:0.82rem; font-weight:700; color:#222; text-align:center; font-family:Arial,sans-serif; }
-.pop-score-wrap { min-width:0; flex:0 1 90px; text-align:right; font-size:0.74rem; }
+.pop-count { width:40px; flex-shrink:0; font-size:0.82rem; font-weight:700; color:#222; text-align:center; font-family:Arial,sans-serif; }
 
 .cont-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:8px; padding:12px 16px; }
 .cont-item { background:#fdf6e3; border:1px solid rgba(242,197,92,0.3); border-radius:8px; padding:12px 14px; }
@@ -228,10 +227,10 @@ body { font-family:'Georgia',serif; background:#0a1f17; color:#fff; }
 .winner-count { display:inline-block; background:var(--gold); color:#4a2c00; font-size:0.62rem; font-weight:700; padding:2px 10px; border-radius:10px; margin-top:6px; }
 
 .matrix-wrap { overflow-x:auto; padding:12px 16px; }
-.matrix { border-collapse:collapse; width:100%; }
+.matrix { border-collapse:collapse; }
 .matrix th { font-size:0.7rem; font-family:Arial,sans-serif; padding:8px 6px; color:#666; font-weight:600; }
-.matrix th.rotate { writing-mode:vertical-lr; text-orientation:mixed; transform:rotate(180deg); min-width:30px; white-space:nowrap; }
-.matrix td { text-align:center; padding:5px 4px; font-size:0.78rem; font-weight:700; font-family:Arial,sans-serif; border:1px solid #eee; min-width:40px; }
+.matrix th.rotate { writing-mode:vertical-lr; text-orientation:mixed; transform:rotate(180deg); min-width:26px; white-space:nowrap; font-size:0.6rem; }
+.matrix td { text-align:center; padding:4px 3px; font-size:0.72rem; font-weight:700; font-family:Arial,sans-serif; border:1px solid #eee; min-width:30px; }
 .matrix td.heat-0 { background:#f9f9f9;    color:#ccc; }
 .matrix td.heat-1 { background:#e8f5e9;    color:#388e3c; }
 .matrix td.heat-2 { background:#a5d6a7;    color:#1b5e20; }
@@ -254,10 +253,11 @@ body { font-family:'Georgia',serif; background:#0a1f17; color:#fff; }
 .footer { text-align:center; padding:20px; font-size:0.72rem; color:rgba(255,255,255,0.2); font-family:Arial,sans-serif; letter-spacing:1px; border-top:1px solid rgba(242,197,92,0.1); }
 @media(max-width:900px){
   .stats-grid{grid-template-columns:1fr;gap:16px;}
-  .matrix td{min-width:32px;padding:4px 2px;font-size:0.7rem;}
-  .matrix th.rotate{min-width:24px;font-size:0.55rem;}
-  .matrix th{padding:6px 3px;font-size:0.58rem;}
-  .pop-name{flex:0 1 100px;}
+  .matrix td{min-width:26px;padding:3px 2px;font-size:0.65rem;}
+  .matrix th.rotate{min-width:20px;font-size:0.5rem;}
+  .matrix th{padding:4px 2px;font-size:0.52rem;}
+  .pop-name{width:110px;}
+  .pop-odds{width:44px;font-size:0.65rem;}
   .live-stats-grid{grid-template-columns:1fr;}
   .winner-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));}
 }
@@ -314,20 +314,19 @@ body { font-family:'Georgia',serif; background:#0a1f17; color:#fff; }
   .cd-num{font-size:1.5rem;}
   /* ── Stats ── */
   .stats-grid{grid-template-columns:1fr;gap:16px;}
-  .pop-row{gap:6px;}
-  .pop-name{min-width:90px;font-size:0.74rem;}
+  .pop-row{gap:4px;}
+  .pop-name{width:80px;font-size:0.72rem;}
   .pop-odds{display:none;}
   .pop-bar-wrap{height:18px;}
-  .pop-count{font-size:0.74rem;min-width:30px;}
+  .pop-count{width:32px;font-size:0.72rem;}
   .pop-score-wrap{display:none;}
-  .pop-score{display:none;}
   .cont-grid{grid-template-columns:1fr;}
   .cont-item{padding:10px 12px;}
   .winner-grid{grid-template-columns:1fr;}
   .winner-card{padding:12px;}
-  .matrix th.rotate{font-size:0.58rem;min-width:28px;}
-  .matrix td{padding:5px 3px;font-size:0.72rem;min-width:34px;}
-  .matrix th{padding:6px 3px;font-size:0.62rem;}
+  .matrix th.rotate{font-size:0.46rem;min-width:18px;}
+  .matrix td{padding:3px 1px;font-size:0.58rem;min-width:18px;}
+  .matrix th{padding:3px 1px;font-size:0.46rem;}
   .live-stats-grid{grid-template-columns:1fr;}
   .live-stat-card{padding:14px;}
   .coverage-body{padding:18px 16px;}
@@ -576,7 +575,7 @@ const FORM_EMBED_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdKnigB3p7isTO0
 
 // Picks lock at first tee
 const REVEAL_DATE = new Date('2026-04-09T08:00:00-04:00');
-const FORCE_REVEAL = true;  // preview mode — reveals picks before tournament
+const FORCE_REVEAL = true;  // preview mode
 
 // ════════════════════════════════════════════════════════
 // Odds — Polymarket live + hardcoded fallback
@@ -744,6 +743,7 @@ function fmtTeamTotal(v){if(v===null||v===undefined)return'<span class="sna">—
 function numScore(n){const s=getScore(n);if(!s||isWD(n))return 0;const v=parseInt(s.tp);return isNaN(v)?0:v;}
 function num(n){return calcPrizeMoney(n);}
 function calcTeam(p){const sc=[...p.picks];let t=0,ua=false;for(const g of sc){if(isWD(g)&&!ua){t+=num(p.alternate);ua=true;}else t+=num(g);}return{t,ua};}
+function calcTeamScore(p){let t=0,ua=false;for(const g of p.picks){if(isWD(g)&&!ua){t+=numScore(p.alternate);ua=true;}else t+=numScore(g);}return t;}
 const hasScores=()=>Object.keys(scores).length>0;
 const isTourneyActive=()=>tourneyStatus==='live'||tourneyStatus==='final'||tourneyStatus==='demo';
 
@@ -877,17 +877,20 @@ function renderStandings(){
   const pot=ranked.length*120;const payout1st=pot-500;const payout2nd=500;
   document.getElementById('pot-total').textContent='$'+pot;
   const winProbs=isTourneyActive()?calcWinProbs(ranked):[];
-  let h='<table class="t"><thead><tr><th style="width:50px">Pos</th><th class="L">Participant</th><th>Prize $</th><th>Win %</th></tr></thead><tbody>';
+  let h='<table class="t"><thead><tr><th style="width:50px">Pos</th><th class="L">Participant</th><th>Prize $</th><th class="hide-m">Score</th><th>Win %</th></tr></thead><tbody>';
   ranked.forEach((p,i)=>{
     const pos=i+1,medal=pos===1?'🥇':pos===2?'🥈':pos===3?'🥉':`<span class="rank-n">${pos}</span>`,exp=expanded.has(i);
     const wp=winProbs[i];
     const wpTxt=isTourneyActive()?`<span class="wp${wp>=0.25?' wp-hot':wp>=0.10?' wp-warm':''}">${(wp*100).toFixed(1)}%</span>`:'<span class="sna">—</span>';
     const payoutTag=pos===1?`<span class="payout-tag">$${payout1st.toLocaleString()}</span>`:pos===2?`<span class="payout-tag">$${payout2nd}</span>`:'';
+    const teamScore=isTourneyActive()?calcTeamScore(p):null;
+    const scoreTxt=teamScore!==null?fmt(teamScore):'<span class="sna">—</span>';
     h+=`<tr class="pr${exp?' expanded':''}" onclick="toggleRow(${i})">`;
     h+=`<td>${medal}</td><td class="L"><span class="p-name">${esc(p.name)}</span>${payoutTag}<span class="chev${exp?' open':''}">▼</span></td>`;
     h+=`<td><span class="tot${pos===1&&isTourneyActive()?' lead':''}">${isTourneyActive()?fmtTeamTotal(p.total):'<span class="sna">—</span>'}</span>${p.ua?'<span class="alt-in">ALT IN</span>':''}</td>`;
+    h+=`<td class="hide-m">${scoreTxt}</td>`;
     h+=`<td>${wpTxt}</td></tr>`;
-    if(exp)h+=`<tr class="squad-tr"><td colspan="4">${buildSquad(p)}</td></tr>`;
+    if(exp)h+=`<tr class="squad-tr"><td colspan="5">${buildSquad(p)}</td></tr>`;
   });
   h+='</tbody></table>';
   el.innerHTML=h;
