@@ -1373,7 +1373,7 @@ function buildGolferDetail(g){
 function buildSquad(p){
   let ua=false;
   const ws=getScore(p.winner);
-  const wo=ODDS[p.winner]||'';
+  const wo=getOdds(p.winner);
   let wCard='<div class="squad-winner">';
   if(ws&&ws.headshot)wCard+=`<img class="squad-winner-img" src="${ws.headshot}" alt="" loading="lazy">`;
   else wCard+='<div class="squad-winner-img" style="background:var(--green-dark);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:1.2rem;font-weight:700">🏆</div>';
@@ -1388,14 +1388,14 @@ function buildSquad(p){
     const isWinner=normName(g)===normName(p.winner);
     const gwd=isWD(g);let cls=isWinner?'win':'',badge=isWinner?'<span class="sq-badge w">Win</span>':'';
     if(gwd&&!ua){cls='wdc';badge='<span class="sq-badge s">→Alt</span>';ua=true;}
-    const go=ODDS[g]||'';
+    const go=getOdds(g);
     const gs=getScore(g);const gTee=gs?fmtTeeTime(gs.teeTime):'';
     const gKey=normName(g),isExp=expandedGolfers.has(gKey);
     h+=`<div><div class="sq ${cls}" onclick="toggleGolfer('${gKey.replace(/'/g,"\\'")}',event)"><span>${badge}${esc(g)}</span><div class="sq-right"><span class="sq-score">${fmtGolfer(g)}</span><span class="sq-odds">${!isTourneyActive()&&gTee?gTee:esc(go)}</span></div></div>`;
     if(isExp)h+=buildGolferDetail(g);
     h+='</div>';
   });
-  const ao=ODDS[p.alternate]||'';
+  const ao=getOdds(p.alternate);
   const as=getScore(p.alternate);const aTee=as?fmtTeeTime(as.teeTime):'';
   const aKey=normName(p.alternate),aExp=expandedGolfers.has(aKey);
   h+=`<div><div class="sq alt" onclick="toggleGolfer('${aKey.replace(/'/g,"\\'")}',event)"><span><span class="sq-badge a">Alt</span>${esc(p.alternate)}</span><div class="sq-right"><span class="sq-score">${fmtGolfer(p.alternate)}</span><span class="sq-odds">${!isTourneyActive()&&aTee?aTee:esc(ao)}</span></div></div>`;
@@ -1653,7 +1653,7 @@ function renderOdds(){
   // Add any odds-only entries (golfers on the odds list but not yet in ESPN data — rare)
   for(const [n,o] of Object.entries(ODDS)){
     if(seen.has(normName(n)))continue;
-    entries.push({n,s:null,o,opening:OPENING_ODDS[n]||'',score:NaN,wp:0,own:own[normName(n)]||null,mine:myPicksSet.has(normName(n))});
+    entries.push({n,s:null,o,opening:getOpeningOdds(n),score:NaN,wp:0,own:own[normName(n)]||null,mine:myPicksSet.has(normName(n))});
   }
 
   // Filters
@@ -1828,10 +1828,10 @@ function renderStats(){
   // ── 2. Winner predictions ──
   const winnerMap={};
   for(const p of liveParts){if(!winnerMap[p.winner])winnerMap[p.winner]=[];winnerMap[p.winner].push(p.name);}
-  const winners=Object.entries(winnerMap).sort((a,b)=>b[1].length-a[1].length||(parseInt(ODDS[a[0]])||9999)-(parseInt(ODDS[b[0]])||9999));
+  const winners=Object.entries(winnerMap).sort((a,b)=>b[1].length-a[1].length||(parseInt(getOdds(a[0]))||9999)-(parseInt(getOdds(b[0]))||9999));
   let winnerHtml='<div class="winner-grid">';
   for(const[g,pickers]of winners){
-    const o=ODDS[g]||'';
+    const o=getOdds(g);
     winnerHtml+=`<div class="winner-card"><div class="winner-name">${esc(g)}</div><div class="winner-odds ${oddsColor(o)}">${esc(o)}</div>${isTourneyActive()?`<div style="margin-top:4px">${fmtGolfer(g)}</div>`:''}`;
     winnerHtml+=`<div class="winner-pickers">${pickers.map(n=>esc(n)).join('<br>')}</div>`;
     if(pickers.length>1)winnerHtml+=`<div class="winner-count">${pickers.length} picks</div>`;
@@ -1840,12 +1840,12 @@ function renderStats(){
   winnerHtml+='</div>';
 
   // ── 3. Pick popularity bars ──
-  const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]||(parseInt(ODDS[a[0]])||9999)-(parseInt(ODDS[b[0]])||9999));
+  const sorted=Object.entries(freq).sort((a,b)=>b[1]-a[1]||(parseInt(getOdds(a[0]))||9999)-(parseInt(getOdds(b[0]))||9999));
   let popHtml='<div class="pop-list">';
   for(const[g,count]of sorted){
     const pctBar=(count/totalParts*100).toFixed(0);
     const tier=count>=totalParts*0.75?'tier-high':count>=totalParts*0.25?'tier-mid':'tier-low';
-    const o=ODDS[g]||'';
+    const o=getOdds(g);
     popHtml+=`<div class="pop-row"><span class="pop-name">${esc(g)}</span><span class="pop-odds ${oddsColor(o)}">${esc(o)}</span><div class="pop-bar-wrap"><div class="pop-bar ${tier}" style="width:${pctBar}%"></div></div><span class="pop-count">${count}/${totalParts}</span>${isTourneyActive()?`<span class="pop-score-wrap">${fmtGolfer(g)}</span>`:''}</div>`;
   }
   popHtml+='</div>';
@@ -1854,10 +1854,10 @@ function renderStats(){
   const contrarians=Object.entries(freq).filter(([,c])=>c===1).map(([g])=>{
     const owner=liveParts.find(p=>p.picks.includes(g));
     return{golfer:g,owner:owner?owner.name:'?'};
-  }).sort((a,b)=>(parseInt(ODDS[a.golfer])||9999)-(parseInt(ODDS[b.golfer])||9999));
+  }).sort((a,b)=>(parseInt(getOdds(a.golfer))||9999)-(parseInt(getOdds(b.golfer))||9999));
   let contHtml='<div class="cont-grid">';
   for(const c of contrarians){
-    const o=ODDS[c.golfer]||'';
+    const o=getOdds(c.golfer);
     contHtml+=`<div class="cont-item"><div class="cont-golfer">${esc(c.golfer)} <span class="cont-odds ${oddsColor(o)}">${esc(o)}</span></div><div class="cont-owner">Only ${esc(c.owner)}</div>${isTourneyActive()?`<div class="cont-score">${fmtGolfer(c.golfer)}</div>`:''}</div>`;
   }
   contHtml+='</div>';
@@ -2135,7 +2135,7 @@ function renderValuePicks(){
     const oRank=oddsRank[g.name]||moneyList.length;
     const mRank=moneyRank[g.name]||moneyList.length;
     const delta=oRank-mRank;
-    return{...g,oddsRank:oRank,moneyRank:mRank,delta,odds:ODDS[g.name]||''};
+    return{...g,oddsRank:oRank,moneyRank:mRank,delta,odds:getOdds(g.name)};
   }).filter(g=>g.delta>10).sort((a,b)=>b.delta-a.delta).slice(0,8);
 
   if(values.length===0) return'<div class="value-empty">No standout value picks yet — check back as the tournament progresses.</div>';
@@ -2200,7 +2200,7 @@ function generateShareCard(pIndex){
   ctx.fillStyle='#F2C55C';ctx.font='bold 10px Arial';
   ctx.fillText('WINNER PICK',30,y);
   y+=16;
-  const ws=getScore(p.winner);const wo=ODDS[p.winner]||'';
+  const ws=getScore(p.winner);const wo=getOdds(p.winner);
   const wMoney=calcPrizeMoney(p.winner);
   ctx.fillStyle='#F2C55C';ctx.font='bold 14px Arial';
   ctx.fillText(`🏆  ${p.winner}`,30,y);
@@ -2253,7 +2253,7 @@ function generateShareCard(pIndex){
   const altMoney=hasScores()?num(p.alternate):null;
   ctx.fillStyle='#aaa';ctx.font='12px Arial';
   ctx.fillText(p.alternate,30,y);
-  const ao=ODDS[p.alternate]||'';
+  const ao=getOdds(p.alternate);
   if(ao){ctx.fillStyle='rgba(255,255,255,0.25)';ctx.font='11px Arial';ctx.fillText(ao,ctx.measureText(p.alternate).width+40,y);}
   if(altMoney!==null){ctx.textAlign='right';ctx.fillStyle=altMoney>0?'#66BB6A':'#999';ctx.font='bold 11px Arial';ctx.fillText(altMoney>0?'$'+altMoney.toLocaleString():'$0',W-30,y);ctx.textAlign='left';}
 
