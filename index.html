@@ -1395,7 +1395,10 @@ function renderFieldLive(){
     h+=`<td class="field-lb-pos">${g.pos&&g.pos!=='-'?esc(g.pos):(i+1)}</td>`;
     h+=`<td class="L">${img} <span class="field-lb-name">${esc(g.n)}</span>${fl}</td>`;
     h+=`<td class="field-lb-score">${fmt(g.tp)}</td>`;
-    h+=isLive?`<td class="field-lb-thru">${g.hole?'Hole '+g.hole:esc(g.thru||'')}</td>`:`<td class="field-lb-tee">${tee||esc(g.thru||'')}</td>`;
+    // When live: show hole if playing, tee time if not started yet, else thru text
+    const notStarted = !g.hole && (parseTp(g.tp)===null||isNaN(parseTp(g.tp))) && (!g.thru || /scheduled|teeing/i.test(g.thru));
+    const liveCell = g.hole ? 'Hole '+g.hole : (notStarted && tee ? tee+' ET' : esc(g.thru||'—'));
+    h+=isLive?`<td class="field-lb-thru">${liveCell}</td>`:`<td class="field-lb-tee">${tee||esc(g.thru||'')}</td>`;
     h+=`<td class="field-lb-odds hide-m ${oddsColor(o)}">${o||'—'}</td>`;
     h+=`</tr>`;
   });
@@ -1685,12 +1688,17 @@ function renderOdds(){
       const rd=(s.rounds||[]).find(r=>r.rd===currentRound);
       if(rd)todayHtml=`<span class="fc-today">${fmt(rd.toPar)}</span>`;
     }
-    // Thru
+    // Thru — show hole if playing, tee time if not started, else status text
     let thruHtml='<span class="sna">—</span>';
     if(s){
       if(isOut)thruHtml=s.st==='WD'?'<span class="swd">WD</span>':'<span class="scut">CUT</span>';
       else if(s.hole)thruHtml=`<span class="fc-thru">H${s.hole}</span>`;
-      else thruHtml=`<span class="fc-thru">${esc(s.thru||'')}</span>`;
+      else {
+        const notStarted = (parseTp(s.tp)===null||isNaN(parseTp(s.tp))) && (!s.thru || /scheduled|teeing/i.test(s.thru));
+        const tee = fmtTeeTime(s.teeTime);
+        if(notStarted && tee) thruHtml=`<span class="fc-thru">${tee} ET</span>`;
+        else thruHtml=`<span class="fc-thru">${esc(s.thru||'—')}</span>`;
+      }
     }
     // Rounds R1-R4
     const rdCells=[1,2,3,4].map(r=>{
