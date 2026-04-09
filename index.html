@@ -397,6 +397,16 @@ body.dark-mode .field-lb tbody tr:hover { background:rgba(255,255,255,0.04); }
   .talk-msg-body{font-size:0.82rem;}
 }
 
+.talk-pin-row { display:flex; gap:8px; margin-top:8px; }
+.talk-pin { background:rgba(255,255,255,0.06); border:1px solid rgba(242,197,92,0.2); color:#fff; padding:10px 14px; border-radius:8px; font-size:1rem; font-family:Arial,sans-serif; width:120px; text-align:center; letter-spacing:6px; outline:none; }
+.talk-pin::placeholder { letter-spacing:0; font-size:0.82rem; }
+.talk-pin-btn { background:var(--gold); color:#4a2c00; border:none; padding:10px 18px; border-radius:8px; font-size:0.82rem; font-family:Arial,sans-serif; font-weight:700; cursor:pointer; transition:background 0.2s; }
+.talk-pin-btn:hover { background:var(--gold-dark); }
+.talk-pin-msg { font-size:0.75rem; color:var(--muted); font-family:Arial,sans-serif; margin-top:6px; min-height:18px; }
+.talk-pin-msg.err { color:var(--red); }
+.talk-authed-name { font-size:0.72rem; color:var(--gold); font-family:Arial,sans-serif; font-weight:700; padding:6px 0 2px; white-space:nowrap; }
+@media(max-width:600px){ .talk-pin{width:100px;font-size:0.9rem;} }
+
 /* ══ DARK MODE ═══════════════════════════════════════════ */
 .dark-toggle { position:absolute; top:8px; right:14px; z-index:10; background:rgba(255,255,255,0.08); border:1px solid rgba(242,197,92,0.25); color:var(--gold); font-size:0.72rem; padding:5px 10px; border-radius:6px; cursor:pointer; font-family:Arial,sans-serif; transition:all 0.2s; }
 .dark-toggle:hover { background:rgba(242,197,92,0.15); }
@@ -634,10 +644,18 @@ body.dark-mode .value-badge { background:rgba(0,107,79,0.2); color:#66bb6a; bord
 <div class="wrap">
   <div class="talk-wrap">
     <div class="talk-compose">
-      <select class="talk-name-select" id="talk-name">
-        <option value="">Select your name…</option>
-      </select>
-      <div class="talk-input-row">
+      <div class="talk-auth" id="talk-auth">
+        <select class="talk-name-select" id="talk-name" onchange="onTalkNameChange()">
+          <option value="">Select your name…</option>
+        </select>
+        <div class="talk-pin-row" id="talk-pin-row" style="display:none">
+          <input class="talk-pin" id="talk-pin" type="tel" placeholder="4-digit PIN" maxlength="4" pattern="[0-9]*" inputmode="numeric">
+          <button class="talk-pin-btn" id="talk-pin-btn" onclick="verifyPin()">Go</button>
+        </div>
+        <div class="talk-pin-msg" id="talk-pin-msg"></div>
+      </div>
+      <div class="talk-input-row" id="talk-input-row" style="display:none">
+        <div class="talk-authed-name" id="talk-authed-name"></div>
         <input class="talk-input" id="talk-input" type="text" placeholder="Talk your trash…" maxlength="280">
         <button class="talk-send" id="talk-send" onclick="sendMessage()">Send</button>
       </div>
@@ -1603,7 +1621,7 @@ renderStats=function(){
 };
 
 // ════════════════════════════════════════════════════════
-// ██  TRASH TALK (Firebase)  ██
+// ██  TRASH TALK (Firebase + PIN Auth)  ██
 // ════════════════════════════════════════════════════════
 const firebaseConfig={
   apiKey:"AIzaSyCm_Y1sfHN2ner18alYY9uiQCC9PnIBt8w",
@@ -1615,6 +1633,7 @@ const firebaseConfig={
 };
 let db=null;
 const REACTIONS=['🔥','😂','💀','👍','👎','🤡'];
+let authedName='';
 try{
   firebase.initializeApp(firebaseConfig);
   db=firebase.firestore();
@@ -1624,21 +1643,99 @@ function populateTalkNames(){
   const sel=document.getElementById('talk-name');if(!sel)return;
   sel.innerHTML='<option value="">Select your name…</option>';
   for(const p of liveParts)sel.innerHTML+=`<option value="${esc(p.name)}">${esc(p.name)}</option>`;
-  // Remember last used name
-  try{const saved=localStorage.getItem('masters-talk-name');if(saved)sel.value=saved;}catch(e){}
+  // Auto-auth if we have saved credentials
+  try{
+    const saved=localStorage.getItem('masters-talk-auth');
+    if(saved){const{name,pin}=JSON.parse(saved);if(name&&pin){sel.value=name;autoAuth(name,pin);}}
+  }catch(e){}
+}
+
+function onTalkNameChange(){
+  const name=document.getElementById('talk-name').value;
+  const pinRow=document.getElementById('talk-pin-row');
+  const pinMsg=document.getElementById('talk-pin-msg');
+  const inputRow=document.getElementById('talk-input-row');
+  authedName='';
+  inputRow.style.display='none';
+  document.getElementById('talk-pin').value='';
+  pinMsg.textContent='';pinMsg.className='talk-pin-msg';
+  if(!name){pinRow.style.display='none';return;}
+  pinRow.style.display='flex';
+  // Check if this name already has a PIN set
+  if(!db)return;
+  db.collection('pins').doc(name).get().then(doc=>{
+    if(doc.exists){
+      pinMsg.textContent='Enter your 4-digit PIN to continue.';
+      document.getElementById('talk-pin-btn').textContent='Unlock';
+    }else{
+      pinMsg.textContent='First time? Set a 4-digit PIN to claim this name.';
+      document.getElementById('talk-pin-btn').textContent='Set PIN';
+    }
+  }).catch(()=>{pinMsg.textContent='Enter or set your PIN.';});
+}
+
+async function autoAuth(name,pin){
+  if(!db)return;
+  try{
+    const doc=await db.collection('pins').doc(name).get();
+    if(doc.exists&&doc.data().pin===pin){
+      authedName=name;
+      document.getElementById('talk-pin-row').style.display='none';
+      document.getElementById('talk-pin-msg').textContent='';
+      document.getElementById('talk-input-row').style.display='flex';
+      document.getElementById('talk-authed-name').textContent='Posting as '+name;
+    }else{
+      localStorage.removeItem('masters-talk-auth');
+      onTalkNameChange();
+    }
+  }catch(e){onTalkNameChange();}
+}
+
+async function verifyPin(){
+  if(!db)return;
+  const name=document.getElementById('talk-name').value.trim();
+  const pin=document.getElementById('talk-pin').value.trim();
+  const msg=document.getElementById('talk-pin-msg');
+  if(!name)return;
+  if(!/^\d{4}$/.test(pin)){msg.textContent='PIN must be exactly 4 digits.';msg.className='talk-pin-msg err';return;}
+  try{
+    const ref=db.collection('pins').doc(name);
+    const doc=await ref.get();
+    if(doc.exists){
+      // Verify existing PIN
+      if(doc.data().pin===pin){
+        authedName=name;
+        try{localStorage.setItem('masters-talk-auth',JSON.stringify({name,pin}));}catch(e){}
+        document.getElementById('talk-pin-row').style.display='none';
+        msg.textContent='';msg.className='talk-pin-msg';
+        document.getElementById('talk-input-row').style.display='flex';
+        document.getElementById('talk-authed-name').textContent='Posting as '+name;
+      }else{
+        msg.textContent='Wrong PIN. Try again.';msg.className='talk-pin-msg err';
+        document.getElementById('talk-pin').value='';
+      }
+    }else{
+      // Set new PIN
+      await ref.set({pin:pin,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+      authedName=name;
+      try{localStorage.setItem('masters-talk-auth',JSON.stringify({name,pin}));}catch(e){}
+      document.getElementById('talk-pin-row').style.display='none';
+      msg.textContent='';msg.className='talk-pin-msg';
+      document.getElementById('talk-input-row').style.display='flex';
+      document.getElementById('talk-authed-name').textContent='Posting as '+name;
+      showToast('PIN set! You own this name now.');
+    }
+  }catch(e){msg.textContent='Error verifying PIN. Try again.';msg.className='talk-pin-msg err';}
 }
 
 function sendMessage(){
   if(!db)return showToast('Chat unavailable');
-  const nameEl=document.getElementById('talk-name');
+  if(!authedName){showToast('Select your name and enter PIN first');return;}
   const inputEl=document.getElementById('talk-input');
-  const name=nameEl.value.trim();
   const text=inputEl.value.trim();
-  if(!name){showToast('Select your name first');return;}
-  if(!text){return;}
-  try{localStorage.setItem('masters-talk-name',name);}catch(e){}
+  if(!text)return;
   db.collection('messages').add({
-    name:name,
+    name:authedName,
     text:text,
     timestamp:firebase.firestore.FieldValue.serverTimestamp(),
     reactions:{}
@@ -1646,20 +1743,17 @@ function sendMessage(){
 }
 
 function toggleReaction(msgId,emoji){
-  if(!db)return;
-  const nameEl=document.getElementById('talk-name');
-  const name=nameEl.value.trim();
-  if(!name){showToast('Select your name to react');return;}
+  if(!db||!authedName){showToast('Sign in to react');return;}
   const ref=db.collection('messages').doc(msgId);
   ref.get().then(doc=>{
     if(!doc.exists)return;
     const reactions=doc.data().reactions||{};
     const users=reactions[emoji]||[];
-    if(users.includes(name)){
-      reactions[emoji]=users.filter(u=>u!==name);
+    if(users.includes(authedName)){
+      reactions[emoji]=users.filter(u=>u!==authedName);
       if(reactions[emoji].length===0)delete reactions[emoji];
     }else{
-      reactions[emoji]=[...users,name];
+      reactions[emoji]=[...users,authedName];
     }
     ref.update({reactions});
   });
@@ -1668,7 +1762,6 @@ function toggleReaction(msgId,emoji){
 function renderTalkFeed(messages){
   const feed=document.getElementById('talk-feed');if(!feed)return;
   if(messages.length===0){feed.innerHTML='<div class="talk-empty">No trash talk yet. Be the first to start it. 🗣️</div>';return;}
-  const currentName=document.getElementById('talk-name')?.value||'';
   let h='';
   for(const m of messages){
     const d=m.timestamp?.toDate?m.timestamp.toDate():new Date();
@@ -1679,7 +1772,7 @@ function renderTalkFeed(messages){
     const reactions=m.reactions||{};
     for(const emoji of REACTIONS){
       const users=reactions[emoji]||[];
-      const active=users.includes(currentName)?' active':'';
+      const active=users.includes(authedName)?' active':'';
       const count=users.length;
       h+=`<button class="talk-react-btn${active}" onclick="toggleReaction('${m.id}','${emoji}')" title="${users.join(', ')}">${emoji}${count?`<span class="talk-react-count">${count}</span>`:''}</button>`;
     }
@@ -1700,10 +1793,12 @@ function listenToMessages(){
   });
 }
 
-// Enter key sends
+// Enter key sends message or submits PIN
 document.addEventListener('DOMContentLoaded',()=>{
   const input=document.getElementById('talk-input');
   if(input)input.addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});
+  const pinInput=document.getElementById('talk-pin');
+  if(pinInput)pinInput.addEventListener('keydown',e=>{if(e.key==='Enter')verifyPin();});
 });
 
 // Start listening once picks load
