@@ -1000,7 +1000,7 @@ function fmtGolfer(n){
   if(!hasScores())return'—';const s=getScore(n);if(!s)return'<span class="sna">—</span>';
   if(!isTourneyActive())return'<span class="sna">—</span>';
   const money=calcPrizeMoney(n);
-  const parVal=parseInt(s.tp);const parStr=isWD(n)?'WD':isCut(n)?'CUT':isNaN(parVal)?'—':parVal<0?''+parVal:parVal===0?'E':'+'+parVal;
+  const parVal=parseTp(s.tp);const parStr=isWD(n)?'WD':isCut(n)?'CUT':isNaN(parVal)?'—':parVal<0?''+parVal:parVal===0?'E':'+'+parVal;
   if(money>0)return`<span class="smoney">$${money.toLocaleString()}</span> <span class="sq-score-par">(${parStr})</span>`;
   if(isWD(n))return'<span class="swd">WD</span>';
   if(isCut(n))return'<span class="scut">CUT · $0</span>';
@@ -1008,7 +1008,7 @@ function fmtGolfer(n){
 }
 function fmtMoney(v){if(v===null||v===undefined)return'<span class="sna">—</span>';if(typeof v==='number'){if(v===0)return'<span class="scut">$0</span>';return`<span class="smoney">$${v.toLocaleString()}</span>`;}return`<span class="se">${v}</span>`;}
 function fmtTeamTotal(v){if(v===null||v===undefined)return'<span class="sna">—</span>';if(v===0)return'<span class="sna">$0</span>';return`<span class="smoney">$${Number(v).toLocaleString()}</span>`;}
-function numScore(n){const s=getScore(n);if(!s||isWD(n))return 0;const v=parseInt(s.tp);return isNaN(v)?0:v;}
+function numScore(n){const s=getScore(n);if(!s||isWD(n))return 0;const v=parseTp(s.tp);return isNaN(v)?0:v;}
 function num(n){return calcPrizeMoney(n);}
 function calcTeam(p){const sc=[...p.picks];let t=0,ua=false;for(const g of sc){if(isWD(g)&&!ua){t+=num(p.alternate);ua=true;}else t+=num(g);}return{t,ua};}
 function calcTeamScore(p){let t=0,ua=false;for(const g of p.picks){if(isWD(g)&&!ua){t+=numScore(p.alternate);ua=true;}else t+=numScore(g);}return t;}
@@ -1417,7 +1417,7 @@ function renderFieldLive(){
   load.style.display='none';
   const sorted=Object.entries(scores).map(([n,s])=>({n,...s})).sort((a,b)=>{
     if(isWD(a.n)&&!isWD(b.n))return 1;if(!isWD(a.n)&&isWD(b.n))return-1;
-    return(isNaN(parseInt(a.tp))?999:parseInt(a.tp))-(isNaN(parseInt(b.tp))?999:parseInt(b.tp));
+    const av=parseTp(a.tp),bv=parseTp(b.tp);return(isNaN(av)?999:av)-(isNaN(bv)?999:bv);
   });
   const isLive=isTourneyActive();
   let h='<table class="field-lb"><thead><tr><th>Pos</th><th class="L">Player</th><th>Score</th>';
@@ -1527,7 +1527,7 @@ function renderOdds(){
     let entries=Object.entries(ODDS).map(([n,o])=>{const s=getScore(n);return{n,o,score:s?.tp??null,thru:s?.thru||'',headshot:s?.headshot||'',flag:s?.flag||'',country:s?.country||''};});
     if(q)entries=entries.filter(e=>e.n.toLowerCase().includes(q));
     if(sortBy==='name')entries.sort((a,b)=>a.n.localeCompare(b.n));
-    else if(sortBy==='score')entries.sort((a,b)=>(isNaN(parseInt(a.score))?999:parseInt(a.score))-(isNaN(parseInt(b.score))?999:parseInt(b.score)));
+    else if(sortBy==='score')entries.sort((a,b)=>{const av=parseTp(a.score),bv=parseTp(b.score);return(isNaN(av)?999:av)-(isNaN(bv)?999:bv);});
     else entries.sort((a,b)=>(isNaN(parseInt(a.o))?9999:parseInt(a.o))-(isNaN(parseInt(b.o))?9999:parseInt(b.o)));
     let h='<div class="odds-grid">';
     entries.forEach((e,i)=>{
@@ -1779,16 +1779,13 @@ function renderOdds(){
 // Value Picks as a horizontally-scrollable strip for the Forecast tab (moved from Stats tab)
 function renderValuePicksStrip(){
   if(!isTourneyActive())return'';
-  const oddsEntries=Object.entries(OPENING_ODDS).map(([n,o])=>({name:n,odds:parseInt(o)||99999})).sort((a,b)=>a.odds-b.odds);
-  const oddsRank={};oddsEntries.forEach((e,i)=>oddsRank[e.name]=i+1);
+  // Build both rankings keyed by ESPN canonical names — getOpeningOdds() handles all alias resolution
   const moneyList=Object.entries(scores).filter(([,s])=>s.st!=='WD'&&s.st!=='CUT').map(([n])=>({name:n,money:calcPrizeMoney(n)})).filter(g=>g.money>0).sort((a,b)=>b.money-a.money);
   const moneyRank={};moneyList.forEach((e,i)=>moneyRank[e.name]=i+1);
-  // Match odds ranks via normName (ESPN names may differ from OPENING_ODDS keys)
-  const oddsRankResolved={};
-  for(const k of Object.keys(oddsRank))oddsRankResolved[normName(k)]=oddsRank[k];
+  const oddsList=Object.keys(scores).map(n=>({name:n,odds:parseInt(getOpeningOdds(n))||99999})).sort((a,b)=>a.odds-b.odds);
+  const oddsRank={};oddsList.forEach((e,i)=>oddsRank[e.name]=i+1);
   const values=moneyList.map(g=>{
-    const nk=normName(g.name);
-    const oRank=oddsRankResolved[nk]||moneyList.length+50;
+    const oRank=oddsRank[g.name]||moneyList.length+50;
     const mRank=moneyRank[g.name]||moneyList.length;
     const delta=oRank-mRank;
     return{...g,oddsRank:oRank,moneyRank:mRank,delta};
@@ -2014,7 +2011,7 @@ function renderMomentumChart(){
         const s=getScore(g);
         if(!s||isWD(g))continue;
         let cumScore=0;
-        for(const rd of(s.rounds||[])){if(rd.rd<=r){const tp=parseInt(rd.toPar);if(!isNaN(tp))cumScore+=tp;}}
+        for(const rd of(s.rounds||[])){if(rd.rd<=r){const tp=parseTp(rd.toPar);if(!isNaN(tp))cumScore+=tp;}}
         total+=cumScore;
       }
       return{name:p.name,total};
@@ -2090,7 +2087,7 @@ function renderMomentumChart(){
 function renderCutTracker(){
   if(!isTourneyActive()||liveParts.length===0) return'';
   // Estimate projected cut line (top 50 + ties after R2)
-  const allScores=Object.entries(scores).filter(([,s])=>s.st!=='WD'&&s.st!=='CUT').map(([,s])=>parseInt(s.tp)).filter(n=>!isNaN(n)).sort((a,b)=>a-b);
+  const allScores=Object.entries(scores).filter(([,s])=>s.st!=='WD'&&s.st!=='CUT').map(([,s])=>parseTp(s.tp)).filter(n=>!isNaN(n)).sort((a,b)=>a-b);
   const cutLine=allScores.length>=50?allScores[49]:allScores[allScores.length-1]||0;
   const hasCuts=Object.values(scores).some(s=>s.st==='CUT');
   let html=`<div class="cut-projected">Projected cut line: <strong>${cutLine>=0?(cutLine===0?'E':'+'+cutLine):cutLine}</strong>${hasCuts?' (official)':' (estimated at T50)'}</div>`;
@@ -2101,7 +2098,7 @@ function renderCutTracker(){
       if(isWD(g)){wd++;continue;}
       if(isCut(g)){cut++;continue;}
       const s=getScore(g);if(!s)continue;
-      const v=parseInt(s.tp);
+      const v=parseTp(s.tp);
       if(isNaN(v))continue;
       if(v>cutLine)danger++;
       else safe++;
