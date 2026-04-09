@@ -1048,6 +1048,11 @@ function calcPrizeMoney(name){
   if(isWD(name))return 0;
   // 2025 rule: missed-cut professionals get $25k flat; amateurs are ineligible.
   if(isCut(name))return isAmateur(name)?0:MASTERS_MC_PAYOUT;
+  // Prefer ESPN's own earnings field when it's populated (happens at STATUS_FINAL
+  // Sunday evening). This guarantees exact 2026 numbers even if our hand-maintained
+  // MASTERS_PAYOUTS hasn't been updated. Falls through to position-based lookup
+  // during play when earnings=0.
+  if(s.earnings>0)return s.earnings;
   const parsed=parsePos(s.pos);
   if(!parsed)return 0;
   const{pos,tied}=parsed;
@@ -1298,7 +1303,11 @@ function parseESPN(data){
     const teeTime=c.status?.teeTime||'';
     const startHole=c.status?.startHole||1;
     const amateur=!!(c.amateur||c.athlete?.amateur);
-    ns[name]={tp,st:st2,thru:c.status?.type?.shortDetail||'',pos,mv,hole,headshot,flag,country,rounds,teeTime,startHole,amateur};
+    // ESPN populates c.earnings (number) at STATUS_FINAL with the official purse breakdown.
+    // Verified against the 2025 Masters final feed — matches MASTERS_PAYOUTS slot-for-slot
+    // including tie averaging. 0 during play, does NOT include the $25k MC payment.
+    const earnings=(typeof c.earnings==='number'&&c.earnings>0)?c.earnings:0;
+    ns[name]={tp,st:st2,thru:c.status?.type?.shortDetail||'',pos,mv,hole,headshot,flag,country,rounds,teeTime,startHole,amateur,earnings};
   }
   if(Object.keys(ns).length>0){scores=ns;buildNameMap();}
 }
