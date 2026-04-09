@@ -1019,6 +1019,11 @@ const hasScores=()=>Object.keys(scores).length>0;
 const isTourneyActive=()=>tourneyStatus==='live'||tourneyStatus==='final'||tourneyStatus==='demo';
 
 // ── Prize money (2025 Masters actuals — update when 2026 purse announced) ──
+// TODO Saturday AM 2026-04-11: Augusta announces 2026 purse + 50-position breakdown
+// after R2 cut is set. Update MASTERS_PURSE, MASTERS_MC_PAYOUT (might bump from $25k),
+// and all 50 entries in MASTERS_PAYOUTS below. Push to BOTH repos before R3 tee times
+// (~10 AM ET). Single localized change, no logic edits — every consumer reads from
+// these constants.
 const MASTERS_PURSE=21000000;
 // 2025 Masters: $25,000 to every PROFESSIONAL who misses the cut. Amateurs get $0.
 const MASTERS_MC_PAYOUT=25000;
