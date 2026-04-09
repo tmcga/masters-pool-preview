@@ -1072,7 +1072,9 @@ function renderStats(){
   // ── 1. Field Coverage donut ──
   const pct=totalField>0?uniqueGolfers/totalField:0;
   const R=52,SW=10,C=2*Math.PI*R,off=C*(1-pct);
-  let coverageHtml=`<div class="coverage-body"><div class="coverage-ring"><svg width="130" height="130" viewBox="0 0 130 130"><circle cx="65" cy="65" r="${R}" fill="none" stroke="#e0e0e0" stroke-width="${SW}"/><circle cx="65" cy="65" r="${R}" fill="none" stroke="#00573F" stroke-width="${SW}" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" stroke-linecap="round"/></svg><div class="coverage-ring-label"><span class="coverage-num">${uniqueGolfers}</span><span class="coverage-denom">of ${totalField}</span></div></div><div class="coverage-sub">${totalParts} participants · ${uniqueGolfers} unique golfers selected</div></div>`;
+  const teamKeys=new Set(liveParts.map(p=>[...p.picks].sort().join('|')));
+  const uniqueTeams=teamKeys.size;
+  let coverageHtml=`<div class="coverage-body"><div class="coverage-ring"><svg width="130" height="130" viewBox="0 0 130 130"><circle cx="65" cy="65" r="${R}" fill="none" stroke="#e0e0e0" stroke-width="${SW}"/><circle cx="65" cy="65" r="${R}" fill="none" stroke="#00573F" stroke-width="${SW}" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" stroke-linecap="round"/></svg><div class="coverage-ring-label"><span class="coverage-num">${uniqueGolfers}</span><span class="coverage-denom">of ${totalField}</span></div></div><div class="coverage-sub">${totalParts} participants · ${uniqueGolfers} unique golfers · <strong>${uniqueTeams}/${totalParts}</strong> unique teams</div></div>`;
 
   // ── 2. Winner predictions ──
   const winnerMap={};
