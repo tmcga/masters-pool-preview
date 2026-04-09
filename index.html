@@ -1040,22 +1040,6 @@ function normalCDF(x){
   const t=1/(1+p*x);const y=1-((((a5*t+a4)*t+a3)*t+a2)*t+a1)*t*Math.exp(-x*x);
   return 0.5*(1+sign*y);
 }
-function calcWinProbs(ranked){
-  const n=ranked.length;if(n===0)return[];
-  if(tourneyStatus==='final')return ranked.map((_,i)=>i===0?1:0);
-  const remRounds=Math.max(4-currentRound,0.5);
-  const teamSigma=300000; // per-round dollar volatility for 21-golfer team
-  const remSigma=Math.sqrt(remRounds)*teamSigma;
-  if(remSigma===0)return ranked.map((_,i)=>i===0?1:0);
-  const leader=ranked[0].total;
-  const raw=ranked.map(p=>{const gap=p.total-leader;return normalCDF(gap/remSigma);});
-  const sum=raw.reduce((a,b)=>a+b,0);
-  return raw.map(r=>sum>0?r/sum:1/n);
-}
-// Per-golfer win probability — model based on current score vs leader + rounds remaining.
-// Lower score is better. Uses normal CDF on strokes, with stdev ~3 strokes per round per golfer.
-// Returns { golferName: probability (0-1) } with probabilities summing to 1 across the active field.
-let golferWinProbMap={};
 // Parse a score-to-par value that could be "-5", "+3", "E", 0, or null → numeric strokes
 function parseTp(tp){
   if(tp===null||tp===undefined)return NaN;
@@ -1066,25 +1050,139 @@ function parseTp(tp){
   const n=parseInt(s);
   return isNaN(n)?NaN:n;
 }
-function calcGolferWinProbs(){
+
+// ── Monte Carlo win-probability model ───────────────────
+// One unified simulation populates BOTH per-golfer and per-team win probabilities,
+// guaranteeing they're internally consistent (computed from the same draws).
+//
+// Model:
+//   For each remaining round, each golfer's score = skill bonus + N(0, σ).
+//   Skill bonus is derived from OPENING odds (Polymarket/DraftKings before play),
+//   so a +400 favorite is expected to play ~1 stroke/round better than the field
+//   median, and a 1000:1 longshot is expected to play ~0.4 strokes/round worse.
+//   Final score = current ESPN score + Σ (skill + noise) over remaining rounds.
+//   In each sim we rank by final score, compute prize money via MASTERS_PAYOUTS,
+//   sum per team, and tally both the golfer winner and the team winner.
+let golferWinProbMap={};
+let teamWinProbMap={};
+const GOLFER_ROUND_SIGMA=3;     // strokes-per-round stdev (PGA Tour empirical ~2.7-3.5)
+const MC_SIMULATIONS=2000;      // monte carlo iterations per refresh
+const SKILL_SCALE=0.7;          // strokes/round per logit unit above the field median (calibrated to match market odds for top favorites)
+
+// Per-round skill bonus (negative = better than field) derived from opening odds
+function golferSkillBonus(name){
+  const o=getOpeningOdds(name);
+  if(!o)return 0;
+  const p=americanToProb(o);
+  if(p<=0||p>=1)return 0;
+  // logit transform spreads the implied probabilities into a near-linear skill scale.
+  // Median PGA pro is roughly p ≈ 0.012 (~1% to win). Use that as the zero point.
+  const logit=Math.log(p/(1-p));
+  const medianLogit=Math.log(0.012/(1-0.012)); // ≈ -4.40
+  return -SKILL_SCALE*(logit-medianLogit);
+}
+
+// Box-Muller normal sampler
+function _rnorm(){
+  let u=0,v=0;
+  while(u===0)u=Math.random();
+  while(v===0)v=Math.random();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+}
+
+function runSimulations(){
   golferWinProbMap={};
-  if(!hasScores()||!isTourneyActive())return golferWinProbMap;
-  const active=Object.entries(scores).filter(([,s])=>s.st!=='WD'&&s.st!=='CUT').map(([n,s])=>{const v=parseTp(s.tp);return{n,score:isNaN(v)?99:v};}).sort((a,b)=>a.score-b.score);
-  if(active.length===0)return golferWinProbMap;
-  if(tourneyStatus==='final'){golferWinProbMap[active[0].n]=1;return golferWinProbMap;}
-  // Remaining rounds: if currentRound=2 mid-play, ~2.5 rounds to go. Use 4-currentRound+0.5 floor 0.5.
+  teamWinProbMap={};
+  if(!hasScores()||!isTourneyActive())return;
+  // Active = golfers still capable of earning prize money
+  const active=Object.entries(scores).filter(([,s])=>s.st!=='WD'&&s.st!=='CUT').map(([n,s])=>{const v=parseTp(s.tp);return{n,score:isNaN(v)?99:v,skill:golferSkillBonus(n)};});
+  if(active.length===0)return;
+
+  // Final state — deterministic, no randomness needed
+  if(tourneyStatus==='final'){
+    const sorted=active.slice().sort((a,b)=>a.score-b.score);
+    if(sorted.length>0)golferWinProbMap[sorted[0].n]=1;
+    let bestTeam=null,bestTotal=-1;
+    for(const p of liveParts){
+      const{t}=calcTeam(p);
+      if(t>bestTotal){bestTotal=t;bestTeam=p.name;}
+    }
+    if(bestTeam)teamWinProbMap[bestTeam]=1;
+    return;
+  }
+
   const remRounds=Math.max(4-currentRound+0.5,0.5);
-  const golferSigma=3; // strokes stdev per round per golfer
-  // Difference between two golfers has sigma = sigma * sqrt(2 * remRounds)
-  const diffSigma=Math.sqrt(2*remRounds)*golferSigma;
-  const leader=active[0].score;
-  const raw=active.map(g=>{
-    const gap=leader-g.score; // ≤0; leader has gap=0 → CDF=0.5, everyone else < 0.5
-    return normalCDF(gap/diffSigma);
+  const noiseSigma=Math.sqrt(remRounds)*GOLFER_ROUND_SIGMA;
+  const A=active.length;
+  const N=MC_SIMULATIONS;
+
+  // Build name → active-index map and pre-compute per-team contribution plans.
+  // Each plan is the list of active-indices that count toward this team's prize total
+  // (with WD substitution and CUT-as-zero already resolved from current ESPN data).
+  const nameIdx={};
+  active.forEach((g,i)=>{nameIdx[g.n]=i;});
+  const teamPlans=liveParts.map(p=>{
+    let altUsed=false;
+    const liveIdxs=[];
+    for(const g of (p.picks||[])){
+      if(isWD(g)){
+        if(!altUsed){
+          const ai=nameIdx[resolveName(p.alternate||'')];
+          if(ai!==undefined)liveIdxs.push(ai);
+          altUsed=true;
+        }
+        // else: no second sub allowed → contributes 0
+      }else if(isCut(g)){
+        // CUT golfers earn $0 → skip
+      }else{
+        const i=nameIdx[resolveName(g)];
+        if(i!==undefined)liveIdxs.push(i);
+      }
+    }
+    return{name:p.name,liveIdxs};
   });
-  const sum=raw.reduce((a,b)=>a+b,0);
-  active.forEach((g,i)=>{golferWinProbMap[g.n]=sum>0?raw[i]/sum:1/active.length;});
-  return golferWinProbMap;
+
+  // Pre-allocate scratch buffers reused across sims for speed
+  const finalScores=new Float64Array(A);
+  const sortedIdxs=new Int32Array(A);
+  for(let i=0;i<A;i++)sortedIdxs[i]=i;
+  const prize=new Float64Array(A);
+  const golferWins=new Int32Array(A);
+  const teamWins=new Int32Array(teamPlans.length);
+
+  // Baseline expected score after remaining play (current + skill drift)
+  const expected=new Float64Array(A);
+  for(let i=0;i<A;i++)expected[i]=active[i].score+remRounds*active[i].skill;
+
+  for(let sim=0;sim<N;sim++){
+    // Sample each golfer's final score
+    for(let i=0;i<A;i++){
+      finalScores[i]=expected[i]+_rnorm()*noiseSigma;
+    }
+    // Sort active indices by final score ascending (lowest = best)
+    // Convert to plain array for .sort closure
+    const idx=Array.from(sortedIdxs);
+    idx.sort((a,b)=>finalScores[a]-finalScores[b]);
+    // Tally golfer winner
+    golferWins[idx[0]]++;
+    // Compute prize per golfer based on this sim's ranking
+    prize.fill(0);
+    const cap=Math.min(idx.length,MASTERS_PAYOUTS.length);
+    for(let r=0;r<cap;r++)prize[idx[r]]=MASTERS_PAYOUTS[r];
+    // Compute each team's total and find the team winner
+    let bestTeam=-1,bestTotal=-1;
+    for(let t=0;t<teamPlans.length;t++){
+      const lp=teamPlans[t].liveIdxs;
+      let total=0;
+      for(let k=0;k<lp.length;k++)total+=prize[lp[k]];
+      if(total>bestTotal){bestTotal=total;bestTeam=t;}
+    }
+    if(bestTeam>=0)teamWins[bestTeam]++;
+  }
+
+  // Materialize results into the maps
+  for(let i=0;i<A;i++)golferWinProbMap[active[i].n]=golferWins[i]/N;
+  for(let t=0;t<teamPlans.length;t++)teamWinProbMap[teamPlans[t].name]=teamWins[t]/N;
 }
 
 // ── ESPN fetch ───────────────────────────────────────────
@@ -1160,11 +1258,10 @@ function renderStandings(){
   const pot=ranked.length*120;const payout1st=pot-500;const payout2nd=500;
   document.getElementById('pot-total').textContent='$'+pot;
   document.getElementById('payout-1st').textContent='$'+payout1st.toLocaleString();
-  const winProbs=isTourneyActive()?calcWinProbs(ranked):[];
   let h='<table class="t"><thead><tr><th style="width:50px">Pos</th><th class="L">Participant</th><th>Prize $</th><th>Score</th><th>Win %</th></tr></thead><tbody>';
   ranked.forEach((p,i)=>{
     const pos=i+1,medal=pos===1?'🥇':pos===2?'🥈':pos===3?'🥉':`<span class="rank-n">${pos}</span>`,exp=expanded.has(i);
-    const wp=winProbs[i];
+    const wp=teamWinProbMap[p.name]||0;
     const wpTxt=isTourneyActive()?`<span class="wp${wp>=0.25?' wp-hot':wp>=0.10?' wp-warm':''}">${(wp*100).toFixed(1)}%</span>`:'<span class="sna">—</span>';
     const payoutTag=pos===1?`<span class="payout-tag">$${payout1st.toLocaleString()}</span>`:pos===2?`<span class="payout-tag">$${payout2nd}</span>`:'';
     const teamScore=isTourneyActive()?calcTeamScore(p):null;
@@ -1384,8 +1481,7 @@ function renderOdds(){
   }
 
   // ── LIVE / FINAL forecast view ──
-  // Recompute live helpers
-  calcGolferWinProbs();
+  // Win-prob maps (golferWinProbMap, teamWinProbMap) are populated by runSimulations() in doRefresh.
   const own=computeOwnership();
   const myName=getSavedTalkName();
   const myPicksSet=new Set();
@@ -1736,6 +1832,8 @@ async function doRefresh(){
   // Preview/test override: force the Forecast view with demo data even when ESPN says pre-tournament
   if(FORCE_LIVE&&(tourneyStatus==='pre'||tourneyStatus==='idle'))loadDemo();
   if(espnRes&&liveParts.length>0)warnUnmatched();
+  // Run Monte Carlo simulations once per refresh to populate per-golfer + per-team win probabilities
+  runSimulations();
   if(isRevealed()){renderStandings();renderFieldLive();renderStats();}else{updateLockedNames();}
   renderOdds();
   const lr=document.getElementById('last-refresh');
