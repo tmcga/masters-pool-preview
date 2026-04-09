@@ -179,6 +179,30 @@ body { font-family:'Georgia',serif; background:#0a1f17; color:#fff; }
 .odds-field{ color:#bbb; font-size:0.75rem; }
 .odds-thru { font-size:0.7rem; color:#999; min-width:26px; text-align:center; }
 
+/* ══ FIELD LEADERBOARD (Masters LB on standings tab) ════ */
+.field-lb { width:100%; border-collapse:collapse; font-family:Arial,sans-serif; }
+.field-lb thead tr { background:var(--green-dark); }
+.field-lb th { padding:8px 10px; font-size:0.62rem; text-transform:uppercase; letter-spacing:1px; color:#fff; font-weight:600; text-align:center; }
+.field-lb th.L { text-align:left; }
+.field-lb td { padding:7px 10px; font-size:0.8rem; color:#222; border-bottom:1px solid #eee; vertical-align:middle; }
+.field-lb tbody tr:hover { background:#f5f5f5; }
+body.dark-mode .field-lb td { color:#e0e0e0; border-bottom-color:rgba(255,255,255,0.06); }
+body.dark-mode .field-lb tbody tr:hover { background:rgba(255,255,255,0.04); }
+.field-lb-photo { width:28px; height:28px; border-radius:50%; object-fit:cover; border:1.5px solid #e0e0e0; vertical-align:middle; }
+.field-lb-flag { width:16px; height:12px; object-fit:cover; border-radius:1px; vertical-align:middle; margin-left:4px; }
+.field-lb-name { font-weight:600; }
+.field-lb-tee { font-size:0.72rem; color:#888; text-align:center; }
+.field-lb-odds { font-weight:700; font-size:0.78rem; text-align:right; }
+.field-lb-score { font-weight:700; text-align:center; }
+.field-lb-pos { text-align:center; font-size:0.78rem; color:#999; min-width:30px; }
+.field-lb-thru { font-size:0.72rem; color:#888; text-align:center; }
+@media(max-width:600px){
+  .field-lb td,.field-lb th{padding:5px 6px;font-size:0.72rem;}
+  .field-lb-photo{width:22px;height:22px;}
+  .field-lb-flag{display:none;}
+  .field-lb-odds{display:none;}
+}
+
 /* ══ SIGNUP TAB ══════════════════════════════════════════ */
 .signup-wrap { max-width:860px; margin:0 auto; }
 .signup-notice { background:rgba(242,197,92,0.07); border:1px solid rgba(242,197,92,0.25); border-radius:10px; padding:18px 22px; margin-bottom:20px; font-family:Arial,sans-serif; }
@@ -848,7 +872,9 @@ function parseESPN(data){
     const headshot=c.athlete?.headshot?.href||'';
     const flag=c.athlete?.flag?.href||'';
     const country=c.athlete?.flag?.alt||'';
-    ns[name]={tp,st:st2,thru:c.status?.type?.shortDetail||'',pos,mv,hole,headshot,flag,country,rounds};
+    const teeTime=c.status?.teeTime||'';
+    const startHole=c.status?.startHole||1;
+    ns[name]={tp,st:st2,thru:c.status?.type?.shortDetail||'',pos,mv,hole,headshot,flag,country,rounds,teeTime,startHole};
   }
   if(Object.keys(ns).length>0){scores=ns;buildNameMap();}
 }
@@ -969,6 +995,10 @@ function toggleGolfer(key,evt){evt.stopPropagation();if(expandedGolfers.has(key)
 function toggleRow(idx){if(expanded.has(idx))expanded.delete(idx);else expanded.add(idx);renderStandings();}
 
 // ── Live field (standings tab) ────────────────────────────
+function fmtTeeTime(iso){
+  if(!iso)return'';
+  try{const d=new Date(iso);return d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',timeZone:'America/New_York'}).replace(' ','');}catch(e){return'';}
+}
 function renderFieldLive(){
   const load=document.getElementById('field-live-loading'),bd=document.getElementById('field-live');
   if(!hasScores()){load.style.display='block';bd.innerHTML='';return;}
@@ -977,9 +1007,29 @@ function renderFieldLive(){
     if(isWD(a.n)&&!isWD(b.n))return 1;if(!isWD(a.n)&&isWD(b.n))return-1;
     return(isNaN(parseInt(a.tp))?999:parseInt(a.tp))-(isNaN(parseInt(b.tp))?999:parseInt(b.tp));
   });
-  let h='<div class="odds-grid">';
-  sorted.forEach((g,i)=>{const o=getOdds(g.n);h+=`<div class="odds-item"><span class="odds-pos">${i+1}</span><span class="odds-name">${g.n}</span><span class="odds-thru">${g.thru||''}</span><span class="odds-val ${oddsColor(o)}">${o}</span><span style="margin-left:8px">${fmt(g.tp)}</span></div>`;});
-  bd.innerHTML=h+'</div>';
+  const isLive=isTourneyActive();
+  let h='<table class="field-lb"><thead><tr><th>Pos</th><th class="L">Player</th>';
+  if(isLive)h+='<th>Score</th><th>Thru</th>';
+  else h+='<th>Tee Time</th>';
+  h+='<th class="hide-m">Odds</th></tr></thead><tbody>';
+  sorted.forEach((g,i)=>{
+    const o=getOdds(g.n);
+    const img=g.headshot?`<img class="field-lb-photo" src="${g.headshot}" alt="" loading="lazy">`:'';
+    const fl=g.flag?`<img class="field-lb-flag" src="${g.flag}" alt="${esc(g.country||'')}" title="${esc(g.country||'')}" loading="lazy">`:'';
+    const tee=fmtTeeTime(g.teeTime);
+    h+=`<tr>`;
+    h+=`<td class="field-lb-pos">${g.pos&&g.pos!=='-'?esc(g.pos):(i+1)}</td>`;
+    h+=`<td class="L">${img} <span class="field-lb-name">${esc(g.n)}</span>${fl}</td>`;
+    if(isLive){
+      h+=`<td class="field-lb-score">${fmt(g.tp)}</td>`;
+      h+=`<td class="field-lb-thru">${g.hole?'Hole '+g.hole:esc(g.thru||'')}</td>`;
+    }else{
+      h+=`<td class="field-lb-tee">${tee||esc(g.thru||'')}</td>`;
+    }
+    h+=`<td class="field-lb-odds hide-m ${oddsColor(o)}">${o||'—'}</td>`;
+    h+=`</tr>`;
+  });
+  bd.innerHTML=h+'</tbody></table>';
 }
 
 // ── Odds tab ─────────────────────────────────────────────
