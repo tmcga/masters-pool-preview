@@ -947,12 +947,19 @@ function showTab(name,btn){
 }
 
 // ── Name normalization ───────────────────────────────────
-const normName=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[øØ]/g,'o').toLowerCase().replace(/\s+/g,' ').trim();
-// Alias groups: all normalized variants of the same golfer
+// Strip diacritics, ø, dots, and hyphens; lowercase; collapse whitespace.
+// "J.J. Spaun" / "J. J. Spaun" → "jj spaun" / "j j spaun" (the latter handled by aliases below).
+// "Hao-Tong Li" / "Haotong Li" → both → "haotong li".
+const normName=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[øØ]/g,'o').toLowerCase().replace(/[.\-]/g,'').replace(/\s+/g,' ').trim();
+// Alias groups: all normalized variants of the same golfer (post-normName form).
+// Used to bridge ESPN <-> Polymarket <-> picks.json name differences.
 const NAME_ALIAS_GROUPS=[
-  ['sungjae im','im sung-jae','im sungjae'],
-  ['fifa laopakdee','pongsapak laopakdee'],
-  ['nicolai hojgaard','nicolai højgaard'],
+  ['sungjae im','im sungjae'],                    // ESPN/picks vs polymarket word order
+  ['fifa laopakdee','pongsapak laopakdee'],       // nickname vs legal name
+  ['nicolai hojgaard','nicolai højgaard'],        // ø handled by normName, kept defensively
+  ['nico echavarria','nicolas echavarria'],       // polymarket uses long form
+  ['alex noren','alexander noren'],               // polymarket uses long form
+  ['jj spaun','j j spaun'],                       // polymarket "J. J. Spaun" → "j j spaun"
 ];
 const nameMap={};
 function buildNameMap(){
