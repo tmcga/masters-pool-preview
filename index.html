@@ -587,6 +587,8 @@ body.dark-mode .smoney { color:#66BB6A; }
 .sq-score-par { font-size:0.7rem; color:#999; font-weight:400; }
 .payout-tag { font-size:0.62rem; color:var(--gold-dark); background:rgba(242,197,92,0.1); border:1px solid rgba(242,197,92,0.2); padding:1px 6px; border-radius:4px; margin-left:4px; font-family:Arial,sans-serif; }
 body.dark-mode .payout-tag { background:rgba(242,197,92,0.08); border-color:rgba(242,197,92,0.15); color:var(--gold); }
+.amateur-tag { font-size:0.62rem; color:#888; font-style:italic; font-family:Arial,sans-serif; margin-left:3px; font-weight:400; }
+body.dark-mode .amateur-tag { color:#aaa; }
 
 /* ══ MOMENTUM CHART ═════════════════════════════════════ */
 .momentum-wrap { position:relative; width:100%; overflow-x:auto; padding:16px; }
@@ -996,6 +998,7 @@ function fmt(v){
 function getScore(n){return scores[n]||scores[resolveName(n)]||null;}
 const isWD=n=>{const s=getScore(n);return s&&(s.st==='WD'||String(s.tp).toUpperCase()==='WD');};
 const isCut=n=>{const s=getScore(n);return s&&s.st==='CUT';};
+const isAmateur=n=>{const s=getScore(n);return!!(s&&s.amateur);};
 function fmtGolfer(n){
   if(!hasScores())return'—';const s=getScore(n);if(!s)return'<span class="sna">—</span>';
   if(!isTourneyActive())return'<span class="sna">—</span>';
@@ -1003,7 +1006,7 @@ function fmtGolfer(n){
   const parVal=parseTp(s.tp);const parStr=isWD(n)?'WD':isCut(n)?'CUT':isNaN(parVal)?'—':parVal<0?''+parVal:parVal===0?'E':'+'+parVal;
   if(money>0)return`<span class="smoney">$${money.toLocaleString()}</span> <span class="sq-score-par">(${parStr})</span>`;
   if(isWD(n))return'<span class="swd">WD</span>';
-  if(isCut(n))return'<span class="scut">CUT · $0</span>';
+  if(isCut(n))return isAmateur(n)?'<span class="scut">CUT · $0 (am)</span>':'<span class="scut">CUT · $0</span>';
   return`${fmt(s.tp)} <span class="sq-score-par">$0</span>`;
 }
 function fmtMoney(v){if(v===null||v===undefined)return'<span class="sna">—</span>';if(typeof v==='number'){if(v===0)return'<span class="scut">$0</span>';return`<span class="smoney">$${v.toLocaleString()}</span>`;}return`<span class="se">${v}</span>`;}
@@ -1017,6 +1020,8 @@ const isTourneyActive=()=>tourneyStatus==='live'||tourneyStatus==='final'||tourn
 
 // ── Prize money (2025 Masters actuals — update when 2026 purse announced) ──
 const MASTERS_PURSE=21000000;
+// 2025 Masters: $25,000 to every PROFESSIONAL who misses the cut. Amateurs get $0.
+const MASTERS_MC_PAYOUT=25000;
 const MASTERS_PAYOUTS=[
   4200000,2268000,1428000,1008000,840000,756000,703500,651000,609000,567000,  // 1-10
   525000,483000,441000,399000,378000,357000,336000,315000,294000,273000,       // 11-20
@@ -1035,7 +1040,9 @@ function parsePos(posStr){
 function calcPrizeMoney(name){
   const s=getScore(name);
   if(!s)return 0;
-  if(isWD(name)||isCut(name))return 0;
+  if(isWD(name))return 0;
+  // 2025 rule: missed-cut professionals get $25k flat; amateurs are ineligible.
+  if(isCut(name))return isAmateur(name)?0:MASTERS_MC_PAYOUT;
   const parsed=parsePos(s.pos);
   if(!parsed)return 0;
   const{pos,tied}=parsed;
@@ -1274,7 +1281,8 @@ function parseESPN(data){
     const country=c.athlete?.flag?.alt||'';
     const teeTime=c.status?.teeTime||'';
     const startHole=c.status?.startHole||1;
-    ns[name]={tp,st:st2,thru:c.status?.type?.shortDetail||'',pos,mv,hole,headshot,flag,country,rounds,teeTime,startHole};
+    const amateur=!!(c.amateur||c.athlete?.amateur);
+    ns[name]={tp,st:st2,thru:c.status?.type?.shortDetail||'',pos,mv,hole,headshot,flag,country,rounds,teeTime,startHole,amateur};
   }
   if(Object.keys(ns).length>0){scores=ns;buildNameMap();}
 }
@@ -1337,7 +1345,7 @@ function buildGolferDetail(g){
   if(!s||!hasScores())return'<div class="sq-detail"><span class="sq-status-line">No scoring data available yet.</span></div>';
   let h='<div class="sq-detail"><div class="sq-detail-hdr">';
   if(s.headshot)h+=`<img class="sq-headshot" src="${s.headshot}" alt="" loading="lazy">`;
-  h+=`<div><div class="sq-detail-name">${esc(g)}`;
+  h+=`<div><div class="sq-detail-name">${esc(g)}${isAmateur(g)?' <span class="amateur-tag">(a)</span>':''}`;
   if(s.flag)h+=` <img class="sq-flag" src="${s.flag}" alt="${esc(s.country||'')}" loading="lazy">`;
   h+='</div><div>';
   if(s.pos)h+=`<span class="sq-pos-badge">${esc(s.pos)}</span> `;
@@ -1377,7 +1385,7 @@ function buildSquad(p){
   let wCard='<div class="squad-winner">';
   if(ws&&ws.headshot)wCard+=`<img class="squad-winner-img" src="${ws.headshot}" alt="" loading="lazy">`;
   else wCard+='<div class="squad-winner-img" style="background:var(--green-dark);display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:1.2rem;font-weight:700">🏆</div>';
-  wCard+=`<div class="squad-winner-info"><div class="squad-winner-label">Winner Pick</div><div class="squad-winner-name">${esc(p.winner)}`;
+  wCard+=`<div class="squad-winner-info"><div class="squad-winner-label">Winner Pick</div><div class="squad-winner-name">${esc(p.winner)}${isAmateur(p.winner)?' <span class="amateur-tag">(a)</span>':''}`;
   if(ws&&ws.flag)wCard+=` <img class="sq-flag" src="${ws.flag}" alt="${esc(ws.country||'')}" loading="lazy">`;
   const wTee=ws?fmtTeeTime(ws.teeTime):'';
   wCard+=`</div><div class="squad-winner-meta">${esc(wo)}${ws&&ws.pos&&ws.pos!=='-'?' · '+esc(ws.pos):''}${wTee&&!isTourneyActive()?' · '+wTee+' ET':''}</div></div>`;
@@ -1391,14 +1399,14 @@ function buildSquad(p){
     const go=getOdds(g);
     const gs=getScore(g);const gTee=gs?fmtTeeTime(gs.teeTime):'';
     const gKey=normName(g),isExp=expandedGolfers.has(gKey);
-    h+=`<div><div class="sq ${cls}" onclick="toggleGolfer('${gKey.replace(/'/g,"\\'")}',event)"><span>${badge}${esc(g)}</span><div class="sq-right"><span class="sq-score">${fmtGolfer(g)}</span><span class="sq-odds">${!isTourneyActive()&&gTee?gTee:esc(go)}</span></div></div>`;
+    h+=`<div><div class="sq ${cls}" onclick="toggleGolfer('${gKey.replace(/'/g,"\\'")}',event)"><span>${badge}${esc(g)}${isAmateur(g)?' <span class="amateur-tag">(a)</span>':''}</span><div class="sq-right"><span class="sq-score">${fmtGolfer(g)}</span><span class="sq-odds">${!isTourneyActive()&&gTee?gTee:esc(go)}</span></div></div>`;
     if(isExp)h+=buildGolferDetail(g);
     h+='</div>';
   });
   const ao=getOdds(p.alternate);
   const as=getScore(p.alternate);const aTee=as?fmtTeeTime(as.teeTime):'';
   const aKey=normName(p.alternate),aExp=expandedGolfers.has(aKey);
-  h+=`<div><div class="sq alt" onclick="toggleGolfer('${aKey.replace(/'/g,"\\'")}',event)"><span><span class="sq-badge a">Alt</span>${esc(p.alternate)}</span><div class="sq-right"><span class="sq-score">${fmtGolfer(p.alternate)}</span><span class="sq-odds">${!isTourneyActive()&&aTee?aTee:esc(ao)}</span></div></div>`;
+  h+=`<div><div class="sq alt" onclick="toggleGolfer('${aKey.replace(/'/g,"\\'")}',event)"><span><span class="sq-badge a">Alt</span>${esc(p.alternate)}${isAmateur(p.alternate)?' <span class="amateur-tag">(a)</span>':''}</span><div class="sq-right"><span class="sq-score">${fmtGolfer(p.alternate)}</span><span class="sq-odds">${!isTourneyActive()&&aTee?aTee:esc(ao)}</span></div></div>`;
   if(aExp)h+=buildGolferDetail(p.alternate);
   h+='</div>';
   return h+'</div></div>';
@@ -2214,7 +2222,7 @@ function generateShareCard(pIndex){
   ctx.fillText('FULL SQUAD (21 PICKS)',30,y);
   y+=14;
   const colW=(W-60)/cols;
-  const allPicks=[...p.picks].map(g=>{const isW=normName(g)===normName(p.winner);return{name:g,score:num(g),isWinner:isW,wd:isWD(g),cut:isCut(g)};});
+  const allPicks=[...p.picks].map(g=>{const isW=normName(g)===normName(p.winner);return{name:g,score:num(g),isWinner:isW,wd:isWD(g),cut:isCut(g),amateur:isAmateur(g)};});
   allPicks.forEach((g,i)=>{
     const col=i%cols;
     const row=Math.floor(i/cols);
@@ -2234,7 +2242,7 @@ function generateShareCard(pIndex){
     if(hasScores()){
       ctx.textAlign='right';ctx.font='bold 10px Arial';
       if(g.wd){ctx.fillStyle='#FF4444';ctx.fillText('WD',x+colW-8,py);}
-      else if(g.cut){ctx.fillStyle='#999';ctx.fillText('CUT',x+colW-8,py);}
+      else if(g.cut&&g.amateur){ctx.fillStyle='#999';ctx.fillText('CUT',x+colW-8,py);}
       else{const m=g.score;ctx.fillStyle=m>0?'#66BB6A':'#999';ctx.fillText(m>0?'$'+(m>=1000000?(m/1000000).toFixed(1)+'M':(m/1000).toFixed(0)+'K'):'$0',x+colW-8,py);}
       ctx.textAlign='left';
     }
