@@ -46,6 +46,12 @@ body { font-family:'Georgia',serif; background:#0a1f17; color:#fff; }
 .pill:last-child { border-right:none; }
 .pill strong { color:var(--gold); font-size:0.88rem; }
 
+/* ══ PAYOUT CALLOUT ═════════════════════════════════════ */
+.payout-callout { display:flex; justify-content:center; align-items:center; gap:12px; padding:7px 16px; background:rgba(242,197,92,0.06); border-top:1px solid rgba(242,197,92,0.15); border-bottom:1px solid rgba(242,197,92,0.15); font-family:Arial,sans-serif; font-size:0.76rem; color:rgba(255,255,255,0.55); letter-spacing:0.3px; position:relative; z-index:2; }
+.payout-callout-item strong { color:var(--gold); margin-left:4px; }
+.payout-callout-sep { color:rgba(242,197,92,0.3); }
+@media(max-width:520px){ .payout-callout { font-size:0.68rem; gap:8px; padding:6px 10px; } }
+
 /* ══ TAB NAV ═════════════════════════════════════════════ */
 .tab-nav { background:rgba(0,30,20,0.6); border-bottom:2px solid var(--gold); display:flex; justify-content:center; flex-wrap:wrap; position:relative; z-index:2; }
 .tab-btn { padding:13px 28px; font-size:0.82rem; font-family:Arial,sans-serif; color:rgba(255,255,255,0.6); cursor:pointer; border:none; background:transparent; border-bottom:3px solid transparent; margin-bottom:-2px; transition:all 0.2s; letter-spacing:0.5px; }
@@ -505,6 +511,11 @@ body.dark-mode .value-badge { background:rgba(0,107,79,0.2); color:#66bb6a; bord
       <div class="pill">Pot <strong id="pot-total">—</strong></div>
       <div class="pill">Scoring <strong>Most Prize $ Wins</strong></div>
     </div>
+    <div class="payout-callout">
+      <span class="payout-callout-item">🥇 1st Place <strong id="payout-1st">—</strong></span>
+      <span class="payout-callout-sep">·</span>
+      <span class="payout-callout-item">🥈 2nd Place <strong>$500</strong></span>
+    </div>
     <div class="tab-nav">
       <button class="tab-btn active" id="tbtn-standings" onclick="showTab('standings',this)"><span class="tab-full">🏆 Leaderboard</span><span class="tab-short">🏆 Leaderboard</span></button>
       <button class="tab-btn" id="tbtn-signup" onclick="showTab('signup',this)"><span class="tab-full">📝 Enter Picks</span><span class="tab-short">📝 Enter Picks</span></button>
@@ -911,6 +922,7 @@ function renderStandings(){
   document.getElementById('entry-count').textContent=ranked.length;
   const pot=ranked.length*120;const payout1st=pot-500;const payout2nd=500;
   document.getElementById('pot-total').textContent='$'+pot;
+  document.getElementById('payout-1st').textContent='$'+payout1st.toLocaleString();
   const winProbs=isTourneyActive()?calcWinProbs(ranked):[];
   let h='<table class="t"><thead><tr><th style="width:50px">Pos</th><th class="L">Participant</th><th>Prize $</th><th>Score</th><th>Win %</th></tr></thead><tbody>';
   ranked.forEach((p,i)=>{
@@ -1166,7 +1178,9 @@ function updateLockedNames(){
   const el=document.getElementById('locked-names');if(!el||liveParts.length===0)return;
   el.innerHTML='<div style="font-size:0.66rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:8px">Entries Locked In</div>'+liveParts.map(p=>`<span class="lname">${esc(p.name)}</span>`).join('');
   document.getElementById('entry-count').textContent=liveParts.length;
-  document.getElementById('pot-total').textContent='$'+(liveParts.length*120);
+  const pot=liveParts.length*120;
+  document.getElementById('pot-total').textContent='$'+pot;
+  document.getElementById('payout-1st').textContent='$'+(pot-500).toLocaleString();
 }
 
 // ── Main refresh ─────────────────────────────────────────
