@@ -563,7 +563,7 @@ body.dark-mode .value-badge { background:rgba(0,107,79,0.2); color:#66bb6a; bord
       <button class="tab-btn" id="tbtn-signup" onclick="showTab('signup',this)"><span class="tab-full">📝 Enter Picks</span><span class="tab-short">📝 Enter Picks</span></button>
       <button class="tab-btn" id="tbtn-odds" onclick="showTab('odds',this)"><span class="tab-full">🎯 Field &amp; Odds</span><span class="tab-short">🎯 Field &amp; Odds</span></button>
       <button class="tab-btn" id="tbtn-stats" onclick="showTab('stats',this)"><span class="tab-full">📊 Statistics</span><span class="tab-short">📊 Stats</span></button>
-      <button class="tab-btn" id="tbtn-talk" onclick="showTab('talk',this)"><span class="tab-full">🗣️ Trash Talk</span><span class="tab-short">🗣️ Talk</span></button>
+      <button class="tab-btn" id="tbtn-talk" onclick="showTab('talk',this)"><span class="tab-full">🏌️ Clubhouse</span><span class="tab-short">🏌️ Clubhouse</span></button>
     </div>
   </div>
   </div>
@@ -656,7 +656,7 @@ body.dark-mode .value-badge { background:rgba(0,107,79,0.2); color:#66bb6a; bord
       </div>
       <div class="talk-input-row" id="talk-input-row" style="display:none">
         <div class="talk-authed-name" id="talk-authed-name"></div>
-        <input class="talk-input" id="talk-input" type="text" placeholder="Talk your trash…" maxlength="280">
+        <input class="talk-input" id="talk-input" type="text" placeholder="Say something…" maxlength="280">
         <button class="talk-send" id="talk-send" onclick="sendMessage()">Send</button>
       </div>
     </div>
@@ -1761,7 +1761,7 @@ function toggleReaction(msgId,emoji){
 
 function renderTalkFeed(messages){
   const feed=document.getElementById('talk-feed');if(!feed)return;
-  if(messages.length===0){feed.innerHTML='<div class="talk-empty">No trash talk yet. Be the first to start it. 🗣️</div>';return;}
+  if(messages.length===0){feed.innerHTML='<div class="talk-empty">The clubhouse is quiet. Be the first to speak up. 🏌️</div>';return;}
   let h='';
   for(const m of messages){
     const d=m.timestamp?.toDate?m.timestamp.toDate():new Date();
