@@ -1268,17 +1268,22 @@ function parseESPN(data){
   const evt=evts.find(e=>(e.name||'').toLowerCase().includes('masters'));
   if(!evt){console.log('[Masters Pool] Masters not found in ESPN feed yet — skipping');return;}
   const comp=(evt.competitions||[])[0]||{};
-  const st=(comp.status||{}).type||{};
-  // Treat any "in" state as live — covers STATUS_IN_PROGRESS during play AND any
-  // between-round/end-of-period lulls (e.g. R1 wrapped but R2 not started yet),
-  // which otherwise would flip us back to 'pre' and collapse the Forecast view.
-  if(st.state==='in'||st.name==='STATUS_IN_PROGRESS'||st.name?.includes('END_OF')){
+  // Tournament lifecycle comes from the EVENT-level status, not the competition-level status.
+  // ESPN sets comp.status.type.state='post' between rounds (e.g. "Round 1 - Play Complete"),
+  // while evt.status.type stays 'in' / STATUS_IN_PROGRESS for the whole tournament duration.
+  // Using comp.status here would incorrectly flip us to 'final' mid-tournament and force
+  // runSimulations() into deterministic mode (leader = 100%).
+  const evtSt=(evt.status||{}).type||{};
+  const compSt=(comp.status||{}).type||{};
+  if(evtSt.state==='in'||evtSt.name==='STATUS_IN_PROGRESS'){
     tourneyStatus='live';
     currentRound=comp.status?.period||1;
-    roundLabel=st.detail||`Round ${currentRound} · Live`;
+    // Use competition-level detail ("Round 1 - In Progress" or "Round 1 - Play Complete")
+    // because it correctly reflects the micro-state within the current tournament window.
+    roundLabel=compSt.detail||`Round ${currentRound} · Live`;
   }
-  else if(st.name?.includes('FINAL')||st.state==='post'){tourneyStatus='final';currentRound=4;roundLabel='Final';}
-  else{tourneyStatus='pre';currentRound=0;roundLabel=(st.name||'').replace('STATUS_','').replace(/_/g,' ');}
+  else if(evtSt.name?.includes('FINAL')||evtSt.state==='post'){tourneyStatus='final';currentRound=4;roundLabel='Final';}
+  else{tourneyStatus='pre';currentRound=0;roundLabel=(evtSt.name||'').replace('STATUS_','').replace(/_/g,' ');}
   // ESPN-provided projected cut line (top 50 + ties, recomputed server-side per refresh).
   // evt.tournament.cutScore is the score-to-par of the current 50th-place bubble.
   // Null until ESPN populates it. renderCutTracker + Forecast header prefer this over our local estimate.
