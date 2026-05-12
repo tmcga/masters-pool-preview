@@ -51,12 +51,18 @@ const POLYMARKET_SLUG = 'us-open-golf-winner-2026';
 const GAMMA_API = 'https://gamma-api.polymarket.com';
 let oddsSource = 'static';  // 'static' | 'polymarket'
 
-// Fallback odds (American format) — STALE 2026 Masters DraftKings snapshot.
-// TODO: replace with a 2026 U.S. Open DraftKings snapshot once lines are published.
-// The entry form sources its golfer list from this (∪ ESPN scores), so leaving the
-// Masters list in means users will see Masters-only players (Couples, Weir, Olazábal,
-// Schwartzel, V. Singh, Bubba, Z. Johnson) who are NOT in the U.S. Open field.
-// Polymarket auto-overrides once the 2026 U.S. Open market opens (~6 weeks out).
+// Fallback odds (American format) — used pre-Polymarket-launch and as the source of the
+// golfer LIST that the entry form picker shows.
+// ⚠️ The numerical odds below are stale 2026 Masters DraftKings values and are NOT
+// representative of U.S. Open futures. Polymarket auto-overrides once that market opens
+// (~6 weeks out), at which point the odds become real. For now, the values are wrong but
+// the LIST (which is what matters for the entry form picker) has been pruned to plausible
+// U.S. Open contenders.
+// TODO: paste a fresh DraftKings 2026 U.S. Open futures snapshot here when lines drop.
+// REMOVED in cleanup: Masters past-champion exemption-only players (Couples, Weir,
+// Olazábal, Schwartzel, V. Singh, Bubba, Z. Johnson, Cabrera, D. Willett) and the
+// Masters-only amateur invitees (Latin America Amateur, Asia-Pacific Amateur, US
+// Mid-Am, etc.: Howell, Pulcini, Herrington, Holtz, Fang, Laopakdee, Kataoka, Jarvis).
 const FALLBACK_ODDS = {
   "Scottie Scheffler":"+410","Jon Rahm":"+850","Rory McIlroy":"+1025",
   "Bryson DeChambeau":"+1100","Ludvig Åberg":"+1750","Xander Schauffele":"+1850",
@@ -77,18 +83,13 @@ const FALLBACK_ODDS = {
   "Alex Noren":"+16000","Ryan Gerard":"+17000","Nick Taylor":"+19500",
   "Aaron Rai":"+19500","Brian Harman":"+20000","Sam Stevens":"+21000",
   "Ryan Fox":"+22000","Sergio García":"+22500","Wyndham Clark":"+22500",
-  "Max Greyserman":"+23000","Dustin Johnson":"+24000","Casey Jarvis":"+25000",
+  "Max Greyserman":"+23000","Dustin Johnson":"+24000",
   "Carlos Ortiz":"+26000","Tom McKibbin":"+27500","Haotong Li":"+28000",
   "Nico Echavarría":"+31000","Kristoffer Reitan":"+31000",
   "Rasmus Neergaard-Petersen":"+32500","Johnny Keefer":"+34000",
   "Michael Kim":"+40000","Andrew Novak":"+40000","Aldrich Potgieter":"+41000",
   "Michael Brennan":"+42500","Sami Välimäki":"+52500","Davis Riley":"+57500",
-  "Charl Schwartzel":"+60000","Bubba Watson":"+60000","Zach Johnson":"+60000",
-  "Brian Campbell":"+250000","Ethan Fang":"+250000","Danny Willett":"+250000",
-  "Pongsapak Laopakdee":"+400000","Vijay Singh":"+450000","Mason Howell":"+450000",
-  "Mateo Pulcini":"+450000","Jackson Herrington":"+450000","Ángel Cabrera":"+450000",
-  "Naoyuki Kataoka":"+450000","Brandon Holtz":"+500000","Mike Weir":"+500000",
-  "Fred Couples":"+500000","José María Olazábal":"+500000"
+  "Brian Campbell":"+250000"
 };
 let ODDS = {...FALLBACK_ODDS};
 // Sync odds for name variants

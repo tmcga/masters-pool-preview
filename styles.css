@@ -826,3 +826,67 @@ body.dark-mode .compare-legend { color:#aaa; }
   .cut-tracker-grid { grid-template-columns:1fr; }
   .value-grid { grid-template-columns:1fr; }
 }
+
+/* ══ MOBILE LEADERBOARD CARDS (≤ 540px) ═════════════════ */
+/* Reflows the leaderboard table into stacked cards instead of a cramped 5-col table. */
+@media(max-width:540px){
+  /* Hide the table chrome */
+  .t thead { display:none; }
+  .t, .t tbody { display:block; width:100%; }
+  .card:has(> .t),
+  #standings-container .card { background:transparent; border:none; box-shadow:none; padding:0; }
+  body.dark-mode .card:has(> .t),
+  body.dark-mode #standings-container .card { background:transparent; border:none; box-shadow:none; }
+
+  /* Each row becomes a card */
+  .t tbody tr.pr { display:block; padding:12px 14px 14px; margin:0 0 10px; background:#fff !important; border:1px solid #e0e0e0; border-radius:10px; box-shadow:0 1px 3px rgba(0,0,0,0.06); cursor:pointer; }
+  body.dark-mode .t tbody tr.pr { background:var(--green-row)!important; border-color:rgba(255,255,255,0.08); box-shadow:0 1px 3px rgba(0,0,0,0.25); }
+  .t tbody tr.pr.pr-mine { box-shadow:0 1px 3px rgba(0,0,0,0.06), inset 0 0 0 2px var(--gold); }
+  body.dark-mode .t tbody tr.pr.pr-mine { box-shadow:0 1px 3px rgba(0,0,0,0.25), inset 0 0 0 2px var(--gold); }
+  .t tbody tr.pr:hover, .t tbody tr.pr.expanded { background:#f9f9fb !important; }
+  body.dark-mode .t tbody tr.pr:hover, body.dark-mode .t tbody tr.pr.expanded { background:rgba(255,255,255,0.06)!important; }
+  .t tbody tr.pr td:first-child { box-shadow:none; }  /* drop the gold inset stripe; we use full border instead */
+
+  .t tbody tr.pr td { display:inline-block; padding:0; border:none; text-align:left; vertical-align:middle; color:#222; }
+  body.dark-mode .t tbody tr.pr td { color:#e0e0e0; }
+
+  /* TOP ROW: medal + name */
+  .t tbody tr.pr td:nth-child(1) { font-size:1.35rem; min-width:36px; margin-right:6px; }
+  .t tbody tr.pr td:nth-child(2) { font-size:0.98rem; font-weight:700; width:calc(100% - 56px); }
+  .t tbody tr.pr td:nth-child(2) .p-name { display:inline; }
+  /* Compact pos-change badge */
+  .t tbody tr.pr td:nth-child(2) .pos-chg { font-size:0.6rem; padding:1px 4px; }
+
+  /* BOTTOM ROW: prize · score · win% — full-width grid */
+  .t tbody tr.pr td:nth-child(3),
+  .t tbody tr.pr td:nth-child(4),
+  .t tbody tr.pr td:nth-child(5) {
+    display:inline-flex; flex-direction:column; align-items:flex-start;
+    margin-top:10px; margin-right:14px; min-width:0;
+    font-size:0.84rem;
+  }
+  .t tbody tr.pr td:nth-child(3)::before,
+  .t tbody tr.pr td:nth-child(4)::before,
+  .t tbody tr.pr td:nth-child(5)::before {
+    display:block; color:#999; font-size:0.6rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:1px; margin-bottom:2px;
+  }
+  .t tbody tr.pr td:nth-child(3)::before { content:'Prize'; }
+  .t tbody tr.pr td:nth-child(4)::before { content:'Score'; }
+  .t tbody tr.pr td:nth-child(5)::before { content:'Win %'; }
+  body.dark-mode .t tbody tr.pr td:nth-child(3)::before,
+  body.dark-mode .t tbody tr.pr td:nth-child(4)::before,
+  body.dark-mode .t tbody tr.pr td:nth-child(5)::before { color:#888; }
+
+  /* Compact font in the value cells */
+  .t tbody tr.pr .tot { font-size:0.95rem; }
+
+  /* Payout tag floats right of name */
+  .t tbody tr.pr td:nth-child(2) .payout-tag { float:right; margin-top:2px; }
+  .t tbody tr.pr td:nth-child(2) .chev { float:right; margin-top:3px; margin-left:6px; }
+
+  /* Expanded squad-tr lives below the card */
+  .t tr.squad-tr { display:block; }
+  .t tr.squad-tr td { display:block; padding:0; }
+  .t tr.squad-tr td .squad-p { margin-top:-6px; margin-bottom:10px; border-radius:10px; }
+}
