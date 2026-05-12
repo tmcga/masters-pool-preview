@@ -379,6 +379,18 @@ body.dark-mode .field-lb tbody tr:hover { background:rgba(255,255,255,0.04); }
 .entry-auth-btn:disabled { background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.4); cursor:not-allowed; }
 .entry-auth-box .talk-pin-msg { margin-top:8px; }
 
+/* Email-link "check your inbox" confirmation state */
+.entry-email-sent { text-align:center; padding:10px 0; }
+.entry-email-sent-icon { font-size:2.4rem; margin-bottom:8px; }
+.entry-email-sent-h { font-size:1rem; color:var(--gold); font-family:'Georgia',serif; margin-bottom:8px; }
+.entry-email-sent-body { font-size:0.85rem; color:rgba(255,255,255,0.75); font-family:Arial,sans-serif; line-height:1.6; margin-bottom:18px; }
+.entry-email-sent-body strong { color:#fff; }
+.entry-auth-btn-secondary { background:transparent; border:1px solid rgba(242,197,92,0.4); color:var(--gold); padding:8px 16px; border-radius:6px; font-size:0.78rem; font-family:Arial,sans-serif; cursor:pointer; }
+.entry-auth-btn-secondary:hover { background:rgba(242,197,92,0.1); }
+
+.entry-sign-out-link { color:rgba(255,255,255,0.5); font-size:0.78rem; margin-left:4px; text-decoration:underline; }
+.entry-sign-out-link:hover { color:var(--gold); }
+
 .entry-hdr { background:rgba(255,255,255,0.04); border:1px solid rgba(242,197,92,0.18); border-radius:10px; padding:14px 18px; margin-bottom:16px; font-family:Arial,sans-serif; }
 .entry-hdr-row { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
 .entry-hdr-name { font-size:0.95rem; color:#fff; font-weight:600; }

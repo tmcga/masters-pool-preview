@@ -10,26 +10,37 @@
 
 rules_version = '2';
 
+// Security model: Firebase Anonymous Auth gives every browser a stable auth.uid.
+// Display-name ownership is recorded in pins/{name}.uid. All privileged writes
+// require request.auth.uid == pins/{name}.uid for the relevant name. PINs are NOT
+// stored in the database — identity comes from Firebase auth, not a 4-digit secret.
+
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ── PINs: claim once, never edit/delete ───────────────
-    // First write creates the doc; after that, the PIN is permanent.
+    // ── Name claims (one per display name, bound to a Firebase auth UID) ────
+    // First-come-first-serve. Once claimed, never modified.
     match /pins/{name} {
       allow read: if true;
-      allow create: if request.resource.data.pin is string
-                    && request.resource.data.pin.size() == 4;
+      allow create: if request.auth != null
+                    && request.resource.data.keys().hasOnly(['uid', 'createdAt'])
+                    && request.resource.data.uid is string
+                    && request.resource.data.uid == request.auth.uid;
       allow update, delete: if false;
     }
 
-    // ── Entries: write-once, locked-on-submit ──────────────────
-    // An entry can be CREATED until first tee (2026-06-18 UTC).
-    // Once written, it can NEVER be updated or deleted — submissions are final.
-    // This holds even if a user bypasses the client UI (e.g. via dev tools).
+    // ── Entries: write-once, locked-on-submit, owned via pins/{name}.uid ────
+    // An entry can be CREATED until first tee (2026-06-18 UTC) AND only by the
+    // Firebase auth user who owns the matching pins/{name} doc. Updates/deletes
+    // are denied at the rule layer — submissions are final.
     match /entries/{name} {
       allow read: if true;
-      allow create: if request.time < timestamp.date(2026, 6, 18)
+      allow create: if request.auth != null
+                    && request.time < timestamp.date(2026, 6, 18)
+                    && exists(/databases/$(database)/documents/pins/$(name))
+                    && get(/databases/$(database)/documents/pins/$(name)).data.uid == request.auth.uid
                     && request.resource.data.name is string
+                    && request.resource.data.name == name
                     && request.resource.data.winner is string
                     && request.resource.data.alternate is string
                     && request.resource.data.picks is list
@@ -37,13 +48,21 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
-    // ── Trash talk messages ───────────────────────────────
+    // ── Trash talk messages ────────────────────────────────────────────────
+    // Doc ID is restricted to a safe charset so the client never has to worry
+    // about it leaking into onclick handlers. Updates are limited to the
+    // reactions field — text/name/timestamp are immutable once written.
     match /messages/{msgId} {
       allow read: if true;
-      allow create: if request.resource.data.name is string
+      allow create: if request.auth != null
+                    && msgId.matches('^[A-Za-z0-9_-]+$')
+                    && request.resource.data.uid is string
+                    && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.name is string
                     && request.resource.data.text is string
                     && request.resource.data.text.size() <= 280;
-      allow update: if true;   // reactions need updates; rely on app-side ownership
+      allow update: if request.auth != null
+                    && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reactions']);
       allow delete: if false;
     }
   }

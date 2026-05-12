@@ -21,6 +21,7 @@
 <link rel="apple-touch-icon" href="favicon.svg">
 <link rel="stylesheet" href="styles.css">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
@@ -112,27 +113,53 @@
   </div>
   <!-- Firebase-backed entry form -->
   <div id="entry-form-mount">
-    <!-- AUTH STRIP (visible until user has set up name + PIN) -->
+    <!-- AUTH STRIP (visible until user has signed in via email link + claimed a name) -->
     <div id="entry-auth" class="entry-auth-box">
-      <div class="entry-auth-h">Step 1 — Set up your name &amp; PIN</div>
-      <div class="entry-auth-sub">Before you can pick golfers, claim a name with a 4-digit PIN. The PIN locks your entry so only you can edit it.</div>
 
-      <div class="entry-auth-field">
-        <label class="entry-auth-label" for="entry-name-input">Your name</label>
-        <input type="text" class="entry-auth-input" id="entry-name-input" placeholder="How it'll appear on the leaderboard" oninput="onEntryNameInput()" autocomplete="off">
-        <div class="entry-name-status" id="entry-name-status"></div>
-      </div>
+      <!-- ─── STEP 1: Email sign-in ─── -->
+      <div id="entry-email-step">
+        <div class="entry-auth-h">Step 1 — Sign in with your email</div>
+        <div class="entry-auth-sub">We'll email you a one-click sign-in link. No password to remember. Your email is your identity across devices.</div>
 
-      <div class="entry-auth-field" id="entry-pin-field" style="display:none">
-        <label class="entry-auth-label" for="entry-pin"><span id="entry-pin-label">Pick a 4-digit PIN</span></label>
-        <div class="entry-pin-row">
-          <input type="tel" class="entry-auth-input entry-pin-input" id="entry-pin" maxlength="4" pattern="[0-9]*" inputmode="numeric" placeholder="••••" autocomplete="off">
-          <button class="entry-auth-btn" id="entry-pin-btn" onclick="verifyEntryPin()">Continue</button>
+        <div id="entry-email-form">
+          <div class="entry-auth-field">
+            <label class="entry-auth-label" for="entry-email-input">Your email</label>
+            <input type="email" class="entry-auth-input" id="entry-email-input" placeholder="you@example.com" autocomplete="email" inputmode="email">
+          </div>
+          <div class="entry-pin-row">
+            <button class="entry-auth-btn" id="entry-email-btn" onclick="sendEmailLink()">Send sign-in link</button>
+          </div>
+          <div class="talk-pin-msg" id="entry-pin-msg"></div>
         </div>
-        <div class="talk-pin-msg" id="entry-pin-msg"></div>
+
+        <!-- After link sent: -->
+        <div id="entry-email-sent" style="display:none">
+          <div class="entry-email-sent-icon">📬</div>
+          <div class="entry-email-sent-h">Check your inbox</div>
+          <div class="entry-email-sent-body">We sent a sign-in link to <strong id="entry-email-sent-addr">—</strong>. Click the link to come back here signed in. (Check your spam folder if you don't see it.)</div>
+          <button class="entry-auth-btn-secondary" onclick="document.getElementById('entry-email-form').style.display='block';document.getElementById('entry-email-sent').style.display='none';document.getElementById('entry-email-btn').disabled=false;document.getElementById('entry-email-btn').textContent='Send sign-in link';">Use a different email</button>
+        </div>
       </div>
 
-      <div class="entry-auth-foot">Picks lock at first tee — <strong>Thursday June 18, 2026 · 6:45 AM ET</strong>. Until then, you can edit anytime by signing back in with the same name &amp; PIN.</div>
+      <!-- ─── STEP 2: Claim display name (shown only after signed in) ─── -->
+      <div id="entry-name-step" style="display:none">
+        <div class="entry-auth-h">Step 2 — Pick your display name</div>
+        <div class="entry-auth-sub">Signed in as <strong id="entry-signed-in-email">—</strong>. Pick the name that'll appear on the leaderboard. <a href="#" onclick="signOutCurrentUser();return false;" class="entry-sign-out-link">Sign out</a></div>
+
+        <div class="entry-auth-field">
+          <label class="entry-auth-label" for="entry-name-input">Your name</label>
+          <input type="text" class="entry-auth-input" id="entry-name-input" placeholder="How it'll appear on the leaderboard" oninput="onEntryNameInput()" autocomplete="off">
+          <div class="entry-name-status" id="entry-name-status"></div>
+        </div>
+
+        <div class="entry-auth-field" id="entry-claim-field" style="display:none">
+          <div class="entry-pin-row">
+            <button class="entry-auth-btn" id="entry-claim-btn" onclick="claimEntryName()">Claim this name</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="entry-auth-foot">⚠️ <strong>Once you submit picks, they're locked.</strong> No edits, no take-backs. Pick carefully. Picks close for everyone at first tee — <strong>Thursday June 18, 2026 · 6:45 AM ET</strong>.</div>
     </div>
 
     <!-- FORM (visible once signed in) -->
@@ -238,15 +265,8 @@
 <div class="wrap">
   <div class="talk-wrap">
     <div class="talk-compose">
-      <div class="talk-auth" id="talk-auth">
-        <select class="talk-name-select" id="talk-name" onchange="onTalkNameChange()">
-          <option value="">Select your name…</option>
-        </select>
-        <div class="talk-pin-row" id="talk-pin-row" style="display:none">
-          <input class="talk-pin" id="talk-pin" type="tel" placeholder="4-digit PIN" maxlength="4" pattern="[0-9]*" inputmode="numeric">
-          <button class="talk-pin-btn" id="talk-pin-btn" onclick="verifyPin()">Go</button>
-        </div>
-        <div class="talk-pin-msg" id="talk-pin-msg"></div>
+      <div class="talk-auth" id="talk-auth" style="display:none">
+        <div class="talk-pin-msg">Claim a display name in the <strong>📝 Enter Picks</strong> tab first — then you can chat.</div>
       </div>
       <div class="talk-input-row" id="talk-input-row" style="display:none">
         <div class="talk-authed-name" id="talk-authed-name"></div>

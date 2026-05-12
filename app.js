@@ -184,7 +184,11 @@ function getOdds(name){
 let scores={}, tourneyStatus='idle', roundLabel='', currentRound=0, expanded=new Set(), expandedGolfers=new Set(), liveParts=[], espnCutScore=null;
 
 // ── HTML escape (prevent XSS from user-submitted names) ──
-const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+// Escapes everything that could break out of either HTML attribute contexts (double-quoted)
+// or JS string literals inside on* handlers (single-quoted or backtick). Don't be tempted
+// to drop the single-quote escape — Firestore-doc-ID flows into onclick="...('${esc(id)}')".
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+  .replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');
 
 // ── Tab nav ──────────────────────────────────────────────
 function showTab(name,btn){
@@ -837,16 +841,13 @@ function renderFieldLive(){
 // State
 let oddsFilter='all'; // 'all' | 'contenders' | 'mine' | 'cut'
 function setOddsFilter(f){oddsFilter=f;renderOdds();}
-// Whose picks to highlight — checks an explicit Forecast-tab selection first, then falls back to Clubhouse auth
+// Whose picks to highlight — checks an explicit Forecast-tab selection first, then falls back to the auth name
 function getSavedTalkName(){
   try{
-    const explicit=localStorage.getItem('usopen-my-name');
-    if(explicit)return explicit;
-    const s=localStorage.getItem('usopen-talk-auth');
-    if(!s)return'';
-    const o=JSON.parse(s);
-    return o?.name||'';
-  }catch(e){return'';}
+    const explicit = localStorage.getItem('usopen-my-name');
+    if(explicit) return explicit;
+    return localStorage.getItem('usopen-name') || authedName || '';
+  }catch(e){ return authedName || ''; }
 }
 function setMyName(name){
   try{
@@ -1855,13 +1856,130 @@ let entryPicksSet = new Set();  // normName-keyed set of the 21 currently select
 // Picks are submittable until first tee. (FORCE_REVEAL only controls the leaderboard preview.)
 const isPickLocked = () => new Date() >= REVEAL_DATE;
 
-// ── Shared auth bridge ────────────────────────────────────
-// Called by BOTH the Clubhouse and Entry-form auth paths so they stay in sync.
-function setAuthed(name, pin){
+// ── Shared auth bridge — Email Link (passwordless) sign-in ─────────────
+// Why email link: anonymous auth fails in private/incognito mode and on
+// privacy-focused browsers (DuckDuckGo, Brave with aggressive Shields) because
+// they clear IndexedDB on tab/window close. Email link persists across all of
+// these because the email IS the durable identity — Firebase looks up the same
+// auth.uid for the same email address every time, regardless of device or
+// browser state.
+let currentUid = null;
+let currentEmail = null;
+
+function setAuthed(name){
   authedName = name;
-  try{ localStorage.setItem('usopen-talk-auth', JSON.stringify({name, pin})); }catch(e){}
-  // Sync the Entry-form UI if it's mounted
+  try{ localStorage.setItem('usopen-name', name); }catch(e){}
   refreshEntryAuthUI();
+  refreshChatAuthUI();
+}
+
+// Wire reactive auth-state listener. Fires on initial load + after every sign-in
+// or sign-out. Driving the UI off this means we never have to thread currentUid
+// through multiple promise chains.
+function wireAuthStateListener(){
+  if(!firebase.auth) return;
+  firebase.auth().onAuthStateChanged(async user => {
+    if(user){
+      currentUid = user.uid;
+      currentEmail = user.email || null;
+      // If they already claimed a name in a prior session, restore it.
+      await restoreClaimedName();
+    }else{
+      currentUid = null;
+      currentEmail = null;
+      authedName = '';
+      try{ localStorage.removeItem('usopen-name'); }catch(e){}
+    }
+    refreshEntryAuthUI();
+    refreshChatAuthUI();
+  });
+}
+
+// Look up the user's previously claimed display name by their auth.uid.
+// Two paths: (1) localStorage hint, (2) Firestore lookup as fallback.
+async function restoreClaimedName(){
+  if(!db || !currentUid) return;
+  // Fast path: check the saved name and verify its pins doc still points at us.
+  let savedName = '';
+  try{ savedName = localStorage.getItem('usopen-name') || ''; }catch(e){}
+  if(savedName){
+    try{
+      const doc = await db.collection('pins').doc(savedName).get();
+      if(doc.exists && doc.data().uid === currentUid){
+        authedName = savedName;
+        return;
+      }
+    }catch(e){ /* fall through to slow path */ }
+  }
+  // Slow path: scan pins for our uid (handles cross-device case where
+  // localStorage is empty but the user has a name claimed under their email).
+  try{
+    const snap = await db.collection('pins').where('uid', '==', currentUid).limit(1).get();
+    if(!snap.empty){
+      authedName = snap.docs[0].id;
+      try{ localStorage.setItem('usopen-name', authedName); }catch(e){}
+    }
+  }catch(e){
+    console.warn('[Auth] Restore failed:', e);
+  }
+}
+
+// Step 1 of email-link sign-in: user types email, we send a magic link.
+async function sendEmailLink(){
+  if(!firebase.auth){ setEntryPinMsg('Firebase Auth not loaded.', 'err'); return; }
+  const emailInput = document.getElementById('entry-email-input');
+  const email = (emailInput?.value || '').trim();
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    setEntryPinMsg('Enter a valid email address.', 'err'); return;
+  }
+  const btn = document.getElementById('entry-email-btn');
+  if(btn){ btn.disabled = true; btn.textContent = 'Sending…'; }
+  try{
+    const actionCodeSettings = {
+      url: window.location.origin + window.location.pathname,
+      handleCodeInApp: true,
+    };
+    await firebase.auth().sendSignInLinkToEmail(email, actionCodeSettings);
+    try{ localStorage.setItem('usopen-emailForSignIn', email); }catch(e){}
+    // Swap UI into "check your inbox" state
+    document.getElementById('entry-email-form').style.display = 'none';
+    const sent = document.getElementById('entry-email-sent');
+    sent.style.display = 'block';
+    document.getElementById('entry-email-sent-addr').textContent = email;
+  }catch(e){
+    console.error('[Auth] Send sign-in link failed:', e);
+    setEntryPinMsg(e?.message || 'Failed to send link. Try again.', 'err');
+    if(btn){ btn.disabled = false; btn.textContent = 'Send sign-in link'; }
+  }
+}
+
+// Step 2 of email-link sign-in: called once on page load. If the current URL is
+// a sign-in completion link, finish the auth handshake and clean up the URL.
+async function completeEmailSignInIfReturning(){
+  if(!firebase.auth) return;
+  if(!firebase.auth().isSignInWithEmailLink(window.location.href)) return;
+  let email = '';
+  try{ email = localStorage.getItem('usopen-emailForSignIn') || ''; }catch(e){}
+  if(!email){
+    // Fallback: user clicked the link from a different browser than where they
+    // started the flow. Ask them to retype the email.
+    email = window.prompt('Confirm the email you used to start sign-in:') || '';
+  }
+  if(!email){ return; }
+  try{
+    await firebase.auth().signInWithEmailLink(email, window.location.href);
+    try{ localStorage.removeItem('usopen-emailForSignIn'); }catch(e){}
+    // Strip the auth params from the URL so a refresh doesn't try to re-auth.
+    history.replaceState({}, '', window.location.pathname);
+  }catch(e){
+    console.error('[Auth] Email-link sign-in failed:', e);
+    showToast('Sign-in failed: ' + (e?.code || 'unknown error'));
+  }
+}
+
+function signOutCurrentUser(){
+  try{ firebase.auth().signOut(); }catch(e){}
+  // onAuthStateChanged will fire and clear UI state
 }
 
 // ── Golfer source ─────────────────────────────────────────
@@ -1883,47 +2001,60 @@ function getGolferField(){
 
 // ── Auth UI for entry form ────────────────────────────────
 // Reactive name lookup — as the user types, check Firestore for an existing pins/{name}
-// doc and reveal Step 2 (PIN) with copy + button label tailored to whether they're
-// claiming a new name or signing back in.
+// doc to decide whether the name is claimable, already owned by this device, or taken
+// by someone else. Identity is the Firebase auth.uid; there is no PIN.
 let _entryNameLookupTO = null;
-let _entryNameExists   = false;
+let _entryNameClaimable = false;  // true → button enabled, false → name is taken or empty
 
 function onEntryNameInput(){
   const input = document.getElementById('entry-name-input');
   const status = document.getElementById('entry-name-status');
-  const pinField = document.getElementById('entry-pin-field');
-  const pinLabel = document.getElementById('entry-pin-label');
-  const pinBtn = document.getElementById('entry-pin-btn');
+  const claimField = document.getElementById('entry-claim-field');
+  const claimBtn = document.getElementById('entry-claim-btn');
   const name = (input.value||'').trim();
 
   clearTimeout(_entryNameLookupTO);
+  _entryNameClaimable = false;
   if(name.length < 2){
     status.textContent = '';
     status.className = 'entry-name-status';
-    pinField.style.display = 'none';
+    claimField.style.display = 'none';
     return;
   }
   status.textContent = 'Checking…';
   status.className = 'entry-name-status';
 
   _entryNameLookupTO = setTimeout(async () => {
-    if(!db){ status.textContent = 'Database not configured yet — check firebaseConfig.'; return; }
+    if(!db){ status.textContent = 'Database not configured yet.'; return; }
+    if(!currentUid){
+      status.textContent = 'Signing you in… retry in a sec.';
+      return;
+    }
     try{
       const doc = await db.collection('pins').doc(name).get();
-      pinField.style.display = 'block';
+      claimField.style.display = 'block';
       if(doc.exists){
-        _entryNameExists = true;
-        status.innerHTML = `Welcome back, <strong>${esc(name)}</strong>. Enter your PIN to continue.`;
-        status.className = 'entry-name-status exists';
-        pinLabel.textContent = 'Your 4-digit PIN';
-        pinBtn.textContent = 'Sign in';
+        if(doc.data().uid === currentUid){
+          // This device already owns this name → "sign in"
+          status.innerHTML = `Welcome back, <strong>${esc(name)}</strong>.`;
+          status.className = 'entry-name-status exists';
+          claimBtn.textContent = 'Continue as ' + name;
+          _entryNameClaimable = true;
+        }else{
+          // Some other device owns this name
+          status.innerHTML = `<strong>${esc(name)}</strong> is already claimed by another device. Pick a different name.`;
+          status.className = 'entry-name-status';
+          claimBtn.textContent = 'Claim this name';
+          _entryNameClaimable = false;
+        }
       }else{
-        _entryNameExists = false;
-        status.innerHTML = `<strong>${esc(name)}</strong> is available. Pick a 4-digit PIN to claim it.`;
+        // Available
+        status.innerHTML = `<strong>${esc(name)}</strong> is available.`;
         status.className = 'entry-name-status avail';
-        pinLabel.textContent = 'Choose a 4-digit PIN';
-        pinBtn.textContent = 'Claim name & continue';
+        claimBtn.textContent = 'Claim this name';
+        _entryNameClaimable = true;
       }
+      claimBtn.disabled = !_entryNameClaimable;
     }catch(e){
       console.warn('[Entry] Name lookup failed:', e);
       status.textContent = 'Could not reach the database. Try again.';
@@ -1931,35 +2062,35 @@ function onEntryNameInput(){
   }, 350);
 }
 
-async function verifyEntryPin(){
-  if(!db){ setEntryPinMsg('Firestore not initialized. Check firebaseConfig.', 'err'); return; }
-  const nameEl = document.getElementById('entry-name-input');
-  const pinEl  = document.getElementById('entry-pin');
-  const name   = (nameEl.value||'').trim();
-  const pin    = (pinEl.value||'').trim();
-  if(!name){ setEntryPinMsg('Type your name first.', 'err'); return; }
-  if(!/^\d{4}$/.test(pin)){ setEntryPinMsg('PIN must be exactly 4 digits.', 'err'); return; }
+async function claimEntryName(){
+  if(!db || !currentUid){ setEntryPinMsg('Not signed in yet. Refresh the page.', 'err'); return; }
+  if(!_entryNameClaimable){ setEntryPinMsg('This name is not available.', 'err'); return; }
+  const name = (document.getElementById('entry-name-input').value||'').trim();
+  if(!name){ return; }
   try{
     const ref = db.collection('pins').doc(name);
     const doc = await ref.get();
     if(doc.exists){
-      if(doc.data().pin === pin){
-        setAuthed(name, pin);
-        setEntryPinMsg('', '');
-      }else{
-        setEntryPinMsg('Wrong PIN. Try again.', 'err');
-        pinEl.value = '';
+      // Existing doc — verify ownership matches our uid
+      if(doc.data().uid !== currentUid){
+        setEntryPinMsg('This name is already claimed by another device.', 'err');
+        return;
       }
+      // Already ours — just sign in
+      setAuthed(name);
     }else{
-      // First-time claim
-      await ref.set({ pin, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-      setAuthed(name, pin);
-      setEntryPinMsg('', '');
-      showToast('PIN set — your entry is locked to this name.');
+      // Fresh claim — write pins doc with our uid
+      await ref.set({
+        uid: currentUid,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+      setAuthed(name);
+      showToast(`"${name}" is yours. Make your picks.`);
     }
+    setEntryPinMsg('', '');
   }catch(e){
-    console.error('[Entry] PIN verify failed:', e);
-    setEntryPinMsg('Error verifying PIN. Try again.', 'err');
+    console.error('[Entry] Claim failed:', e);
+    setEntryPinMsg('Error claiming name. Try again.', 'err');
   }
 }
 
@@ -1972,25 +2103,48 @@ function setEntryPinMsg(text, cls){
 
 function entrySignOut(){
   authedName = '';
-  try{ localStorage.removeItem('usopen-talk-auth'); }catch(e){}
+  try{ localStorage.removeItem('usopen-name'); }catch(e){}
   currentEntry = null;
   entryPicksSet.clear();
   refreshEntryAuthUI();
 }
 
 // ── Render form state ─────────────────────────────────────
+// Three states:
+//   (1) No auth          → show Step 1 (email sign-in)
+//   (2) Auth, no name    → show Step 2 (pick display name)
+//   (3) Auth + name      → hide auth box, show the picks form
 function refreshEntryAuthUI(){
   const authBox = document.getElementById('entry-auth');
   const form    = document.getElementById('entry-form');
   if(!authBox || !form) return;
+
   if(authedName){
+    // State 3: fully set up — show picks form
     authBox.style.display = 'none';
     form.style.display = 'block';
-    document.getElementById('entry-authed-name').textContent = authedName;
+    const authedLbl = document.getElementById('entry-authed-name');
+    if(authedLbl) authedLbl.textContent = authedName;
     loadEntryForAuthedUser();
+    return;
+  }
+
+  // States 1 & 2: auth box visible
+  authBox.style.display = 'block';
+  form.style.display = 'none';
+
+  const emailStep = document.getElementById('entry-email-step');
+  const nameStep  = document.getElementById('entry-name-step');
+  if(currentUid){
+    // State 2: signed in, just need to claim a display name
+    if(emailStep) emailStep.style.display = 'none';
+    if(nameStep)  nameStep.style.display  = 'block';
+    const emailLbl = document.getElementById('entry-signed-in-email');
+    if(emailLbl) emailLbl.textContent = currentEmail || '(signed in)';
   }else{
-    authBox.style.display = 'block';
-    form.style.display = 'none';
+    // State 1: not signed in
+    if(emailStep) emailStep.style.display = 'block';
+    if(nameStep)  nameStep.style.display  = 'none';
   }
 }
 
@@ -2215,105 +2369,38 @@ try{
   db=firebase.firestore();
 }catch(e){console.warn('[Trash Talk] Firebase init failed:',e);}
 
-function populateTalkNames(){
-  const sel=document.getElementById('talk-name');if(!sel)return;
-  sel.innerHTML='<option value="">Select your name…</option>';
-  for(const p of liveParts)sel.innerHTML+=`<option value="${esc(p.name)}">${esc(p.name)}</option>`;
-  // Auto-auth if we have saved credentials
-  try{
-    const saved=localStorage.getItem('usopen-talk-auth');
-    if(saved){const{name,pin}=JSON.parse(saved);if(name&&pin){sel.value=name;autoAuth(name,pin);}}
-  }catch(e){}
-}
-
-function onTalkNameChange(){
-  const name=document.getElementById('talk-name').value;
-  const pinRow=document.getElementById('talk-pin-row');
-  const pinMsg=document.getElementById('talk-pin-msg');
-  const inputRow=document.getElementById('talk-input-row');
-  authedName='';
-  inputRow.style.display='none';
-  document.getElementById('talk-pin').value='';
-  pinMsg.textContent='';pinMsg.className='talk-pin-msg';
-  if(!name){pinRow.style.display='none';return;}
-  pinRow.style.display='flex';
-  // Check if this name already has a PIN set
-  if(!db)return;
-  db.collection('pins').doc(name).get().then(doc=>{
-    if(doc.exists){
-      pinMsg.textContent='Enter your 4-digit PIN to continue.';
-      document.getElementById('talk-pin-btn').textContent='Unlock';
-    }else{
-      pinMsg.textContent='First time? Set a 4-digit PIN to claim this name.';
-      document.getElementById('talk-pin-btn').textContent='Set PIN';
-    }
-  }).catch(()=>{pinMsg.textContent='Enter or set your PIN.';});
-}
-
-async function autoAuth(name,pin){
-  if(!db)return;
-  try{
-    const doc=await db.collection('pins').doc(name).get();
-    if(doc.exists&&doc.data().pin===pin){
-      setAuthed(name, pin);
-      document.getElementById('talk-pin-row').style.display='none';
-      document.getElementById('talk-pin-msg').textContent='';
-      document.getElementById('talk-input-row').style.display='flex';
-      document.getElementById('talk-authed-name').textContent='Posting as '+name;
-    }else{
-      localStorage.removeItem('usopen-talk-auth');
-      onTalkNameChange();
-    }
-  }catch(e){onTalkNameChange();}
-}
-
-async function verifyPin(){
-  if(!db)return;
-  const name=document.getElementById('talk-name').value.trim();
-  const pin=document.getElementById('talk-pin').value.trim();
-  const msg=document.getElementById('talk-pin-msg');
-  if(!name)return;
-  if(!/^\d{4}$/.test(pin)){msg.textContent='PIN must be exactly 4 digits.';msg.className='talk-pin-msg err';return;}
-  try{
-    const ref=db.collection('pins').doc(name);
-    const doc=await ref.get();
-    if(doc.exists){
-      // Verify existing PIN
-      if(doc.data().pin===pin){
-        setAuthed(name, pin);
-        document.getElementById('talk-pin-row').style.display='none';
-        msg.textContent='';msg.className='talk-pin-msg';
-        document.getElementById('talk-input-row').style.display='flex';
-        document.getElementById('talk-authed-name').textContent='Posting as '+name;
-      }else{
-        msg.textContent='Wrong PIN. Try again.';msg.className='talk-pin-msg err';
-        document.getElementById('talk-pin').value='';
-      }
-    }else{
-      // Set new PIN
-      await ref.set({pin:pin,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
-      setAuthed(name, pin);
-      document.getElementById('talk-pin-row').style.display='none';
-      msg.textContent='';msg.className='talk-pin-msg';
-      document.getElementById('talk-input-row').style.display='flex';
-      document.getElementById('talk-authed-name').textContent='Posting as '+name;
-      showToast('PIN set! You own this name now.');
-    }
-  }catch(e){msg.textContent='Error verifying PIN. Try again.';msg.className='talk-pin-msg err';}
+// Chat auth is now derived from the entry-form name claim (authedName + currentUid).
+// Refreshes the Clubhouse compose UI based on whether the user has claimed a name.
+function refreshChatAuthUI(){
+  const authBox = document.getElementById('talk-auth');
+  const inputRow = document.getElementById('talk-input-row');
+  const authedLbl = document.getElementById('talk-authed-name');
+  if(!authBox || !inputRow) return;
+  if(authedName){
+    authBox.style.display = 'none';
+    inputRow.style.display = 'flex';
+    if(authedLbl) authedLbl.textContent = 'Posting as ' + authedName;
+  }else{
+    authBox.style.display = 'block';
+    inputRow.style.display = 'none';
+  }
 }
 
 function sendMessage(){
-  if(!db)return showToast('Chat unavailable');
-  if(!authedName){showToast('Select your name and enter PIN first');return;}
-  const inputEl=document.getElementById('talk-input');
-  const text=inputEl.value.trim();
-  if(!text)return;
+  if(!db) return showToast('Chat unavailable');
+  if(!authedName){ showToast('Claim a display name in the Enter Picks tab first.'); return; }
+  if(!currentUid){ showToast('Not signed in yet — try again.'); return; }
+  const inputEl = document.getElementById('talk-input');
+  const text = inputEl.value.trim();
+  if(!text) return;
+  // Firestore auto-generated IDs match ^[A-Za-z0-9_-]+$ and satisfy the rule's msgId check.
   db.collection('messages').add({
-    name:authedName,
-    text:text,
-    timestamp:firebase.firestore.FieldValue.serverTimestamp(),
-    reactions:{}
-  }).then(()=>{inputEl.value='';}).catch(e=>{console.error(e);showToast('Failed to send');});
+    uid: currentUid,
+    name: authedName,
+    text: text,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    reactions: {},
+  }).then(()=>{ inputEl.value = ''; }).catch(e=>{ console.error(e); showToast('Failed to send'); });
 }
 
 function toggleReaction(msgId,emoji){
@@ -2367,29 +2454,26 @@ function listenToMessages(){
   });
 }
 
-// Enter key sends message or submits PIN
-document.addEventListener('DOMContentLoaded',()=>{
-  const input=document.getElementById('talk-input');
-  if(input)input.addEventListener('keydown',e=>{if(e.key==='Enter')sendMessage();});
-  const pinInput=document.getElementById('talk-pin');
-  if(pinInput)pinInput.addEventListener('keydown',e=>{if(e.key==='Enter')verifyPin();});
+// Enter key sends a chat message
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('talk-input');
+  if(input) input.addEventListener('keydown', e => { if(e.key === 'Enter') sendMessage(); });
 });
 
 // Start listening once picks load
-const _origInit=init;
-init=async function(){
+const _origInit = init;
+init = async function(){
   await _origInit();
-  populateTalkNames();
+  // Auth bootstrap (email link):
+  //   1. Wire the reactive auth listener — drives all UI state off auth changes.
+  //   2. If the current URL is an incoming sign-in link, complete the handshake.
+  // No anonymous fallback — email is the durable identity, works across
+  // browser clears, privacy modes, and devices.
+  wireAuthStateListener();
+  await completeEmailSignInIfReturning();
   listenToMessages();
-  // Entry form bootstrap — if we have stored auth, auto-load the entry form for that user
-  try{
-    const saved = localStorage.getItem('usopen-talk-auth');
-    if(saved){
-      const { name } = JSON.parse(saved);
-      if(name) authedName = name;
-    }
-  }catch(e){}
   refreshEntryAuthUI();
+  refreshChatAuthUI();
   // Live Firestore listener for entries → updates leaderboard as picks arrive
   listenToEntries();
   // Re-render entry form when ODDS/scores populate so the golfer source is fresh
