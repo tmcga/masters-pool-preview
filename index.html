@@ -20,9 +20,20 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="apple-touch-icon" href="favicon.svg">
 <link rel="stylesheet" href="styles.css">
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<!-- Firebase SDK loaded from Google's CDN, pinned to v10.12.2 and verified via SRI.
+     If gstatic.com ever served a different payload (CDN compromise, MITM, etc.),
+     the browser will refuse to execute the script. Regenerate the integrity
+     hashes if/when this version is bumped:
+       curl -s https://www.gstatic.com/firebasejs/<ver>/<file>.js | openssl dgst -sha384 -binary | openssl base64 -A -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"
+        integrity="sha384-AQ3POAMqIhwS81FrUH95ekxqBZHeP5tG2JfEL3+7GuTtfRLWnrRh32UxwzM+//A9"
+        crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"
+        integrity="sha384-TnlRYaR4JYz/lpaGuaiU61PjNberSA4vjLjtF+oRC/IkohkJqnWxw5EmDSOt1vA1"
+        crossorigin="anonymous"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"
+        integrity="sha384-qn4Jh88HhJA8dplNQyGjOh9OGI4izVhrfj/qIFgaKcdgOE06pXqIKGlsCILZcLAC"
+        crossorigin="anonymous"></script>
 </head>
 <body>
 
