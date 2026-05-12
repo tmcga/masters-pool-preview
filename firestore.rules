@@ -22,17 +22,19 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
-    // ── Entries: writable until first tee (2026-06-18 06:45 ET = 10:45 UTC) ──
-    // After this timestamp, entries are immutable — leaderboard locks in.
+    // ── Entries: write-once, locked-on-submit ──────────────────
+    // An entry can be CREATED until first tee (2026-06-18 UTC).
+    // Once written, it can NEVER be updated or deleted — submissions are final.
+    // This holds even if a user bypasses the client UI (e.g. via dev tools).
     match /entries/{name} {
       allow read: if true;
-      allow create, update: if request.time < timestamp.date(2026, 6, 18)
-                            && request.resource.data.name is string
-                            && request.resource.data.winner is string
-                            && request.resource.data.alternate is string
-                            && request.resource.data.picks is list
-                            && request.resource.data.picks.size() == 21;
-      allow delete: if false;
+      allow create: if request.time < timestamp.date(2026, 6, 18)
+                    && request.resource.data.name is string
+                    && request.resource.data.winner is string
+                    && request.resource.data.alternate is string
+                    && request.resource.data.picks is list
+                    && request.resource.data.picks.size() == 21;
+      allow update, delete: if false;
     }
 
     // ── Trash talk messages ───────────────────────────────

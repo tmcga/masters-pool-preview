@@ -387,7 +387,13 @@ body.dark-mode .field-lb tbody tr:hover { background:rgba(255,255,255,0.04); }
 .entry-signout-btn { background:transparent; border:1px solid rgba(255,255,255,0.2); color:rgba(255,255,255,0.6); padding:6px 14px; border-radius:6px; font-size:0.72rem; font-family:Arial,sans-serif; cursor:pointer; }
 .entry-signout-btn:hover { background:rgba(255,255,255,0.06); color:#fff; }
 
-.entry-locked-notice { background:rgba(255,68,68,0.1); border:1px solid rgba(255,68,68,0.3); color:#ffb3b3; padding:12px 16px; border-radius:8px; font-family:Arial,sans-serif; font-size:0.84rem; margin-bottom:16px; text-align:center; }
+.entry-locked-notice { background:rgba(242,197,92,0.1); border:1px solid rgba(242,197,92,0.4); color:var(--gold); padding:13px 18px; border-radius:8px; font-family:Arial,sans-serif; font-size:0.88rem; margin-bottom:16px; text-align:center; font-weight:600; letter-spacing:0.3px; }
+/* When locked, dim everything slightly so it visually reads as "view-only" */
+.entry-form-locked { opacity:0.92; }
+.entry-form-locked .entry-field-item { cursor:default; }
+.entry-form-locked .entry-field-item:hover { background:rgba(255,255,255,0.04); border-color:transparent; }
+.entry-form-locked .entry-field-item.picked { background:rgba(242,197,92,0.18); border-color:var(--gold); cursor:default; }
+.entry-form-locked input, .entry-form-locked select { cursor:not-allowed; opacity:0.75; }
 .entry-empty-field { background:rgba(255,165,0,0.08); border:1px solid rgba(255,165,0,0.3); color:rgba(255,255,255,0.8); padding:14px 18px; border-radius:8px; font-family:Arial,sans-serif; font-size:0.82rem; line-height:1.6; margin-bottom:16px; }
 .entry-empty-field code { background:rgba(0,0,0,0.3); padding:1px 6px; border-radius:3px; font-family:Menlo,monospace; font-size:0.78rem; color:var(--gold); }
 

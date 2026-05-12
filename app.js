@@ -1993,6 +1993,14 @@ function refreshEntryAuthUI(){
   }
 }
 
+// An entry is locked from edits as soon as it's submitted — no take-backs.
+// Returns the reason it's locked (or null if editable).
+function entryLockReason(){
+  if(currentEntry) return 'submitted';     // already submitted → permanently locked
+  if(isPickLocked()) return 'first-tee';   // first tee has passed → window closed
+  return null;
+}
+
 async function loadEntryForAuthedUser(){
   if(!db || !authedName) return;
   const body  = document.getElementById('entry-form-body');
@@ -2010,13 +2018,14 @@ async function loadEntryForAuthedUser(){
   empty.style.display = 'none';
   body.style.display = 'block';
 
-  // Load existing entry (if any) for prefill
+  // Load existing entry (if any). If one exists, it's PERMANENTLY locked —
+  // we render the picks read-only.
   try{
     const doc = await db.collection('entries').doc(authedName).get();
     if(doc.exists){
       currentEntry = doc.data();
       entryPicksSet = new Set((currentEntry.picks||[]).map(g=>normName(g)));
-      modeLabel.textContent = 'Editing your submitted entry';
+      modeLabel.textContent = 'Your entry is locked';
     }else{
       currentEntry = null;
       entryPicksSet.clear();
@@ -2028,12 +2037,24 @@ async function loadEntryForAuthedUser(){
     entryPicksSet.clear();
   }
 
-  // Lock once first tee passes
-  if(isPickLocked()){
+  // Apply lock state based on reason
+  const reason = entryLockReason();
+  const submitRow = body.querySelector('.entry-submit-row');
+  if(reason){
+    if(reason === 'submitted'){
+      lockedNotice.innerHTML = '🔒 Your picks are locked in. Submissions are final — no edits after submit.';
+    }else{
+      lockedNotice.innerHTML = '🔒 Picks are locked — first tee has passed. Your entry is final.';
+    }
     lockedNotice.style.display = 'block';
-    body.querySelectorAll('input,select,button').forEach(el=>el.disabled=true);
+    body.querySelectorAll('input,select,button').forEach(el=>{ el.disabled = true; });
+    body.classList.add('entry-form-locked');
+    if(submitRow) submitRow.style.display = 'none';
   }else{
     lockedNotice.style.display = 'none';
+    body.querySelectorAll('input,select,button').forEach(el=>{ el.disabled = false; });
+    body.classList.remove('entry-form-locked');
+    if(submitRow) submitRow.style.display = '';
   }
 
   renderEntryFieldList();
@@ -2062,7 +2083,7 @@ function renderEntryFieldList(){
 }
 
 function toggleEntryPick(name){
-  if(isPickLocked()) return;
+  if(entryLockReason()) return;
   const k = normName(name);
   if(entryPicksSet.has(k)) entryPicksSet.delete(k);
   else {
@@ -2122,8 +2143,8 @@ function updateEntryValidation(){
   const errors = validateEntry();
   if(errors.length === 0){
     vEl.className = 'entry-validation ok';
-    vEl.innerHTML = '<strong>✓ Ready to submit.</strong> Your picks pass all rules.';
-    btn.disabled = isPickLocked();
+    vEl.innerHTML = '<strong>✓ Ready to submit.</strong> Submissions are <strong>final</strong> — you can\'t edit after this.';
+    btn.disabled = !!entryLockReason();
   }else{
     vEl.className = 'entry-validation warn';
     vEl.innerHTML = '<strong>Still to do:</strong><ul>' + errors.map(e=>`<li>${esc(e)}</li>`).join('') + '</ul>';
@@ -2133,9 +2154,13 @@ function updateEntryValidation(){
 
 async function submitEntry(){
   if(!db || !authedName) return;
-  if(isPickLocked()){ showToast('Picks are locked.'); return; }
+  if(entryLockReason()){ showToast('Your entry is already locked.'); return; }
   const errors = validateEntry();
   if(errors.length > 0) return;
+  // Hard confirmation — picks are final. Native confirm() keeps this dead-simple
+  // and intentionally a little jarring; the lock is irreversible.
+  const ok = window.confirm('Submit your picks?\n\nThis is final — once submitted, your picks are LOCKED and cannot be edited.');
+  if(!ok) return;
   const winner = document.getElementById('entry-winner').value;
   const alt    = document.getElementById('entry-alternate').value;
   const picks  = getGolferField().filter(n=>entryPicksSet.has(normName(n)));
@@ -2144,18 +2169,19 @@ async function submitEntry(){
   btn.disabled = true;
   msg.textContent = 'Submitting…'; msg.className = 'entry-submit-msg';
   try{
+    // Use create() semantics — Firestore rules will reject any subsequent update,
+    // and we explicitly avoid the {merge:true} path that previously allowed edits.
     const payload = {
       name: authedName,
       winner, alternate: alt, picks,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
     };
-    if(!currentEntry) payload.submittedAt = firebase.firestore.FieldValue.serverTimestamp();
-    await db.collection('entries').doc(authedName).set(payload, { merge: true });
-    currentEntry = { ...currentEntry, ...payload };
-    msg.textContent = '✓ Picks saved. You can edit them anytime before first tee.';
+    await db.collection('entries').doc(authedName).set(payload);
+    currentEntry = { ...payload, submittedAt: new Date() };
+    msg.textContent = '✓ Your picks are locked in. Good luck.';
     msg.className = 'entry-submit-msg ok';
-    document.getElementById('entry-mode-label').textContent = 'Editing your submitted entry';
-    btn.disabled = false;
+    // Swap UI into locked mode immediately
+    loadEntryForAuthedUser();
   }catch(e){
     console.error('[Entry] Submit failed:', e);
     msg.textContent = 'Submit failed — check console and try again.';
