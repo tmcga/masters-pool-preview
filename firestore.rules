@@ -3,17 +3,17 @@
 // Deploy via Firebase Console (Firestore → Rules → paste + Publish)
 // or via CLI: `firebase deploy --only firestore:rules`
 //
-// Trust model: name+PIN claims are verified CLIENT-SIDE against `pins/{name}.pin`.
-// Firestore rules enforce structural invariants (shape, write windows) but do not
-// validate the PIN itself. This is the same trust model the chat already uses and
-// is appropriate for the friend-group context.
+// Trust model: Firebase Email Link (passwordless) auth gives each verified email
+// a stable auth.uid. Display-name ownership is recorded in pins/{name}.uid. All
+// privileged writes require request.auth.uid == pins/{name}.uid for the relevant
+// name. Identity comes from Firebase auth tied to a verified email — there are
+// no PINs stored anywhere.
+//
+// Anonymous Auth must be DISABLED in the Firebase Console — these rules require
+// request.auth != null, and Anonymous Auth would let unverified visitors satisfy
+// that check while still being unidentifiable.
 
 rules_version = '2';
-
-// Security model: Firebase Anonymous Auth gives every browser a stable auth.uid.
-// Display-name ownership is recorded in pins/{name}.uid. All privileged writes
-// require request.auth.uid == pins/{name}.uid for the relevant name. PINs are NOT
-// stored in the database — identity comes from Firebase auth, not a 4-digit secret.
 
 service cloud.firestore {
   match /databases/{database}/documents {
