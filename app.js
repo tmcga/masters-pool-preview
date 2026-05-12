@@ -2193,18 +2193,18 @@ async function submitEntry(){
 // ════════════════════════════════════════════════════════
 // ██  TRASH TALK (Firebase + PIN Auth)  ██
 // ════════════════════════════════════════════════════════
-// ⚠️ TODO: replace these values with a NEW Firebase project for the 2026 U.S. Open pool.
-// The Masters project (brian-sullivan-s-masters-pool) is being preserved for archive/next-year
-// purposes — do NOT reuse it. Create a fresh Firebase project, copy its web SDK config below,
-// then deploy firestore.rules (in repo root) via the Firebase console or `firebase deploy`.
-// Until this is swapped, the chat + entry form will fail to read/write.
+// Firebase project: us-open-bs-pool (dedicated to the 2026 U.S. Open pool).
+// The 2026 Masters project (brian-sullivan-s-masters-pool) is preserved separately as archive.
+// firestore.rules must be deployed to this project — see Firestore Database → Rules in the Console.
+// The apiKey is intentionally public — Firestore rules enforce access, not the key.
 const firebaseConfig={
-  apiKey:"REPLACE_WITH_NEW_PROJECT_API_KEY",
-  authDomain:"REPLACE_WITH_NEW_PROJECT.firebaseapp.com",
-  projectId:"REPLACE_WITH_NEW_PROJECT_ID",
-  storageBucket:"REPLACE_WITH_NEW_PROJECT.firebasestorage.app",
-  messagingSenderId:"REPLACE_WITH_SENDER_ID",
-  appId:"REPLACE_WITH_APP_ID"
+  apiKey:"AIzaSyBOmPwFlFskaaKRFLNRckRjYr5TWnphw8Q",
+  authDomain:"us-open-bs-pool.firebaseapp.com",
+  projectId:"us-open-bs-pool",
+  storageBucket:"us-open-bs-pool.firebasestorage.app",
+  messagingSenderId:"522018697716",
+  appId:"1:522018697716:web:49175d1f32f295335dc9a1",
+  measurementId:"G-WQ5KRYTKTV"
 };
 let db=null;
 const REACTIONS=['🔥','😂','💀','👍','👎','🤡'];
