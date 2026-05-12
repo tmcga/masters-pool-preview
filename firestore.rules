@@ -1,0 +1,48 @@
+// Firestore security rules for the 2026 U.S. Open pool.
+//
+// Deploy via Firebase Console (Firestore → Rules → paste + Publish)
+// or via CLI: `firebase deploy --only firestore:rules`
+//
+// Trust model: name+PIN claims are verified CLIENT-SIDE against `pins/{name}.pin`.
+// Firestore rules enforce structural invariants (shape, write windows) but do not
+// validate the PIN itself. This is the same trust model the chat already uses and
+// is appropriate for the friend-group context.
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── PINs: claim once, never edit/delete ───────────────
+    // First write creates the doc; after that, the PIN is permanent.
+    match /pins/{name} {
+      allow read: if true;
+      allow create: if request.resource.data.pin is string
+                    && request.resource.data.pin.size() == 4;
+      allow update, delete: if false;
+    }
+
+    // ── Entries: writable until first tee (2026-06-18 06:45 ET = 10:45 UTC) ──
+    // After this timestamp, entries are immutable — leaderboard locks in.
+    match /entries/{name} {
+      allow read: if true;
+      allow create, update: if request.time < timestamp.date(2026, 6, 18)
+                            && request.resource.data.name is string
+                            && request.resource.data.winner is string
+                            && request.resource.data.alternate is string
+                            && request.resource.data.picks is list
+                            && request.resource.data.picks.size() == 21;
+      allow delete: if false;
+    }
+
+    // ── Trash talk messages ───────────────────────────────
+    match /messages/{msgId} {
+      allow read: if true;
+      allow create: if request.resource.data.name is string
+                    && request.resource.data.text is string
+                    && request.resource.data.text.size() <= 280;
+      allow update: if true;   // reactions need updates; rely on app-side ownership
+      allow delete: if false;
+    }
+  }
+}

@@ -3,23 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Brian Sullivan's Masters Pool 2026</title>
-<meta name="description" content="Live leaderboard, picks, forecasts and trash talk for Brian Sullivan's 2026 Masters Pool.">
-<meta name="theme-color" content="#00573F">
-<meta property="og:title" content="Brian Sullivan's Masters Pool 2026">
-<meta property="og:description" content="Live leaderboard, picks, forecasts and trash talk for the 2026 Masters Tournament pool.">
+<title>Brian Sullivan's U.S. Open Pool 2026</title>
+<meta name="description" content="Live leaderboard, picks, forecasts and trash talk for Brian Sullivan's 2026 U.S. Open Pool.">
+<meta name="theme-color" content="#0A2240">
+<meta property="og:title" content="Brian Sullivan's U.S. Open Pool 2026">
+<meta property="og:description" content="Live leaderboard, picks, forecasts and trash talk for the 2026 U.S. Open Championship pool.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="Masters_Lockup1A_RGB.png">
 <meta name="twitter:card" content="summary_large_image">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --green-dark:  #00573F;
-  --green-deep:  #003829;
-  --green-med:   #006B4F;
-  --green-row:   #1F4035;
-  --green-alt:   #17332A;
-  --green-soft:  #e8f5e9;
+  /* Variable names are kept (--green-*) for historical reasons; values are now USGA navy. */
+  --green-dark:  #0A2240;
+  --green-deep:  #061427;
+  --green-med:   #1A3A6B;
+  --green-row:   #1F2D4A;
+  --green-alt:   #15233E;
+  --green-soft:  #E8EEF7;
   --gold:        #F2C55C;
   --gold-dark:   #C9963B;
   --gold-dim:    #8b6914;
@@ -33,18 +34,19 @@
   --blue-text:   #90CAF9;
 }
 html,body { min-height:100%; }
-body { font-family:'Georgia',serif; background:#0a1f17; color:#fff; }
+body { font-family:'Georgia',serif; background:#0a1424; color:#fff; }
 
 /* ══ HEADER ══════════════════════════════════════════════ */
 .hdr { border-bottom:3px solid var(--gold); }
 .hdr-top { background:var(--green-deep); text-align:center; padding:8px; font-size:0.68rem; letter-spacing:5px; color:var(--gold); text-transform:uppercase; font-family:Arial,sans-serif; position:relative; z-index:2; }
+/* TODO: swap the header background image to a Shinnecock Hills / U.S. Open shot before launch (file currently shows Rory at the 2024 Masters). */
 .hdr-bg { background:url('12nat-masters-photos-rory-win-sunday-chtq-videoSixteenByNine3000.jpg') center 85% / cover no-repeat; position:relative; }
-.hdr-bg::before { content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(0,56,41,0.82) 0%,rgba(0,30,20,0.88) 100%); z-index:1; }
+.hdr-bg::before { content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(6,20,39,0.82) 0%,rgba(4,12,24,0.88) 100%); z-index:1; }
 .hdr-inner { max-width:1100px; margin:0 auto; padding:8px 20px 14px; text-align:center; position:relative; z-index:2; }
 .hdr-lockup { display:inline-block; text-align:center; }
 .hdr-host { font-size:0.88rem; color:var(--gold); letter-spacing:5px; text-transform:uppercase; font-family:Arial,sans-serif; margin-bottom:2px; }
 .hdr-flag { margin-bottom:0; line-height:1; }
-.masters-logo { height:100px; width:auto; }
+.event-logo { height:100px; width:auto; }
 .hdr-title { font-size:0.92rem; color:var(--gold); letter-spacing:5px; text-transform:uppercase; font-family:Arial,sans-serif; margin-bottom:0; }
 .hdr-slogan { font-size:0.78rem; color:rgba(255,255,255,0.78); font-family:'Georgia',serif; font-style:italic; letter-spacing:0.5px; margin-top:14px; text-shadow:0 1px 4px rgba(0,0,0,0.6); }
 .hdr-sub { font-size:0.68rem; color:var(--muted); letter-spacing:3px; text-transform:uppercase; font-family:Arial,sans-serif; margin-top:14px; margin-bottom:0; }
@@ -61,7 +63,7 @@ body { font-family:'Georgia',serif; background:#0a1f17; color:#fff; }
 @media(max-width:520px){ .payout-callout { font-size:0.68rem; gap:8px; padding:6px 10px; } }
 
 /* ══ TAB NAV ═════════════════════════════════════════════ */
-.tab-nav { background:rgba(0,30,20,0.6); border-bottom:2px solid var(--gold); display:flex; justify-content:center; flex-wrap:wrap; position:relative; z-index:2; }
+.tab-nav { background:rgba(4,12,24,0.6); border-bottom:2px solid var(--gold); display:flex; justify-content:center; flex-wrap:wrap; position:relative; z-index:2; }
 .tab-btn { padding:13px 28px; font-size:0.82rem; font-family:Arial,sans-serif; color:rgba(255,255,255,0.6); cursor:pointer; border:none; background:transparent; border-bottom:3px solid transparent; margin-bottom:-2px; transition:all 0.2s; letter-spacing:0.5px; }
 .tab-btn:hover { color:rgba(255,255,255,0.9); }
 .tab-short { display:none; }
@@ -122,7 +124,7 @@ body.dark-mode .t tbody tr.pr-mine td:first-child { box-shadow:inset 4px 0 0 var
 .tot { font-size:1.1rem; font-weight:700; color:#222; }
 .tot.lead { color:var(--green-dark); font-size:1.15rem; }
 .wd-tag { display:inline-block; background:rgba(200,16,46,0.1); border:1px solid rgba(200,16,46,0.3); color:#c8102e; font-size:0.62rem; font-weight:700; padding:1px 5px; border-radius:4px; margin-right:3px; vertical-align:middle; }
-.alt-in { display:inline-block; background:rgba(0,87,63,0.1); border:1px solid rgba(0,87,63,0.3); color:var(--green-dark); font-size:0.62rem; font-weight:700; padding:1px 6px; border-radius:4px; margin-left:4px; vertical-align:middle; }
+.alt-in { display:inline-block; background:rgba(10,34,64,0.1); border:1px solid rgba(10,34,64,0.3); color:var(--green-dark); font-size:0.62rem; font-weight:700; padding:1px 6px; border-radius:4px; margin-left:4px; vertical-align:middle; }
 .wp { font-size:0.82rem; color:#999; font-weight:600; }
 .wp-warm { color:var(--gold-dark); }
 .wp-hot { color:var(--green-dark); font-weight:700; }
@@ -144,11 +146,11 @@ body.dark-mode .t tbody tr.pr-mine td:first-child { box-shadow:inset 4px 0 0 var
 .squad-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:6px; }
 .sq { background:#fff; border:1px solid #e0e0e0; border-radius:7px; padding:7px 10px; display:flex; align-items:center; justify-content:space-between; font-size:0.8rem; font-family:Arial,sans-serif; color:#222; }
 .sq.win  { border-color:var(--gold);  background:#fdf6e3; }
-.sq.alt  { border-color:rgba(0,87,63,0.3); background:rgba(0,87,63,0.05); }
+.sq.alt  { border-color:rgba(10,34,64,0.3); background:rgba(10,34,64,0.05); }
 .sq.wdc  { border-color:rgba(200,16,46,0.3);  background:rgba(200,16,46,0.05); opacity:0.8; }
 .sq-badge { font-size:0.58rem; font-weight:700; padding:1px 5px; border-radius:4px; margin-right:4px; text-transform:uppercase; }
 .sq-badge.w { background:var(--gold); color:#4a2c00; }
-.sq-badge.a { background:rgba(0,87,63,0.15); color:var(--green-dark); }
+.sq-badge.a { background:rgba(10,34,64,0.15); color:var(--green-dark); }
 .sq-badge.s { background:rgba(200,16,46,0.15); color:#c8102e; font-style:italic; }
 .sq-right { display:flex; flex-direction:column; align-items:flex-end; gap:2px; }
 .sq-score { font-weight:700; font-size:0.78rem; min-width:80px; text-align:right; }
@@ -210,8 +212,8 @@ body.dark-mode .forecast-value-strip { background:var(--green-row); border-color
 .forecast-value-hdr { font-size:0.62rem; text-transform:uppercase; letter-spacing:2px; color:var(--gold-dark); font-family:Arial,sans-serif; font-weight:700; margin-bottom:8px; }
 body.dark-mode .forecast-value-hdr { color:var(--gold); }
 .forecast-value-row { display:flex; gap:10px; overflow-x:auto; padding-bottom:4px; }
-.forecast-value-chip { flex:0 0 auto; background:rgba(0,87,63,0.06); border:1px solid rgba(0,87,63,0.25); border-left:4px solid var(--green-dark); border-radius:6px; padding:8px 12px; font-family:Arial,sans-serif; min-width:180px; }
-body.dark-mode .forecast-value-chip { background:rgba(0,107,79,0.15); border-color:rgba(0,107,79,0.35); border-left-color:#66bb6a; }
+.forecast-value-chip { flex:0 0 auto; background:rgba(10,34,64,0.06); border:1px solid rgba(10,34,64,0.25); border-left:4px solid var(--green-dark); border-radius:6px; padding:8px 12px; font-family:Arial,sans-serif; min-width:180px; }
+body.dark-mode .forecast-value-chip { background:rgba(26,58,107,0.15); border-color:rgba(26,58,107,0.35); border-left-color:#66bb6a; }
 .forecast-value-name { font-size:0.82rem; font-weight:700; color:#222; }
 body.dark-mode .forecast-value-name { color:#fff; }
 .forecast-value-meta { font-size:0.68rem; color:#888; margin-top:2px; }
@@ -263,9 +265,9 @@ body.dark-mode .fc-own.hot { color:#66BB6A; }
 body.dark-mode .fc-thru { color:#aaa; }
 .fc-rounds { display:inline-flex; gap:3px; justify-content:center; }
 .fc-rd { display:inline-block; min-width:22px; padding:2px 4px; border-radius:3px; font-size:0.68rem; background:#f0f0f0; color:#666; }
-.fc-rd.done { background:rgba(0,87,63,0.12); color:var(--green-dark); font-weight:700; }
+.fc-rd.done { background:rgba(10,34,64,0.12); color:var(--green-dark); font-weight:700; }
 body.dark-mode .fc-rd { background:rgba(255,255,255,0.06); color:#888; }
-body.dark-mode .fc-rd.done { background:rgba(0,107,79,0.25); color:#a5d6a7; }
+body.dark-mode .fc-rd.done { background:rgba(26,58,107,0.25); color:#a5d6a7; }
 .fc-winprob { font-weight:700; font-size:0.82rem; color:#666; }
 .fc-winprob.warm { color:var(--gold-dark); }
 .fc-winprob.hot { color:var(--green-dark); }
@@ -302,7 +304,7 @@ tr.fc-cut td { opacity:0.6; }
   .forecast-value-chip{min-width:150px;padding:7px 10px;}
 }
 
-/* ══ FIELD LEADERBOARD (Masters LB on standings tab) ════ */
+/* ══ FIELD LEADERBOARD (U.S. Open field on standings tab) ════ */
 .field-lb { width:100%; border-collapse:collapse; font-family:Arial,sans-serif; }
 .field-lb thead tr { background:var(--green-dark); }
 .field-lb th { padding:8px 10px; font-size:0.62rem; text-transform:uppercase; letter-spacing:1px; color:#fff; font-weight:600; text-align:center; }
@@ -334,6 +336,68 @@ body.dark-mode .field-lb tbody tr:hover { background:rgba(255,255,255,0.04); }
 .form-frame-wrap { background:#fff; border:1px solid rgba(242,197,92,0.18); border-radius:10px; overflow:hidden; }
 .form-frame-wrap iframe { width:100%; height:3200px; border:none; display:block; }
 
+/* ══ ENTRY FORM (Firebase) ═════════════════════════════ */
+.entry-auth-box { background:linear-gradient(135deg,var(--green-deep),var(--green-row)); border:1px solid rgba(242,197,92,0.3); border-radius:12px; padding:28px 24px; max-width:560px; margin:24px auto; text-align:center; }
+.entry-auth-h { font-size:1.15rem; color:var(--gold); font-family:'Georgia',serif; margin-bottom:6px; }
+.entry-auth-sub { font-size:0.82rem; color:rgba(255,255,255,0.7); font-family:Arial,sans-serif; margin-bottom:18px; line-height:1.5; }
+.entry-auth-foot { font-size:0.72rem; color:var(--muted); font-family:Arial,sans-serif; margin-top:12px; }
+.entry-auth-box .talk-name-select { max-width:300px; margin:0 auto 10px; }
+.entry-auth-box .talk-pin-row { justify-content:center; }
+
+.entry-hdr { background:rgba(255,255,255,0.04); border:1px solid rgba(242,197,92,0.18); border-radius:10px; padding:14px 18px; margin-bottom:16px; font-family:Arial,sans-serif; }
+.entry-hdr-row { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+.entry-hdr-name { font-size:0.95rem; color:#fff; font-weight:600; }
+.entry-hdr-name span { color:var(--gold); }
+.entry-hdr-sub { font-size:0.74rem; color:var(--muted); margin-top:2px; }
+.entry-signout-btn { background:transparent; border:1px solid rgba(255,255,255,0.2); color:rgba(255,255,255,0.6); padding:6px 14px; border-radius:6px; font-size:0.72rem; font-family:Arial,sans-serif; cursor:pointer; }
+.entry-signout-btn:hover { background:rgba(255,255,255,0.06); color:#fff; }
+
+.entry-locked-notice { background:rgba(255,68,68,0.1); border:1px solid rgba(255,68,68,0.3); color:#ffb3b3; padding:12px 16px; border-radius:8px; font-family:Arial,sans-serif; font-size:0.84rem; margin-bottom:16px; text-align:center; }
+.entry-empty-field { background:rgba(255,165,0,0.08); border:1px solid rgba(255,165,0,0.3); color:rgba(255,255,255,0.8); padding:14px 18px; border-radius:8px; font-family:Arial,sans-serif; font-size:0.82rem; line-height:1.6; margin-bottom:16px; }
+.entry-empty-field code { background:rgba(0,0,0,0.3); padding:1px 6px; border-radius:3px; font-family:Menlo,monospace; font-size:0.78rem; color:var(--gold); }
+
+.entry-rules { background:rgba(242,197,92,0.06); border-left:3px solid var(--gold); padding:11px 16px; border-radius:4px; font-family:Arial,sans-serif; font-size:0.82rem; color:rgba(255,255,255,0.78); line-height:1.6; margin-bottom:22px; }
+.entry-rules strong { color:var(--gold); }
+
+.entry-section { margin-bottom:24px; }
+.entry-section-hdr { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.entry-section-ttl { font-size:0.82rem; color:var(--gold); font-family:Arial,sans-serif; text-transform:uppercase; letter-spacing:1.5px; font-weight:600; }
+.entry-counter { font-size:0.78rem; color:rgba(255,255,255,0.6); font-family:Arial,sans-serif; }
+.entry-counter span { color:var(--gold); font-weight:700; }
+
+.entry-search { width:100%; background:rgba(255,255,255,0.06); border:1px solid rgba(242,197,92,0.2); color:#fff; padding:9px 14px; border-radius:8px; font-size:0.85rem; font-family:Arial,sans-serif; outline:none; margin-bottom:10px; }
+.entry-search:focus { border-color:var(--gold); }
+.entry-field-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:6px; max-height:480px; overflow-y:auto; padding:6px; background:rgba(0,0,0,0.15); border:1px solid rgba(242,197,92,0.15); border-radius:8px; }
+.entry-field-item { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:8px 12px; background:rgba(255,255,255,0.04); border:1px solid transparent; border-radius:6px; font-family:Arial,sans-serif; font-size:0.83rem; color:rgba(255,255,255,0.85); cursor:pointer; transition:all 0.12s; }
+.entry-field-item:hover { background:rgba(255,255,255,0.08); border-color:rgba(242,197,92,0.3); }
+.entry-field-item.picked { background:rgba(242,197,92,0.18); border-color:var(--gold); color:#fff; font-weight:600; }
+.entry-field-item .entry-field-odds { font-size:0.72rem; color:rgba(255,255,255,0.5); }
+.entry-field-item.picked .entry-field-odds { color:var(--gold); }
+.entry-field-empty { grid-column:1/-1; padding:30px; text-align:center; color:var(--muted); font-family:Arial,sans-serif; font-size:0.85rem; }
+
+.entry-select { width:100%; background:rgba(255,255,255,0.06); border:1px solid rgba(242,197,92,0.2); color:#fff; padding:10px 14px; border-radius:8px; font-size:0.88rem; font-family:Arial,sans-serif; outline:none; cursor:pointer; }
+.entry-select:focus { border-color:var(--gold); }
+.entry-select option { background:var(--green-deep); color:#fff; }
+
+.entry-validation { background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:12px 16px; font-family:Arial,sans-serif; font-size:0.82rem; margin-bottom:14px; }
+.entry-validation.ok { background:rgba(102,187,106,0.1); border-color:rgba(102,187,106,0.3); color:#a5d6a7; }
+.entry-validation.warn { background:rgba(255,68,68,0.08); border-color:rgba(255,68,68,0.3); color:#ffb3b3; }
+.entry-validation ul { list-style:none; padding:0; margin:0; }
+.entry-validation li { padding:3px 0; }
+.entry-validation li::before { content:'•  '; opacity:0.6; }
+
+.entry-submit-row { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.entry-submit-btn { background:var(--gold); color:var(--green-deep); border:none; padding:11px 28px; border-radius:8px; font-size:0.92rem; font-family:Arial,sans-serif; font-weight:700; cursor:pointer; transition:all 0.15s; letter-spacing:0.5px; }
+.entry-submit-btn:hover:not(:disabled) { background:var(--gold-dark); }
+.entry-submit-btn:disabled { background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.4); cursor:not-allowed; }
+.entry-submit-msg { font-family:Arial,sans-serif; font-size:0.82rem; color:rgba(255,255,255,0.7); }
+.entry-submit-msg.ok { color:#a5d6a7; }
+.entry-submit-msg.err { color:#ffb3b3; }
+
+@media(max-width:600px){
+  .entry-field-list { grid-template-columns:1fr; max-height:380px; }
+}
+
 /* ══ STATS TAB ══════════════════════════════════════════ */
 .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-bottom:24px; min-width:0; }
 .stats-full { grid-column:1 / -1; min-width:0; }
@@ -355,7 +419,7 @@ body.dark-mode .field-lb tbody tr:hover { background:rgba(255,255,255,0.04); }
 .pop-score-wrap { width:80px; flex-shrink:0; text-align:right; font-size:0.74rem; }
 .pop-bar-wrap { flex:1; min-width:40px; height:22px; background:#f0f0f0; border-radius:4px; overflow:hidden; }
 .pop-bar { height:100%; border-radius:4px; transition:width 0.4s ease; min-width:2px; }
-.pop-bar.tier-high { background:linear-gradient(90deg,#00573F,#00875F); }
+.pop-bar.tier-high { background:linear-gradient(90deg,#0A2240,#1A4A8C); }
 .pop-bar.tier-mid  { background:linear-gradient(90deg,#C9963B,#F2C55C); }
 .pop-bar.tier-low  { background:#d0d0d0; }
 .pop-count { width:40px; flex-shrink:0; font-size:0.82rem; font-weight:700; color:#222; text-align:center; font-family:Arial,sans-serif; }
@@ -412,7 +476,7 @@ body.dark-mode .field-lb tbody tr:hover { background:rgba(255,255,255,0.04); }
 @media(max-width:600px){
   /* ── Header ── */
   .hdr-host{font-size:0.72rem;letter-spacing:4px;}
-  .masters-logo{height:80px;}
+  .event-logo{height:80px;}
   .hdr-title{font-size:0.75rem;letter-spacing:4px;}
   .hdr-slogan{font-size:0.7rem;margin-top:10px;}
   .hdr-sub{font-size:0.58rem;margin-top:8px;}
@@ -544,7 +608,7 @@ body.dark-mode .sq { background:var(--green-row); border-color:rgba(255,255,255,
 body.dark-mode .sq:hover { background:var(--green-med); }
 body.dark-mode .sq.win { background:rgba(242,197,92,0.1); border-color:var(--gold-dark); }
 body.dark-mode .sq.win:hover { background:rgba(242,197,92,0.18); }
-body.dark-mode .sq.alt { background:rgba(0,107,79,0.15); border-color:rgba(0,107,79,0.3); }
+body.dark-mode .sq.alt { background:rgba(26,58,107,0.15); border-color:rgba(26,58,107,0.3); }
 body.dark-mode .sq.wdc { background:rgba(255,68,68,0.08); border-color:rgba(255,68,68,0.2); }
 body.dark-mode .sq-detail { background:var(--green-deep); border-color:rgba(255,255,255,0.08); }
 body.dark-mode .sq-detail-name { color:#fff; }
@@ -573,10 +637,10 @@ body.dark-mode .coverage-sub { color:#aaa; }
 body.dark-mode .matrix td { border-color:rgba(255,255,255,0.06); }
 body.dark-mode .matrix th { color:#bbb; }
 body.dark-mode .matrix td.heat-0 { background:rgba(255,255,255,0.03); color:#666; }
-body.dark-mode .matrix td.heat-1 { background:rgba(0,87,63,0.2); color:#66bb6a; }
-body.dark-mode .matrix td.heat-2 { background:rgba(0,87,63,0.35); color:#a5d6a7; }
-body.dark-mode .matrix td.heat-3 { background:rgba(0,87,63,0.5); color:#fff; }
-body.dark-mode .matrix td.heat-4 { background:rgba(0,87,63,0.7); color:#fff; }
+body.dark-mode .matrix td.heat-1 { background:rgba(10,34,64,0.2); color:#66bb6a; }
+body.dark-mode .matrix td.heat-2 { background:rgba(10,34,64,0.35); color:#a5d6a7; }
+body.dark-mode .matrix td.heat-3 { background:rgba(10,34,64,0.5); color:#fff; }
+body.dark-mode .matrix td.heat-4 { background:rgba(10,34,64,0.7); color:#fff; }
 body.dark-mode .matrix td.diag { background:rgba(255,255,255,0.03); color:#666; }
 body.dark-mode .live-stat-card { background:var(--green-row); border-color:rgba(255,255,255,0.08); }
 body.dark-mode .live-stat-golfer { color:#fff; }
@@ -608,13 +672,13 @@ body.dark-mode .cut-card-name { color:#fff; }
 .cut-bar-track { height:8px; background:#f0f0f0; border-radius:4px; overflow:hidden; margin-bottom:6px; }
 body.dark-mode .cut-bar-track { background:rgba(255,255,255,0.06); }
 .cut-bar-fill { height:100%; border-radius:4px; transition:width 0.4s; }
-.cut-bar-safe { background:linear-gradient(90deg,#00573F,#00875F); }
+.cut-bar-safe { background:linear-gradient(90deg,#0A2240,#1A4A8C); }
 .cut-bar-danger { background:linear-gradient(90deg,#C9963B,#F2C55C); }
 .cut-bar-cut { background:linear-gradient(90deg,#c8102e,#ff4444); }
 .cut-stats { display:flex; gap:12px; font-size:0.72rem; color:#888; }
 .cut-stat { display:flex; align-items:center; gap:4px; }
 .cut-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-.cut-dot-safe { background:#00573F; }
+.cut-dot-safe { background:#0A2240; }
 .cut-dot-danger { background:#C9963B; }
 .cut-dot-cut { background:#c8102e; }
 .cut-projected { text-align:center; padding:10px 16px 6px; font-size:0.78rem; color:#888; font-family:Arial,sans-serif; }
@@ -630,8 +694,8 @@ body.dark-mode .value-golfer { color:#fff; }
 .value-odds { font-size:0.75rem; font-weight:700; margin-bottom:4px; }
 .value-score { font-size:1.1rem; font-weight:700; margin-bottom:4px; }
 .value-detail { font-size:0.7rem; color:#888; line-height:1.5; }
-.value-badge { display:inline-block; background:rgba(0,87,63,0.1); border:1px solid rgba(0,87,63,0.25); color:var(--green-dark); font-size:0.6rem; font-weight:700; padding:2px 8px; border-radius:10px; margin-top:6px; text-transform:uppercase; letter-spacing:0.5px; }
-body.dark-mode .value-badge { background:rgba(0,107,79,0.2); color:#66bb6a; border-color:rgba(0,107,79,0.4); }
+.value-badge { display:inline-block; background:rgba(10,34,64,0.1); border:1px solid rgba(10,34,64,0.25); color:var(--green-dark); font-size:0.6rem; font-weight:700; padding:2px 8px; border-radius:10px; margin-top:6px; text-transform:uppercase; letter-spacing:0.5px; }
+body.dark-mode .value-badge { background:rgba(26,58,107,0.2); color:#66bb6a; border-color:rgba(26,58,107,0.4); }
 .value-empty { text-align:center; padding:24px 16px; color:#999; font-family:Arial,sans-serif; font-size:0.85rem; }
 
 /* ══ SHARE CARD ═════════════════════════════════════════ */
@@ -654,16 +718,17 @@ body.dark-mode .value-badge { background:rgba(0,107,79,0.2); color:#66bb6a; bord
 
 <!-- HEADER -->
 <div class="hdr">
-  <div class="hdr-top">Augusta National Golf Club<button class="dark-toggle" onclick="toggleDarkMode()" id="dark-toggle">🌙 Dark</button></div>
+  <div class="hdr-top">Shinnecock Hills Golf Club<button class="dark-toggle" onclick="toggleDarkMode()" id="dark-toggle">🌙 Dark</button></div>
   <div class="hdr-bg">
     <div class="hdr-inner">
       <div class="hdr-lockup">
         <div class="hdr-host">Brian Sullivan's</div>
-        <div class="hdr-flag"><img src="Masters_Lockup1A_RGB.png" alt="The Masters" class="masters-logo"></div>
+        <!-- TODO: replace Masters_Lockup1A_RGB.png with a 2026 U.S. Open lockup, then update src below and the og:image meta in <head> -->
+        <div class="hdr-flag"><img src="Masters_Lockup1A_RGB.png" alt="The U.S. Open" class="event-logo"></div>
         <div class="hdr-title">Pool</div>
       </div>
-      <div class="hdr-slogan">"A tradition unlike any other."</div>
-      <div class="hdr-sub">Opening Round &nbsp;·&nbsp; April 9th, 2026</div>
+      <div class="hdr-slogan">"The toughest test in golf."</div>
+      <div class="hdr-sub">Opening Round &nbsp;·&nbsp; June 18th, 2026</div>
     </div>
 
   <!-- PILLS + TABS -->
@@ -697,7 +762,7 @@ body.dark-mode .value-badge { background:rgba(0,107,79,0.2); color:#66bb6a; bord
     <div class="lock-box">
       <div class="lock-icon">🔒</div>
       <div class="lock-h">Picks Revealed at First Tee</div>
-      <div class="lock-sub">All picks are sealed — they'll appear here at<br><strong>Thursday April 9, 2026 · 8:00 AM ET</strong></div>
+      <div class="lock-sub">All picks are sealed — they'll appear here at<br><strong>Thursday June 18, 2026 · 6:45 AM ET</strong></div>
       <div class="cd">
         <div class="cd-unit"><span class="cd-num" id="cd-d">—</span><span class="cd-lbl">Days</span></div>
         <div class="cd-unit"><span class="cd-num" id="cd-h">—</span><span class="cd-lbl">Hours</span></div>
@@ -713,7 +778,7 @@ body.dark-mode .value-badge { background:rgba(0,107,79,0.2); color:#66bb6a; bord
       <div id="standings-container"><div class="loading"><div class="spinner"></div>Calculating…</div></div>
     </div>
     <div id="last-refresh" style="text-align:right;font-size:0.65rem;color:rgba(255,255,255,0.35);font-family:Arial,sans-serif;margin:-16px 0 20px;padding-right:4px"></div>
-    <div class="sec-lbl">Masters Leaderboard</div>
+    <div class="sec-lbl">U.S. Open Leaderboard</div>
     <div class="card">
       <div id="field-live-loading" class="loading"><div class="spinner"></div>Fetching live scores…</div>
       <div id="field-live"></div>
@@ -728,10 +793,88 @@ body.dark-mode .value-badge { background:rgba(0,107,79,0.2); color:#66bb6a; bord
 <div class="signup-wrap">
   <div class="signup-notice">
     <h3>📋 How to Enter Your Picks</h3>
-    <p>Make <strong>23 Selections</strong>: <strong>21 Golfers</strong>, <strong>1 Winner</strong> &amp; <strong>1 Alternate</strong>. Winner MUST be one of your 21 golfers selected. Alternate will serve as a substitute in case of a W/D. Buy-in is <strong>$120</strong> — please pay <strong>Brian or Charlie</strong> before the event starts. <strong>Scoring:</strong> Your team's total is the combined Masters prize money earned by your 21 golfers. <strong>1st place</strong> wins the pot minus $500, <strong>2nd place</strong> wins $500. Check the <strong>🎯 Field &amp; Odds</strong> tab for current lines. <strong>Picks lock before first tee — Thursday April 9, 2026.</strong> Good Luck!</p>
+    <p>Make <strong>23 Selections</strong>: <strong>21 Golfers</strong>, <strong>1 Winner</strong> &amp; <strong>1 Alternate</strong>. Winner MUST be one of your 21 golfers selected. Alternate will serve as a substitute in case of a W/D. Buy-in is <strong>$120</strong> — please pay <strong>Brian or Charlie</strong> before the event starts. <strong>Scoring:</strong> Your team's total is the combined U.S. Open prize money earned by your 21 golfers. <strong>1st place</strong> wins the pot minus $500, <strong>2nd place</strong> wins $500. Check the <strong>🎯 Field &amp; Odds</strong> tab for current lines. <strong>Picks lock before first tee — Thursday June 18, 2026.</strong> Good Luck!</p>
   </div>
-  <div class="form-frame-wrap">
-    <iframe id="form-iframe" src="" title="Masters Pool Entry Form" allowfullscreen></iframe>
+  <!-- Firebase-backed entry form -->
+  <div id="entry-form-mount">
+    <!-- AUTH STRIP (visible until user is signed in) -->
+    <div id="entry-auth" class="entry-auth-box">
+      <div class="entry-auth-h">Sign in to submit your picks</div>
+      <div class="entry-auth-sub">Pick your name from the list and set (or enter) your 4-digit PIN. Same PIN works in the Clubhouse chat.</div>
+      <select class="talk-name-select" id="entry-name-select" onchange="onEntryNameChange()">
+        <option value="">Select your name…</option>
+      </select>
+      <div class="talk-pin-row" id="entry-pin-row" style="display:none">
+        <input class="talk-pin" id="entry-pin" type="tel" placeholder="4-digit PIN" maxlength="4" pattern="[0-9]*" inputmode="numeric">
+        <button class="talk-pin-btn" id="entry-pin-btn" onclick="verifyEntryPin()">Go</button>
+      </div>
+      <div class="talk-pin-msg" id="entry-pin-msg"></div>
+      <div class="entry-auth-foot">First time? Pick a 4-digit PIN — it locks your entry so nobody else can edit it.</div>
+    </div>
+
+    <!-- FORM (visible once signed in) -->
+    <div id="entry-form" style="display:none">
+      <div class="entry-hdr">
+        <div class="entry-hdr-row">
+          <div>
+            <div class="entry-hdr-name">Picks for <span id="entry-authed-name">—</span></div>
+            <div class="entry-hdr-sub" id="entry-mode-label">Building a new entry</div>
+          </div>
+          <button class="entry-signout-btn" onclick="entrySignOut()">Sign out</button>
+        </div>
+      </div>
+
+      <div id="entry-locked-notice" class="entry-locked-notice" style="display:none">🔒 Picks are locked — first tee has passed. Your entry is final.</div>
+
+      <div class="entry-empty-field" id="entry-empty-field" style="display:none">
+        <strong>Golfer field not loaded yet.</strong> Pre-event, the form pulls from the odds list (Polymarket once live; fallback otherwise). If you're seeing this, check that <code>FALLBACK_ODDS</code> in index.html is populated with the U.S. Open field, or wait for Polymarket to publish the 2026 market.
+      </div>
+
+      <div id="entry-form-body" style="display:none">
+        <div class="entry-rules">
+          <strong>The rules:</strong> pick exactly <strong>21 golfers</strong> + <strong>1 Winner</strong> (must be one of your 21) + <strong>1 Alternate</strong> (must NOT be one of your 21). No duplicates.
+        </div>
+
+        <!-- 21 GOLFER PICKS -->
+        <div class="entry-section">
+          <div class="entry-section-hdr">
+            <span class="entry-section-ttl">Step 1 — Pick 21 Golfers</span>
+            <span class="entry-counter"><span id="entry-pick-count">0</span> / 21</span>
+          </div>
+          <input class="entry-search" type="text" id="entry-search" placeholder="Search the field…" oninput="renderEntryFieldList()">
+          <div class="entry-field-list" id="entry-field-list"></div>
+        </div>
+
+        <!-- WINNER -->
+        <div class="entry-section">
+          <div class="entry-section-hdr">
+            <span class="entry-section-ttl">Step 2 — Pick Your Winner</span>
+            <span class="entry-counter" id="entry-winner-hint">From your 21</span>
+          </div>
+          <select class="entry-select" id="entry-winner" onchange="updateEntryValidation()">
+            <option value="">— select winner —</option>
+          </select>
+        </div>
+
+        <!-- ALTERNATE -->
+        <div class="entry-section">
+          <div class="entry-section-hdr">
+            <span class="entry-section-ttl">Step 3 — Pick Your Alternate</span>
+            <span class="entry-counter">In case of a W/D</span>
+          </div>
+          <select class="entry-select" id="entry-alternate" onchange="updateEntryValidation()">
+            <option value="">— select alternate —</option>
+          </select>
+        </div>
+
+        <!-- VALIDATION + SUBMIT -->
+        <div class="entry-validation" id="entry-validation"></div>
+        <div class="entry-submit-row">
+          <button class="entry-submit-btn" id="entry-submit-btn" onclick="submitEntry()" disabled>Submit picks</button>
+          <div class="entry-submit-msg" id="entry-submit-msg"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 </div>
@@ -740,7 +883,7 @@ body.dark-mode .value-badge { background:rgba(0,107,79,0.2); color:#66bb6a; bord
 <!-- ══ TAB: FIELD & ODDS ═════════════════════════════════ -->
 <div class="tab-panel" id="tab-odds">
 <div class="wrap">
-  <div class="sec-lbl" id="odds-label">2026 Masters Field — Odds to Win</div>
+  <div class="sec-lbl" id="odds-label">2026 U.S. Open Field — Odds to Win</div>
   <div id="forecast-summary"></div>
   <div id="forecast-value-card"></div>
   <div class="odds-controls">
@@ -796,29 +939,38 @@ body.dark-mode .value-badge { background:rgba(0,107,79,0.2); color:#66bb6a; bord
 <!-- SHARE TOAST -->
 <div class="share-toast" id="share-toast">Image copied to clipboard!</div>
 
-<div class="footer">BRIAN SULLIVAN'S MASTERS POOL &nbsp;·&nbsp; AUGUSTA NATIONAL GOLF CLUB &nbsp;·&nbsp; APRIL 9–12, 2026</div>
+<div class="footer">BRIAN SULLIVAN'S U.S. OPEN POOL &nbsp;·&nbsp; SHINNECOCK HILLS GOLF CLUB &nbsp;·&nbsp; JUNE 18–21, 2026</div>
 
 <script>
 // ════════════════════════════════════════════════════════
 // ██  CONFIG  ██
 // ════════════════════════════════════════════════════════
 
-// Google Form embed URL
-const FORM_EMBED_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdKnigB3p7isTO0DPcTLgWAjEu9Z-pusUMR0xzaliS4YWU1VQ/viewform?embedded=true";
+// Entry form: Google-Form embed is being replaced by a Firebase-backed form.
+// The iframe wiring below is a no-op until the new form is built.
+const FORM_EMBED_URL = "";
 
 // Picks lock at first tee
-const REVEAL_DATE = new Date('2026-04-09T08:00:00-04:00');
+const REVEAL_DATE = new Date('2026-06-18T06:45:00-04:00');
 const FORCE_REVEAL = true;  // set true to bypass lock for testing
 const FORCE_LIVE = true;    // set true to force the Forecast view with demo data when ESPN reports pre-tournament (preview repo only)
 
 // ════════════════════════════════════════════════════════
 // Odds — Polymarket live + hardcoded fallback
 // ════════════════════════════════════════════════════════
-const POLYMARKET_SLUG = 'the-masters-winner-2026';
+// TODO: verify the Polymarket event slug once their 2026 U.S. Open market goes live.
+// Markets typically open ~6 weeks out. Visit polymarket.com, search "US Open golf",
+// and grab the event slug from the URL (events/<slug>).
+const POLYMARKET_SLUG = 'us-open-golf-winner-2026';
 const GAMMA_API = 'https://gamma-api.polymarket.com';
 let oddsSource = 'static';  // 'static' | 'polymarket'
 
-// Fallback odds (American format) — DraftKings, April 4, 2026
+// Fallback odds (American format) — STALE 2026 Masters DraftKings snapshot.
+// TODO: replace with a 2026 U.S. Open DraftKings snapshot once lines are published.
+// The entry form sources its golfer list from this (∪ ESPN scores), so leaving the
+// Masters list in means users will see Masters-only players (Couples, Weir, Olazábal,
+// Schwartzel, V. Singh, Bubba, Z. Johnson) who are NOT in the U.S. Open field.
+// Polymarket auto-overrides once the 2026 U.S. Open market opens (~6 weeks out).
 const FALLBACK_ODDS = {
   "Scottie Scheffler":"+410","Jon Rahm":"+850","Rory McIlroy":"+1025",
   "Bryson DeChambeau":"+1100","Ludvig Åberg":"+1750","Xander Schauffele":"+1850",
@@ -913,7 +1065,7 @@ async function fetchPolymarket(){
         if(!ODDS["Sungjae Im"]&&ODDS["Im Sung-jae"])ODDS["Sungjae Im"]=ODDS["Im Sung-jae"];
         if(!ODDS["Nicolai Hojgaard"]&&ODDS["Nicolai Højgaard"])ODDS["Nicolai Hojgaard"]=ODDS["Nicolai Højgaard"];
         if(!ODDS["Nicolai Højgaard"]&&ODDS["Nicolai Hojgaard"])ODDS["Nicolai Højgaard"]=ODDS["Nicolai Hojgaard"];
-        console.log(`[Masters Pool] Polymarket odds loaded: ${Object.keys(newOdds).length} golfers`);
+        console.log(`[US Open Pool] Polymarket odds loaded: ${Object.keys(newOdds).length} golfers`);
         return true;
       }
     }catch(e){continue;}
@@ -979,7 +1131,7 @@ function warnUnmatched(){
   if(!hasScores())return;
   for(const p of liveParts){
     for(const g of [p.alternate,...p.picks]){
-      if(g&&!scores[g]&&!scores[resolveName(g)])console.warn(`[Masters Pool] No ESPN match for pick: "${g}"`);
+      if(g&&!scores[g]&&!scores[resolveName(g)])console.warn(`[US Open Pool] No ESPN match for pick: "${g}"`);
     }
   }
 }
@@ -1018,21 +1170,25 @@ function calcTeamScore(p){let t=0,ua=false;for(const g of p.picks){if(isWD(g)&&!
 const hasScores=()=>Object.keys(scores).length>0;
 const isTourneyActive=()=>tourneyStatus==='live'||tourneyStatus==='final'||tourneyStatus==='demo';
 
-// ── Prize money (2025 Masters actuals — update when 2026 purse announced) ──
-// TODO Saturday AM 2026-04-11: Augusta announces 2026 purse + 50-position breakdown
-// after R2 cut is set. Update MASTERS_PURSE, MASTERS_MC_PAYOUT (might bump from $25k),
-// and all 50 entries in MASTERS_PAYOUTS below. Push to BOTH repos before R3 tee times
-// (~10 AM ET). Single localized change, no logic edits — every consumer reads from
-// these constants.
-const MASTERS_PURSE=21000000;
-// 2025 Masters: $25,000 to every PROFESSIONAL who misses the cut. Amateurs get $0.
-const MASTERS_MC_PAYOUT=25000;
-const MASTERS_PAYOUTS=[
-  4200000,2268000,1428000,1008000,840000,756000,703500,651000,609000,567000,  // 1-10
-  525000,483000,441000,399000,378000,357000,336000,315000,294000,273000,       // 11-20
-  252000,235200,218400,201600,184800,168000,161700,155400,149100,142800,       // 21-30
-  136500,130200,123900,118650,113400,108150,102900,98700,94500,90300,          // 31-40
-  86100,81900,77700,73500,69300,65100,60900,57540,54600,52920                  // 41-50
+// ── Prize money (placeholder baseline — UPDATE when 2026 U.S. Open purse + breakdown announced) ──
+// U.S. Open structure: top 60 + ties make the cut; flat MC payout to professional non-qualifiers.
+// 2024 (Pinehurst) / 2025 (Oakmont) purse was $21.5M with ~$4.3M to the winner.
+// TODO Friday/Saturday 2026-06-19→20: USGA publishes the official 2026 purse + 60-position
+// payout breakdown after R2. Update USOPEN_PURSE, USOPEN_MC_PAYOUT, and every entry in
+// USOPEN_PAYOUTS below. ESPN's c.earnings field overrides this at STATUS_FINAL anyway,
+// so the table only matters for in-tournament projections.
+// Numbers below are scaled placeholders — VERIFY against the official 2025 U.S. Open
+// payout table (Oakmont) before play begins.
+const USOPEN_PURSE=21500000;
+// U.S. Open: flat ~$10,000 to professionals who miss the cut. Amateurs get $0.
+const USOPEN_MC_PAYOUT=10000;
+const USOPEN_PAYOUTS=[
+  4300000,2322000,1461365,1016138,848290,756400,703900,651400,609400,567400,   // 1-10
+  525400,483400,441400,399400,378400,357400,336400,315400,294400,273400,        // 11-20
+  252400,235600,218800,202000,185200,168400,162100,155800,149500,143200,        // 21-30
+  136900,130600,124300,119050,113800,108550,103300,99100,94900,90700,           // 31-40
+  86500,82300,78100,73900,69700,65500,61300,57940,55000,53320,                  // 41-50
+  51000,49000,47500,46000,44500,43000,41500,40000,38500,37000                   // 51-60
 ];
 function parsePos(posStr){
   if(!posStr)return null;
@@ -1046,18 +1202,18 @@ function calcPrizeMoney(name){
   const s=getScore(name);
   if(!s)return 0;
   if(isWD(name))return 0;
-  // 2025 rule: missed-cut professionals get $25k flat; amateurs are ineligible.
-  if(isCut(name))return isAmateur(name)?0:MASTERS_MC_PAYOUT;
+  // U.S. Open rule: missed-cut professionals get a flat MC payout (~$10k); amateurs are ineligible.
+  if(isCut(name))return isAmateur(name)?0:USOPEN_MC_PAYOUT;
   // Prefer ESPN's own earnings field when it's populated (happens at STATUS_FINAL
   // Sunday evening). This guarantees exact 2026 numbers even if our hand-maintained
-  // MASTERS_PAYOUTS hasn't been updated. Falls through to position-based lookup
+  // USOPEN_PAYOUTS hasn't been updated. Falls through to position-based lookup
   // during play when earnings=0.
   if(s.earnings>0)return s.earnings;
   const parsed=parsePos(s.pos);
   if(!parsed)return 0;
   const{pos,tied}=parsed;
-  if(pos>MASTERS_PAYOUTS.length)return 0;
-  if(!tied)return MASTERS_PAYOUTS[pos-1];
+  if(pos>USOPEN_PAYOUTS.length)return 0;
+  if(!tied)return USOPEN_PAYOUTS[pos-1];
   // Ties: count golfers sharing this position, average their payout slots
   let numTied=0;
   for(const[,sc]of Object.entries(scores)){
@@ -1067,7 +1223,7 @@ function calcPrizeMoney(name){
   }
   if(numTied<2)numTied=2;
   let totalPayout=0;
-  for(let i=pos-1;i<pos-1+numTied&&i<MASTERS_PAYOUTS.length;i++)totalPayout+=MASTERS_PAYOUTS[i];
+  for(let i=pos-1;i<pos-1+numTied&&i<USOPEN_PAYOUTS.length;i++)totalPayout+=USOPEN_PAYOUTS[i];
   return Math.round(totalPayout/numTied);
 }
 
@@ -1099,7 +1255,7 @@ function parseTp(tp){
 //   so a +400 favorite is expected to play ~1 stroke/round better than the field
 //   median, and a 1000:1 longshot is expected to play ~0.4 strokes/round worse.
 //   Final score = current ESPN score + Σ (skill + noise) over remaining rounds.
-//   In each sim we rank by final score, compute prize money via MASTERS_PAYOUTS,
+//   In each sim we rank by final score, compute prize money via USOPEN_PAYOUTS,
 //   sum per team, and tally both the golfer winner and the team winner.
 let golferWinProbMap={};
 let teamWinProbMap={};
@@ -1207,8 +1363,8 @@ function runSimulations(){
     golferWins[idx[0]]++;
     // Compute prize per golfer based on this sim's ranking
     prize.fill(0);
-    const cap=Math.min(idx.length,MASTERS_PAYOUTS.length);
-    for(let r=0;r<cap;r++)prize[idx[r]]=MASTERS_PAYOUTS[r];
+    const cap=Math.min(idx.length,USOPEN_PAYOUTS.length);
+    for(let r=0;r<cap;r++)prize[idx[r]]=USOPEN_PAYOUTS[r];
     // Compute each team's total and find the team winner.
     // Random tiebreaker prevents earlier-team-in-iteration-order bias when totals tie.
     let bestTeam=-1,bestTotal=-1;
@@ -1252,7 +1408,7 @@ function syncOddsToField(){
   }
   ODDS=cleaned;
   if(liveApplied||stale){
-    console.log(`[Masters Pool] ODDS sync: ${Object.keys(cleaned).length} canonical entries (${liveApplied} live Polymarket, ${stale} stale dropped)`);
+    console.log(`[US Open Pool] ODDS sync: ${Object.keys(cleaned).length} canonical entries (${liveApplied} live Polymarket, ${stale} stale dropped)`);
   }
 }
 
@@ -1265,8 +1421,9 @@ async function fetchESPN(){
 }
 function parseESPN(data){
   const evts=data.events||[];
-  const evt=evts.find(e=>(e.name||'').toLowerCase().includes('masters'));
-  if(!evt){console.log('[Masters Pool] Masters not found in ESPN feed yet — skipping');return;}
+  // ESPN's PGA feed names this event "U.S. Open" (with dots) — match on "u.s. open" and "us open" defensively
+  const evt=evts.find(e=>{const n=(e.name||'').toLowerCase();return n.includes('u.s. open')||n.includes('us open');});
+  if(!evt){console.log('[US Open Pool] U.S. Open not found in ESPN feed yet — skipping');return;}
   const comp=(evt.competitions||[])[0]||{};
   // Tournament lifecycle comes from the EVENT-level status, not the competition-level status.
   // ESPN sets comp.status.type.state='post' between rounds (e.g. "Round 1 - Play Complete"),
@@ -1309,7 +1466,7 @@ function parseESPN(data){
     const startHole=c.status?.startHole||1;
     const amateur=!!(c.amateur||c.athlete?.amateur);
     // ESPN populates c.earnings (number) at STATUS_FINAL with the official purse breakdown.
-    // Verified against the 2025 Masters final feed — matches MASTERS_PAYOUTS slot-for-slot
+    // ESPN populates official US Open payouts at STATUS_FINAL — overrides USOPEN_PAYOUTS
     // including tie averaging. 0 during play, does NOT include the $25k MC payment.
     const earnings=(typeof c.earnings==='number'&&c.earnings>0)?c.earnings:0;
     ns[name]={tp,st:st2,thru:c.status?.type?.shortDetail||'',pos,mv,hole,headshot,flag,country,rounds,teeTime,startHole,amateur,earnings};
@@ -1329,8 +1486,34 @@ function loadDemo(){
   tourneyStatus='demo';roundLabel='Sample Data';buildNameMap();
 }
 
-// ── Picks (from backend-synced JSON) ─────────────────────
+// ── Picks (Firestore-primary, picks.json fallback) ───────
+// Primary source: Firestore `entries` collection (written by the entry form).
+// Fallback: data/picks.json (the legacy Google-Sheet sync path — kept for emergency rollback).
 async function fetchPicks(){
+  // 1. Try Firestore first
+  if(db){
+    try{
+      const snap = await db.collection('entries').get();
+      if(!snap.empty){
+        const parts = snap.docs.map(d=>{
+          const x = d.data();
+          return {
+            name: x.name || d.id,
+            winner: x.winner || '',
+            alternate: x.alternate || '',
+            picks: Array.isArray(x.picks) ? x.picks : [],
+          };
+        }).filter(p=>p.winner && p.picks.length>0);
+        if(parts.length > 0){
+          liveParts = parts;
+          return true;
+        }
+      }
+    }catch(e){
+      console.warn('[US Open Pool] Firestore fetchPicks failed, falling back to picks.json:', e);
+    }
+  }
+  // 2. Fallback to legacy JSON
   try{
     const r=await fetch('data/picks.json?_t='+Date.now(),{cache:'no-store'});
     if(!r.ok)return false;
@@ -1339,6 +1522,30 @@ async function fetchPicks(){
     liveParts=data.participants;
     return true;
   }catch(e){return false;}
+}
+
+// Live snapshot listener — leaderboard updates instantly as entries arrive.
+function listenToEntries(){
+  if(!db) return;
+  db.collection('entries').onSnapshot(snap=>{
+    const parts = snap.docs.map(d=>{
+      const x = d.data();
+      return {
+        name: x.name || d.id,
+        winner: x.winner || '',
+        alternate: x.alternate || '',
+        picks: Array.isArray(x.picks) ? x.picks : [],
+      };
+    }).filter(p=>p.winner && p.picks.length>0);
+    if(parts.length === 0) return; // keep prior data rather than blanking the board
+    liveParts = parts;
+    if(isRevealed()){ renderStandings(); renderStats(); }
+    else updateLockedNames();
+    // Keep the entry-form name dropdown fresh
+    populateEntryNameSelect();
+  }, err=>{
+    console.warn('[US Open Pool] Firestore entries listener error:', err);
+  });
 }
 
 
@@ -1487,9 +1694,9 @@ function setOddsFilter(f){oddsFilter=f;renderOdds();}
 // Whose picks to highlight — checks an explicit Forecast-tab selection first, then falls back to Clubhouse auth
 function getSavedTalkName(){
   try{
-    const explicit=localStorage.getItem('masters-my-name');
+    const explicit=localStorage.getItem('usopen-my-name');
     if(explicit)return explicit;
-    const s=localStorage.getItem('masters-talk-auth');
+    const s=localStorage.getItem('usopen-talk-auth');
     if(!s)return'';
     const o=JSON.parse(s);
     return o?.name||'';
@@ -1497,8 +1704,8 @@ function getSavedTalkName(){
 }
 function setMyName(name){
   try{
-    if(name)localStorage.setItem('masters-my-name',name);
-    else localStorage.removeItem('masters-my-name');
+    if(name)localStorage.setItem('usopen-my-name',name);
+    else localStorage.removeItem('usopen-my-name');
   }catch(e){}
   renderOdds();
 }
@@ -1547,9 +1754,9 @@ function renderOdds(){
   if(live){
     lbl.textContent=`Forecast · ${roundLabel||'Live'}`+(oddsSource==='polymarket'?' · Live odds via Polymarket':'');
   }else if(oddsSource==='polymarket'){
-    lbl.textContent='2026 Masters Field — Live Odds via Polymarket';
+    lbl.textContent='2026 U.S. Open Field — Live Odds via Polymarket';
   }else{
-    lbl.textContent='2026 Masters Field — Odds to Win (static fallback)';
+    lbl.textContent='2026 U.S. Open Field — Odds to Win (static fallback)';
   }
 
   const q=(document.getElementById('odds-search').value||'').toLowerCase();
@@ -1591,8 +1798,8 @@ function renderOdds(){
   const active=Object.entries(scores).filter(([,s])=>s.st!=='WD'&&s.st!=='CUT');
   const underPar=active.filter(([,s])=>{const v=parseTp(s.tp);return!isNaN(v)&&v<0;}).length;
   const allScores=active.map(([,s])=>parseTp(s.tp)).filter(n=>!isNaN(n)).sort((a,b)=>a-b);
-  // Prefer ESPN's server-side cut projection when available, else local estimate
-  const localCutLine=allScores.length>=50?allScores[49]:(allScores[allScores.length-1]||0);
+  // Prefer ESPN's server-side cut projection when available, else local estimate (top 60 + ties for U.S. Open)
+  const localCutLine=allScores.length>=60?allScores[59]:(allScores[allScores.length-1]||0);
   const cutLine=(espnCutScore!==null)?espnCutScore:localCutLine;
   const cutTxt=cutLine>=0?(cutLine===0?'E':'+'+cutLine):String(cutLine);
   // Find leader and any tied co-leaders
@@ -1651,7 +1858,7 @@ function renderOdds(){
     chipEl.className='forecast-chips';
     // Selector: lets the user pick their name (saved per-device) so ⭐ highlights their golfers.
     // Falls back to Clubhouse PIN auth if they're already logged in there.
-    const explicitName=(()=>{try{return localStorage.getItem('masters-my-name')||'';}catch(e){return'';}})();
+    const explicitName=(()=>{try{return localStorage.getItem('usopen-my-name')||'';}catch(e){return'';}})();
     let selectorHtml='';
     if(explicitName){
       selectorHtml=`<span class="forecast-mine-row">📌 Highlighting picks for: <strong>${esc(explicitName)}</strong> <button class="forecast-mine-clear" onclick="setMyName('')" title="Clear">✕</button></span>`;
@@ -1853,15 +2060,15 @@ function renderStats(){
   const freq={};
   for(const p of liveParts) for(const g of p.picks) freq[g]=(freq[g]||0)+1;
   const uniqueGolfers=Object.keys(freq).length;
-  // Prefer ESPN field count; fall back to ODDS only pre-tournament
-  const totalField=Object.keys(scores).length||Object.keys(ODDS).length||89;
+  // Prefer ESPN field count; fall back to ODDS only pre-tournament (U.S. Open field is 156 typically)
+  const totalField=Object.keys(scores).length||Object.keys(ODDS).length||156;
 
   // ── 1. Field Coverage donut ──
   const pct=totalField>0?uniqueGolfers/totalField:0;
   const R=52,SW=10,C=2*Math.PI*R,off=C*(1-pct);
   const teamKeys=new Set(liveParts.map(p=>[...p.picks].sort().join('|')));
   const uniqueTeams=teamKeys.size;
-  let coverageHtml=`<div class="coverage-body"><div class="coverage-ring"><svg width="130" height="130" viewBox="0 0 130 130"><circle cx="65" cy="65" r="${R}" fill="none" stroke="#e0e0e0" stroke-width="${SW}"/><circle cx="65" cy="65" r="${R}" fill="none" stroke="#00573F" stroke-width="${SW}" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" stroke-linecap="round"/></svg><div class="coverage-ring-label"><span class="coverage-num">${uniqueGolfers}</span><span class="coverage-denom">of ${totalField}</span></div></div><div class="coverage-sub">${totalParts} participants · ${uniqueGolfers} unique golfers · <strong>${uniqueTeams}/${totalParts}</strong> unique teams</div></div>`;
+  let coverageHtml=`<div class="coverage-body"><div class="coverage-ring"><svg width="130" height="130" viewBox="0 0 130 130"><circle cx="65" cy="65" r="${R}" fill="none" stroke="#e0e0e0" stroke-width="${SW}"/><circle cx="65" cy="65" r="${R}" fill="none" stroke="#0A2240" stroke-width="${SW}" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" stroke-linecap="round"/></svg><div class="coverage-ring-label"><span class="coverage-num">${uniqueGolfers}</span><span class="coverage-denom">of ${totalField}</span></div></div><div class="coverage-sub">${totalParts} participants · ${uniqueGolfers} unique golfers · <strong>${uniqueTeams}/${totalParts}</strong> unique teams</div></div>`;
 
   // ── 2. Winner predictions ──
   const winnerMap={};
@@ -1997,29 +2204,41 @@ function updateRefreshLabel(){
 
 // ── Init ─────────────────────────────────────────────────
 async function init(){
-  // Wire up the form iframe
-  if(FORM_EMBED_URL) document.getElementById('form-iframe').src=FORM_EMBED_URL;
-
+  // Form iframe was removed; the Firebase entry form will mount into #entry-form-mount.
   renderOdds();
   await fetchPicks();
   updateLockedNames();
 
+  // Sign-up tab visibility tracks real time (not FORCE_REVEAL preview flag) — picks are
+  // submittable until first tee, then the tab hides.
+  document.getElementById('tbtn-signup').style.display = isPickLocked() ? 'none' : '';
+
+  // Always populate ODDS/scores at startup so the entry form has a golfer list to render,
+  // even pre-reveal when the leaderboard is locked behind a countdown.
+  await doRefresh();
+  setInterval(doRefresh, 5*60*1000);
+
   if(isRevealed()){
     document.getElementById('lock-screen').style.display='none';
     document.getElementById('live-board').style.display='block';
-    document.getElementById('tbtn-signup').style.display='none';
-    await doRefresh();
-    setInterval(doRefresh,5*60*1000);
   } else {
     document.getElementById('lock-screen').style.display='block';
     document.getElementById('live-board').style.display='none';
     updateCD();
-    const cdInterval=setInterval(()=>{updateCD();if(isRevealed()){clearInterval(cdInterval);document.getElementById('lock-screen').style.display='none';document.getElementById('live-board').style.display='block';document.getElementById('tbtn-signup').style.display='none';doRefresh();setInterval(doRefresh,5*60*1000);}},1000);
+    const cdInterval=setInterval(()=>{
+      updateCD();
+      // Hide the Sign Up tab the moment first tee arrives
+      if(isPickLocked()) document.getElementById('tbtn-signup').style.display='none';
+      if(isRevealed()){
+        clearInterval(cdInterval);
+        document.getElementById('lock-screen').style.display='none';
+        document.getElementById('live-board').style.display='block';
+      }
+    },1000);
   }
   // Refresh as soon as user returns to the tab if our last successful fetch was >60s ago
   document.addEventListener('visibilitychange',()=>{
     if(document.hidden)return;
-    if(!isRevealed())return;
     if(Date.now()-lastSuccessfulRefresh>60*1000)doRefresh();
   });
   // Update the "Updated X · Stale" label every minute so the warning appears without waiting for next refresh
@@ -2032,14 +2251,14 @@ async function init(){
 function toggleDarkMode(){
   const on=document.body.classList.toggle('dark-mode');
   document.getElementById('dark-toggle').textContent=on?'☀️ Light':'🌙 Dark';
-  try{localStorage.setItem('masters-dark',on?'1':'0');}catch(e){}
+  try{localStorage.setItem('usopen-dark',on?'1':'0');}catch(e){}
 }
-(function(){try{if(localStorage.getItem('masters-dark')==='1'){document.body.classList.add('dark-mode');document.getElementById('dark-toggle').textContent='☀️ Light';}}catch(e){}})();
+(function(){try{if(localStorage.getItem('usopen-dark')==='1'){document.body.classList.add('dark-mode');document.getElementById('dark-toggle').textContent='☀️ Light';}}catch(e){}})();
 
 // ════════════════════════════════════════════════════════
 // ██  MOMENTUM CHART  ██
 // ════════════════════════════════════════════════════════
-const CHART_COLORS=['#F2C55C','#00875F','#c8102e','#90CAF9','#FF9800','#AB47BC','#26A69A','#EF5350','#42A5F5','#66BB6A','#FFA726','#EC407A','#8D6E63','#78909C','#FFEE58','#7E57C2','#29B6F6','#D4E157','#FF7043','#5C6BC0'];
+const CHART_COLORS=['#F2C55C','#1A4A8C','#c8102e','#90CAF9','#FF9800','#AB47BC','#26A69A','#EF5350','#42A5F5','#66BB6A','#FFA726','#EC407A','#8D6E63','#78909C','#FFEE58','#7E57C2','#29B6F6','#D4E157','#FF7043','#5C6BC0'];
 
 function renderMomentumChart(){
   if(!hasScores()||liveParts.length===0||currentRound<1) return'<div class="momentum-empty">Momentum chart will appear once Round 1 scoring begins.</div>';
@@ -2127,13 +2346,13 @@ function renderMomentumChart(){
 // ════════════════════════════════════════════════════════
 function renderCutTracker(){
   if(!isTourneyActive()||liveParts.length===0) return'';
-  // Prefer ESPN's official projected cut line (tournament.cutScore — top 50 + ties,
+  // Prefer ESPN's official projected cut line (tournament.cutScore — top 60 + ties at U.S. Open,
   // recomputed server-side). Fall back to our local estimate if ESPN hasn't populated it yet.
   const allScores=Object.entries(scores).filter(([,s])=>s.st!=='WD'&&s.st!=='CUT').map(([,s])=>parseTp(s.tp)).filter(n=>!isNaN(n)).sort((a,b)=>a-b);
-  const localCut=allScores.length>=50?allScores[49]:allScores[allScores.length-1]||0;
+  const localCut=allScores.length>=60?allScores[59]:allScores[allScores.length-1]||0;
   const cutLine=(espnCutScore!==null)?espnCutScore:localCut;
   const hasCuts=Object.values(scores).some(s=>s.st==='CUT');
-  const qualifier=hasCuts?' (official)':(espnCutScore!==null)?' (ESPN projection, top 50 + ties)':currentRound>=2?' (T50 after R2)':' (R1 estimate, noisy)';
+  const qualifier=hasCuts?' (official)':(espnCutScore!==null)?' (ESPN projection, top 60 + ties)':currentRound>=2?' (T60 after R2)':' (R1 estimate, noisy)';
   let html=`<div class="cut-projected">Projected cut line: <strong>${cutLine>=0?(cutLine===0?'E':'+'+cutLine):cutLine}</strong>${qualifier}</div>`;
   html+='<div class="cut-tracker-grid">';
   const ranked=liveParts.map(p=>{
@@ -2211,13 +2430,13 @@ function generateShareCard(pIndex){
   const ctx=canvas.getContext('2d');ctx.scale(2,2);
   // Background
   const grad=ctx.createLinearGradient(0,0,0,H);
-  grad.addColorStop(0,'#003829');grad.addColorStop(1,'#001a12');
+  grad.addColorStop(0,'#061427');grad.addColorStop(1,'#04101F');
   ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
   // Gold border
   ctx.strokeStyle='#F2C55C';ctx.lineWidth=3;ctx.strokeRect(8,8,W-16,H-16);
   // Header
   ctx.fillStyle='#F2C55C';ctx.font='bold 11px Arial';ctx.textAlign='center';
-  ctx.fillText("BRIAN SULLIVAN'S MASTERS POOL 2026",W/2,36);
+  ctx.fillText("BRIAN SULLIVAN'S U.S. OPEN POOL 2026",W/2,36);
   // Position + Name
   const ordinal=pos===1?'st':pos===2?'nd':pos===3?'rd':'th';
   ctx.fillStyle='#fff';ctx.font='bold 26px Georgia';
@@ -2300,7 +2519,7 @@ function generateShareCard(pIndex){
 
   // Footer
   ctx.textAlign='center';ctx.fillStyle='rgba(255,255,255,0.15)';ctx.font='9px Arial';
-  ctx.fillText('AUGUSTA NATIONAL · APRIL 9-12, 2026',W/2,H-14);
+  ctx.fillText('SHINNECOCK HILLS · JUNE 18-21, 2026',W/2,H-14);
 
   canvas.toBlob(blob=>{
     if(!blob)return;
@@ -2310,7 +2529,7 @@ function generateShareCard(pIndex){
   },'image/png');
 }
 function downloadBlob(blob,name){
-  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`masters-pool-${name.replace(/\s+/g,'-').toLowerCase()}.png`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`usopen-pool-${name.replace(/\s+/g,'-').toLowerCase()}.png`;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
   showToast('Share card downloaded!');
 }
 function showToast(msg){
@@ -2357,15 +2576,322 @@ renderStats=function(){
 };
 
 // ════════════════════════════════════════════════════════
+// ██  ENTRY FORM (Firebase-backed pick submission)  ██
+// ════════════════════════════════════════════════════════
+// Trust model: same as Clubhouse — name+PIN claim is verified client-side against
+// pins/{name}.pin. Firestore rules then constrain WHEN writes are allowed (locked at
+// REVEAL_DATE) but do not enforce per-user ownership. Acceptable for the friend-pool
+// context. Upgrade to Firebase Auth + auth.uid checks if multi-pool scale is ever needed.
+
+let currentEntry = null;        // the authed user's current entry doc, or null
+let entryPicksSet = new Set();  // normName-keyed set of the 21 currently selected picks
+
+// Picks are submittable until first tee. (FORCE_REVEAL only controls the leaderboard preview.)
+const isPickLocked = () => new Date() >= REVEAL_DATE;
+
+// ── Shared auth bridge ────────────────────────────────────
+// Called by BOTH the Clubhouse and Entry-form auth paths so they stay in sync.
+function setAuthed(name, pin){
+  authedName = name;
+  try{ localStorage.setItem('usopen-talk-auth', JSON.stringify({name, pin})); }catch(e){}
+  // Sync the Entry-form UI if it's mounted
+  refreshEntryAuthUI();
+}
+
+// ── Golfer source ─────────────────────────────────────────
+// Pre-event: pull from ODDS keys (populated by Polymarket once live, or FALLBACK_ODDS).
+// Once ESPN has the field, union both. Sorted A-Z by last name for selection UX.
+function getGolferField(){
+  const set = new Map(); // canonical → display name
+  for(const n of Object.keys(scores||{})) set.set(normName(n), n);
+  for(const n of Object.keys(ODDS||{})){
+    const k = normName(n);
+    if(!set.has(k)) set.set(k, n);
+  }
+  const lastNameKey = n => {
+    const parts = n.trim().split(/\s+/);
+    return (parts[parts.length-1] + ' ' + parts[0]).toLowerCase();
+  };
+  return [...set.values()].sort((a,b)=>lastNameKey(a).localeCompare(lastNameKey(b)));
+}
+
+// ── Auth UI for entry form ────────────────────────────────
+function onEntryNameChange(){
+  // (Kept for parity with chat dropdown; current entry-auth uses a free-text name input.)
+}
+
+async function verifyEntryPin(){
+  if(!db){ setEntryPinMsg('Firestore not initialized. Check firebaseConfig.', 'err'); return; }
+  const nameEl = document.getElementById('entry-name-select');
+  const pinEl  = document.getElementById('entry-pin');
+  const name   = (nameEl.value||'').trim();
+  const pin    = (pinEl.value||'').trim();
+  if(!name){ setEntryPinMsg('Pick or type your name first.', 'err'); return; }
+  if(!/^\d{4}$/.test(pin)){ setEntryPinMsg('PIN must be exactly 4 digits.', 'err'); return; }
+  try{
+    const ref = db.collection('pins').doc(name);
+    const doc = await ref.get();
+    if(doc.exists){
+      if(doc.data().pin === pin){
+        setAuthed(name, pin);
+        setEntryPinMsg('', '');
+        showEntryForm();
+      }else{
+        setEntryPinMsg('Wrong PIN. Try again.', 'err');
+        pinEl.value = '';
+      }
+    }else{
+      // First-time claim
+      await ref.set({ pin, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+      setAuthed(name, pin);
+      setEntryPinMsg('', '');
+      showToast('PIN set — this name is yours now.');
+      showEntryForm();
+    }
+  }catch(e){
+    console.error('[Entry] PIN verify failed:', e);
+    setEntryPinMsg('Error verifying PIN. Try again.', 'err');
+  }
+}
+
+function setEntryPinMsg(text, cls){
+  const m = document.getElementById('entry-pin-msg');
+  if(!m) return;
+  m.textContent = text;
+  m.className = 'talk-pin-msg' + (cls ? ' ' + cls : '');
+}
+
+function entrySignOut(){
+  authedName = '';
+  try{ localStorage.removeItem('usopen-talk-auth'); }catch(e){}
+  currentEntry = null;
+  entryPicksSet.clear();
+  refreshEntryAuthUI();
+}
+
+// ── Render form state ─────────────────────────────────────
+function refreshEntryAuthUI(){
+  const authBox = document.getElementById('entry-auth');
+  const form    = document.getElementById('entry-form');
+  if(!authBox || !form) return;
+  if(authedName){
+    authBox.style.display = 'none';
+    form.style.display = 'block';
+    document.getElementById('entry-authed-name').textContent = authedName;
+    loadEntryForAuthedUser();
+  }else{
+    authBox.style.display = 'block';
+    form.style.display = 'none';
+    populateEntryNameSelect();
+  }
+}
+
+function populateEntryNameSelect(){
+  // Populate the dropdown with existing entry names + a "New entry…" placeholder.
+  const sel = document.getElementById('entry-name-select');
+  if(!sel) return;
+  const existing = (liveParts||[]).map(p=>p.name);
+  sel.innerHTML = '<option value="">Select your name or type a new one…</option>'
+    + existing.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('')
+    + '<option value="__new__">+ New entry…</option>';
+  sel.onchange = () => {
+    if(sel.value === '__new__'){
+      const typed = prompt('Enter your name as you want it shown:');
+      if(typed && typed.trim()){
+        const opt = document.createElement('option');
+        opt.value = typed.trim();
+        opt.textContent = typed.trim();
+        sel.appendChild(opt);
+        sel.value = typed.trim();
+      }else{
+        sel.value = '';
+      }
+    }
+    document.getElementById('entry-pin-row').style.display = sel.value ? 'flex' : 'none';
+  };
+}
+
+async function loadEntryForAuthedUser(){
+  if(!db || !authedName) return;
+  const body  = document.getElementById('entry-form-body');
+  const empty = document.getElementById('entry-empty-field');
+  const lockedNotice = document.getElementById('entry-locked-notice');
+  const modeLabel = document.getElementById('entry-mode-label');
+
+  // Check golfer field availability
+  const field = getGolferField();
+  if(field.length === 0){
+    body.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  body.style.display = 'block';
+
+  // Load existing entry (if any) for prefill
+  try{
+    const doc = await db.collection('entries').doc(authedName).get();
+    if(doc.exists){
+      currentEntry = doc.data();
+      entryPicksSet = new Set((currentEntry.picks||[]).map(g=>normName(g)));
+      modeLabel.textContent = 'Editing your submitted entry';
+    }else{
+      currentEntry = null;
+      entryPicksSet.clear();
+      modeLabel.textContent = 'Building a new entry';
+    }
+  }catch(e){
+    console.warn('[Entry] Load failed:', e);
+    currentEntry = null;
+    entryPicksSet.clear();
+  }
+
+  // Lock once first tee passes
+  if(isPickLocked()){
+    lockedNotice.style.display = 'block';
+    body.querySelectorAll('input,select,button').forEach(el=>el.disabled=true);
+  }else{
+    lockedNotice.style.display = 'none';
+  }
+
+  renderEntryFieldList();
+  renderEntryWinnerAlt();
+  updateEntryValidation();
+}
+
+function renderEntryFieldList(){
+  const listEl = document.getElementById('entry-field-list');
+  if(!listEl) return;
+  const q = (document.getElementById('entry-search').value||'').toLowerCase();
+  const field = getGolferField();
+  const rows = q ? field.filter(n=>n.toLowerCase().includes(q)) : field;
+  if(rows.length === 0){
+    listEl.innerHTML = '<div class="entry-field-empty">No golfers match this search.</div>';
+    return;
+  }
+  let h = '';
+  for(const n of rows){
+    const isPicked = entryPicksSet.has(normName(n));
+    const o = ODDS[n] || getOdds(n) || '';
+    h += `<div class="entry-field-item ${isPicked?'picked':''}" onclick="toggleEntryPick(${JSON.stringify(n).replace(/"/g,'&quot;')})"><span>${esc(n)}</span><span class="entry-field-odds">${esc(o)}</span></div>`;
+  }
+  listEl.innerHTML = h;
+  document.getElementById('entry-pick-count').textContent = entryPicksSet.size;
+}
+
+function toggleEntryPick(name){
+  if(isPickLocked()) return;
+  const k = normName(name);
+  if(entryPicksSet.has(k)) entryPicksSet.delete(k);
+  else {
+    if(entryPicksSet.size >= 21){
+      showToast('You already have 21 picks. Remove one first.');
+      return;
+    }
+    entryPicksSet.add(k);
+  }
+  renderEntryFieldList();
+  renderEntryWinnerAlt();
+  updateEntryValidation();
+}
+
+function renderEntryWinnerAlt(){
+  const winnerSel = document.getElementById('entry-winner');
+  const altSel    = document.getElementById('entry-alternate');
+  if(!winnerSel || !altSel) return;
+  const field = getGolferField();
+  const pickedNames = field.filter(n=>entryPicksSet.has(normName(n)));
+  const nonPickedNames = field.filter(n=>!entryPicksSet.has(normName(n)));
+
+  const prevWinner = winnerSel.value || (currentEntry?.winner || '');
+  const prevAlt    = altSel.value    || (currentEntry?.alternate || '');
+
+  winnerSel.innerHTML = '<option value="">— select winner —</option>'
+    + pickedNames.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+  altSel.innerHTML = '<option value="">— select alternate —</option>'
+    + nonPickedNames.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');
+
+  // Restore previous selections if still valid
+  if(prevWinner && pickedNames.some(n=>normName(n)===normName(prevWinner))) winnerSel.value = pickedNames.find(n=>normName(n)===normName(prevWinner));
+  if(prevAlt    && nonPickedNames.some(n=>normName(n)===normName(prevAlt)))    altSel.value    = nonPickedNames.find(n=>normName(n)===normName(prevAlt));
+}
+
+function validateEntry(){
+  const errors = [];
+  const winner = document.getElementById('entry-winner').value;
+  const alt    = document.getElementById('entry-alternate').value;
+  if(entryPicksSet.size !== 21) errors.push(`You have ${entryPicksSet.size} picks — need exactly 21.`);
+  if(!winner) errors.push('Pick a winner.');
+  else if(!entryPicksSet.has(normName(winner))) errors.push('Winner must be one of your 21 picks.');
+  if(!alt) errors.push('Pick an alternate.');
+  else if(entryPicksSet.has(normName(alt))) errors.push('Alternate must NOT be one of your 21 picks.');
+  return errors;
+}
+
+function updateEntryValidation(){
+  const vEl = document.getElementById('entry-validation');
+  const btn = document.getElementById('entry-submit-btn');
+  if(!vEl || !btn) return;
+  const errors = validateEntry();
+  if(errors.length === 0){
+    vEl.className = 'entry-validation ok';
+    vEl.innerHTML = '<strong>✓ Ready to submit.</strong> Your picks pass all rules.';
+    btn.disabled = isPickLocked();
+  }else{
+    vEl.className = 'entry-validation warn';
+    vEl.innerHTML = '<strong>Still to do:</strong><ul>' + errors.map(e=>`<li>${esc(e)}</li>`).join('') + '</ul>';
+    btn.disabled = true;
+  }
+}
+
+async function submitEntry(){
+  if(!db || !authedName) return;
+  if(isPickLocked()){ showToast('Picks are locked.'); return; }
+  const errors = validateEntry();
+  if(errors.length > 0) return;
+  const winner = document.getElementById('entry-winner').value;
+  const alt    = document.getElementById('entry-alternate').value;
+  const picks  = getGolferField().filter(n=>entryPicksSet.has(normName(n)));
+  const msg = document.getElementById('entry-submit-msg');
+  const btn = document.getElementById('entry-submit-btn');
+  btn.disabled = true;
+  msg.textContent = 'Submitting…'; msg.className = 'entry-submit-msg';
+  try{
+    const payload = {
+      name: authedName,
+      winner, alternate: alt, picks,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    };
+    if(!currentEntry) payload.submittedAt = firebase.firestore.FieldValue.serverTimestamp();
+    await db.collection('entries').doc(authedName).set(payload, { merge: true });
+    currentEntry = { ...currentEntry, ...payload };
+    msg.textContent = '✓ Picks saved. You can edit them anytime before first tee.';
+    msg.className = 'entry-submit-msg ok';
+    document.getElementById('entry-mode-label').textContent = 'Editing your submitted entry';
+    btn.disabled = false;
+  }catch(e){
+    console.error('[Entry] Submit failed:', e);
+    msg.textContent = 'Submit failed — check console and try again.';
+    msg.className = 'entry-submit-msg err';
+    btn.disabled = false;
+  }
+}
+
+// ════════════════════════════════════════════════════════
 // ██  TRASH TALK (Firebase + PIN Auth)  ██
 // ════════════════════════════════════════════════════════
+// ⚠️ TODO: replace these values with a NEW Firebase project for the 2026 U.S. Open pool.
+// The Masters project (brian-sullivan-s-masters-pool) is being preserved for archive/next-year
+// purposes — do NOT reuse it. Create a fresh Firebase project, copy its web SDK config below,
+// then deploy firestore.rules (in repo root) via the Firebase console or `firebase deploy`.
+// Until this is swapped, the chat + entry form will fail to read/write.
 const firebaseConfig={
-  apiKey:"AIzaSyCm_Y1sfHN2ner18alYY9uiQCC9PnIBt8w",
-  authDomain:"brian-sullivan-s-masters-pool.firebaseapp.com",
-  projectId:"brian-sullivan-s-masters-pool",
-  storageBucket:"brian-sullivan-s-masters-pool.firebasestorage.app",
-  messagingSenderId:"241230888692",
-  appId:"1:241230888692:web:c386b4f1100dffb56428a1"
+  apiKey:"REPLACE_WITH_NEW_PROJECT_API_KEY",
+  authDomain:"REPLACE_WITH_NEW_PROJECT.firebaseapp.com",
+  projectId:"REPLACE_WITH_NEW_PROJECT_ID",
+  storageBucket:"REPLACE_WITH_NEW_PROJECT.firebasestorage.app",
+  messagingSenderId:"REPLACE_WITH_SENDER_ID",
+  appId:"REPLACE_WITH_APP_ID"
 };
 let db=null;
 const REACTIONS=['🔥','😂','💀','👍','👎','🤡'];
@@ -2381,7 +2907,7 @@ function populateTalkNames(){
   for(const p of liveParts)sel.innerHTML+=`<option value="${esc(p.name)}">${esc(p.name)}</option>`;
   // Auto-auth if we have saved credentials
   try{
-    const saved=localStorage.getItem('masters-talk-auth');
+    const saved=localStorage.getItem('usopen-talk-auth');
     if(saved){const{name,pin}=JSON.parse(saved);if(name&&pin){sel.value=name;autoAuth(name,pin);}}
   }catch(e){}
 }
@@ -2415,13 +2941,13 @@ async function autoAuth(name,pin){
   try{
     const doc=await db.collection('pins').doc(name).get();
     if(doc.exists&&doc.data().pin===pin){
-      authedName=name;
+      setAuthed(name, pin);
       document.getElementById('talk-pin-row').style.display='none';
       document.getElementById('talk-pin-msg').textContent='';
       document.getElementById('talk-input-row').style.display='flex';
       document.getElementById('talk-authed-name').textContent='Posting as '+name;
     }else{
-      localStorage.removeItem('masters-talk-auth');
+      localStorage.removeItem('usopen-talk-auth');
       onTalkNameChange();
     }
   }catch(e){onTalkNameChange();}
@@ -2440,8 +2966,7 @@ async function verifyPin(){
     if(doc.exists){
       // Verify existing PIN
       if(doc.data().pin===pin){
-        authedName=name;
-        try{localStorage.setItem('masters-talk-auth',JSON.stringify({name,pin}));}catch(e){}
+        setAuthed(name, pin);
         document.getElementById('talk-pin-row').style.display='none';
         msg.textContent='';msg.className='talk-pin-msg';
         document.getElementById('talk-input-row').style.display='flex';
@@ -2453,8 +2978,7 @@ async function verifyPin(){
     }else{
       // Set new PIN
       await ref.set({pin:pin,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
-      authedName=name;
-      try{localStorage.setItem('masters-talk-auth',JSON.stringify({name,pin}));}catch(e){}
+      setAuthed(name, pin);
       document.getElementById('talk-pin-row').style.display='none';
       msg.textContent='';msg.className='talk-pin-msg';
       document.getElementById('talk-input-row').style.display='flex';
@@ -2543,6 +3067,25 @@ init=async function(){
   await _origInit();
   populateTalkNames();
   listenToMessages();
+  // Entry form bootstrap
+  populateEntryNameSelect();
+  // If we have stored auth, auto-load the entry form for that user
+  try{
+    const saved = localStorage.getItem('usopen-talk-auth');
+    if(saved){
+      const { name } = JSON.parse(saved);
+      if(name) authedName = name;
+    }
+  }catch(e){}
+  refreshEntryAuthUI();
+  // Live Firestore listener for entries → updates leaderboard as picks arrive
+  listenToEntries();
+  // Re-render entry form when ODDS/scores populate so the golfer source is fresh
+  const origDoRefresh = doRefresh;
+  doRefresh = async function(){
+    await origDoRefresh.apply(this, arguments);
+    if(authedName) refreshEntryAuthUI();
+  };
 };
 
 init();

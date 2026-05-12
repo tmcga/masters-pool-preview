@@ -1,11 +1,12 @@
-name: Sync Picks from Google Sheet
+name: Sync Picks from Google Sheet (disabled — moving to Firebase)
+
+# Disabled while we transition to a Firebase-backed entry form for the 2026 U.S. Open pool.
+# The sheet path no longer feeds picks.json; Firestore will be the source of truth.
+# Re-enable (un-comment the schedule/push triggers + restore SHEET_CSV_URL in
+# scripts/sync-picks.mjs) only if reverting to the Google Form workflow.
 
 on:
-  schedule:
-    - cron: '*/10 * * * *'   # every 10 minutes
-  push:
-    branches: [main]
-  workflow_dispatch:          # manual trigger from Actions tab
+  workflow_dispatch:          # manual trigger only
 
 permissions:
   contents: write
