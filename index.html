@@ -7,9 +7,9 @@
 <meta name="description" content="Live leaderboard, picks, forecasts and trash talk for Brian Sullivan's 2026 U.S. Open Pool.">
 <meta name="theme-color" content="#0A2240">
 <meta property="og:title" content="Brian Sullivan's U.S. Open Pool 2026">
-<meta property="og:description" content="Live leaderboard, picks, forecasts and trash talk for the 2026 U.S. Open Championship pool.">
+<meta property="og:description" content="Live leaderboard, picks, forecasts and trash talk for the 2026 U.S. Open at Shinnecock Hills — June 18-21, 2026.">
 <meta property="og:type" content="website">
-<meta property="og:image" content="Masters_Lockup1A_RGB.png">
+<meta property="og:image" content="1573241112656.avif">
 <meta name="twitter:card" content="summary_large_image">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -37,19 +37,54 @@ html,body { min-height:100%; }
 body { font-family:'Georgia',serif; background:#0a1424; color:#fff; }
 
 /* ══ HEADER ══════════════════════════════════════════════ */
-.hdr { border-bottom:3px solid var(--gold); }
+.hdr { border-bottom:3px solid var(--gold); position:relative; }
 .hdr-top { background:var(--green-deep); text-align:center; padding:8px; font-size:0.68rem; letter-spacing:5px; color:var(--gold); text-transform:uppercase; font-family:Arial,sans-serif; position:relative; z-index:2; }
-/* TODO: swap the header background image to a Shinnecock Hills / U.S. Open shot before launch (file currently shows Rory at the 2024 Masters). */
-.hdr-bg { background:url('12nat-masters-photos-rory-win-sunday-chtq-videoSixteenByNine3000.jpg') center 85% / cover no-repeat; position:relative; }
-.hdr-bg::before { content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(6,20,39,0.82) 0%,rgba(4,12,24,0.88) 100%); z-index:1; }
-.hdr-inner { max-width:1100px; margin:0 auto; padding:8px 20px 14px; text-align:center; position:relative; z-index:2; }
-.hdr-lockup { display:inline-block; text-align:center; }
-.hdr-host { font-size:0.88rem; color:var(--gold); letter-spacing:5px; text-transform:uppercase; font-family:Arial,sans-serif; margin-bottom:2px; }
-.hdr-flag { margin-bottom:0; line-height:1; }
-.event-logo { height:100px; width:auto; }
-.hdr-title { font-size:0.92rem; color:var(--gold); letter-spacing:5px; text-transform:uppercase; font-family:Arial,sans-serif; margin-bottom:0; }
-.hdr-slogan { font-size:0.78rem; color:rgba(255,255,255,0.78); font-family:'Georgia',serif; font-style:italic; letter-spacing:0.5px; margin-top:14px; text-shadow:0 1px 4px rgba(0,0,0,0.6); }
+/* Hero: Shinnecock Hills clubhouse photo with a navy/atmospheric overlay for legibility. */
+.hdr-bg {
+  position:relative;
+  background:
+    /* Navy overlay — darker at top + bottom (for wordmark + course strip), lighter in the middle so the photo breathes */
+    linear-gradient(180deg, rgba(6,20,39,0.88) 0%, rgba(10,34,64,0.45) 38%, rgba(10,34,64,0.55) 62%, rgba(4,12,24,0.92) 100%),
+    url('1573241112656.avif') center 35% / cover no-repeat;
+  overflow:hidden;
+}
+.hdr-bg::after {
+  /* Gold horizon line at the bottom — dune ridge accent */
+  content:''; position:absolute; left:0; right:0; bottom:0; height:2px; z-index:1;
+  background:linear-gradient(90deg, transparent, rgba(242,197,92,0.5), transparent);
+}
+.hdr-inner { max-width:1100px; margin:0 auto; padding:24px 20px 26px; text-align:center; position:relative; z-index:2; }
+.hdr-host { font-size:0.78rem; color:rgba(242,197,92,0.85); letter-spacing:6px; text-transform:uppercase; font-family:Arial,sans-serif; margin-bottom:14px; }
+
+/* Hero wordmark — engraved trophy plate feel */
+.usopen-lockup { display:inline-block; padding:18px 38px; margin-bottom:6px; position:relative; }
+.usopen-lockup::before, .usopen-lockup::after {
+  content:''; position:absolute; left:50%; transform:translateX(-50%); width:140px; height:1px;
+  background:linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.usopen-lockup::before { top:0; }
+.usopen-lockup::after  { bottom:0; }
+.usopen-mark { font-family:'Georgia','Times New Roman',serif; font-size:3.6rem; font-weight:700; color:var(--gold); letter-spacing:8px; line-height:1; text-shadow:0 2px 12px rgba(0,0,0,0.5), 0 0 36px rgba(242,197,92,0.15); }
+.usopen-mark .dot { color:rgba(242,197,92,0.65); }
+.usopen-sub { font-family:Arial,sans-serif; font-size:0.74rem; color:rgba(255,255,255,0.75); letter-spacing:7px; margin-top:10px; text-transform:uppercase; }
+.usopen-sub .star { color:var(--gold); margin:0 8px; }
+.usopen-year { display:inline-block; margin-left:10px; padding:1px 8px; border:1px solid rgba(242,197,92,0.4); border-radius:3px; font-size:0.7rem; letter-spacing:4px; color:var(--gold); }
+
+.hdr-title { font-family:'Georgia',serif; font-size:1.02rem; color:#fff; letter-spacing:14px; text-transform:uppercase; margin-top:14px; font-style:italic; opacity:0.85; }
+.hdr-slogan { font-size:0.82rem; color:rgba(255,255,255,0.7); font-family:'Georgia',serif; font-style:italic; letter-spacing:0.5px; margin-top:18px; text-shadow:0 1px 4px rgba(0,0,0,0.6); }
+
+/* Course stat strip — Shinnecock signature line */
+.hdr-course-strip { display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:0; margin-top:18px; padding:8px 14px; background:rgba(0,0,0,0.25); border:1px solid rgba(242,197,92,0.18); border-radius:30px; font-family:Arial,sans-serif; font-size:0.7rem; color:rgba(255,255,255,0.65); letter-spacing:2.5px; text-transform:uppercase; }
+.hdr-course-item { padding:0 14px; border-right:1px solid rgba(242,197,92,0.18); }
+.hdr-course-item:last-child { border-right:none; }
+.hdr-course-item strong { color:var(--gold); margin-right:5px; }
+@media(max-width:600px){
+  .hdr-course-strip { font-size:0.6rem; letter-spacing:1.5px; gap:0; padding:7px 8px; }
+  .hdr-course-item { padding:0 8px; }
+}
+
 .hdr-sub { font-size:0.68rem; color:var(--muted); letter-spacing:3px; text-transform:uppercase; font-family:Arial,sans-serif; margin-top:14px; margin-bottom:0; }
+
 .pills-tabs { position:relative; z-index:2; background:transparent; }
 .hdr-pills { display:flex; justify-content:center; gap:0; flex-wrap:wrap; padding:8px 0; border-bottom:1px solid rgba(242,197,92,0.15); }
 .pill { padding:6px 18px; border-right:1px solid rgba(242,197,92,0.2); font-size:0.76rem; color:rgba(255,255,255,0.65); font-family:Arial,sans-serif; }
@@ -337,12 +372,26 @@ body.dark-mode .field-lb tbody tr:hover { background:rgba(255,255,255,0.04); }
 .form-frame-wrap iframe { width:100%; height:3200px; border:none; display:block; }
 
 /* ══ ENTRY FORM (Firebase) ═════════════════════════════ */
-.entry-auth-box { background:linear-gradient(135deg,var(--green-deep),var(--green-row)); border:1px solid rgba(242,197,92,0.3); border-radius:12px; padding:28px 24px; max-width:560px; margin:24px auto; text-align:center; }
-.entry-auth-h { font-size:1.15rem; color:var(--gold); font-family:'Georgia',serif; margin-bottom:6px; }
-.entry-auth-sub { font-size:0.82rem; color:rgba(255,255,255,0.7); font-family:Arial,sans-serif; margin-bottom:18px; line-height:1.5; }
-.entry-auth-foot { font-size:0.72rem; color:var(--muted); font-family:Arial,sans-serif; margin-top:12px; }
-.entry-auth-box .talk-name-select { max-width:300px; margin:0 auto 10px; }
-.entry-auth-box .talk-pin-row { justify-content:center; }
+.entry-auth-box { background:linear-gradient(135deg,var(--green-deep),var(--green-row)); border:1px solid rgba(242,197,92,0.3); border-radius:12px; padding:28px 26px; max-width:520px; margin:24px auto; }
+.entry-auth-h { font-size:1.05rem; color:var(--gold); font-family:'Georgia',serif; margin-bottom:6px; text-align:center; }
+.entry-auth-sub { font-size:0.82rem; color:rgba(255,255,255,0.7); font-family:Arial,sans-serif; margin-bottom:22px; line-height:1.5; text-align:center; }
+.entry-auth-foot { font-size:0.72rem; color:var(--muted); font-family:Arial,sans-serif; margin-top:18px; text-align:center; line-height:1.6; }
+.entry-auth-foot strong { color:var(--gold); }
+.entry-auth-field { margin-bottom:14px; }
+.entry-auth-label { display:block; font-size:0.72rem; color:var(--gold); font-family:Arial,sans-serif; letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; font-weight:600; }
+.entry-auth-input { width:100%; background:rgba(255,255,255,0.06); border:1px solid rgba(242,197,92,0.2); color:#fff; padding:10px 14px; border-radius:8px; font-size:0.92rem; font-family:Arial,sans-serif; outline:none; }
+.entry-auth-input:focus { border-color:var(--gold); }
+.entry-auth-input::placeholder { color:rgba(255,255,255,0.35); }
+.entry-name-status { margin-top:8px; font-size:0.78rem; font-family:Arial,sans-serif; color:rgba(255,255,255,0.6); min-height:1.1em; }
+.entry-name-status.exists { color:var(--gold); }
+.entry-name-status.avail { color:#a5d6a7; }
+.entry-name-status strong { color:#fff; }
+.entry-pin-row { display:flex; gap:10px; align-items:stretch; }
+.entry-pin-input { flex:1; max-width:140px; text-align:center; letter-spacing:8px; font-size:1.1rem; font-family:'Menlo','Courier New',monospace; }
+.entry-auth-btn { flex:0 0 auto; background:var(--gold); color:var(--green-deep); border:none; padding:0 22px; border-radius:8px; font-size:0.88rem; font-family:Arial,sans-serif; font-weight:700; cursor:pointer; transition:background 0.15s; letter-spacing:0.5px; }
+.entry-auth-btn:hover { background:var(--gold-dark); }
+.entry-auth-btn:disabled { background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.4); cursor:not-allowed; }
+.entry-auth-box .talk-pin-msg { margin-top:8px; }
 
 .entry-hdr { background:rgba(255,255,255,0.04); border:1px solid rgba(242,197,92,0.18); border-radius:10px; padding:14px 18px; margin-bottom:16px; font-family:Arial,sans-serif; }
 .entry-hdr-row { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
@@ -475,10 +524,13 @@ body.dark-mode .field-lb tbody tr:hover { background:rgba(255,255,255,0.04); }
 }
 @media(max-width:600px){
   /* ── Header ── */
-  .hdr-host{font-size:0.72rem;letter-spacing:4px;}
-  .event-logo{height:80px;}
-  .hdr-title{font-size:0.75rem;letter-spacing:4px;}
-  .hdr-slogan{font-size:0.7rem;margin-top:10px;}
+  .hdr-host{font-size:0.66rem;letter-spacing:4px;margin-bottom:10px;}
+  .usopen-mark{font-size:2.2rem;letter-spacing:5px;}
+  .usopen-sub{font-size:0.62rem;letter-spacing:4px;}
+  .usopen-lockup{padding:14px 22px;}
+  .usopen-lockup::before,.usopen-lockup::after{width:100px;}
+  .hdr-title{font-size:0.84rem;letter-spacing:8px;margin-top:10px;}
+  .hdr-slogan{font-size:0.72rem;margin-top:12px;}
   .hdr-sub{font-size:0.58rem;margin-top:8px;}
   .hdr-pills{gap:0;padding:6px 0;}
   .pill{padding:4px 8px;font-size:0.65rem;}
@@ -718,23 +770,29 @@ body.dark-mode .value-badge { background:rgba(26,58,107,0.2); color:#66bb6a; bor
 
 <!-- HEADER -->
 <div class="hdr">
-  <div class="hdr-top">Shinnecock Hills Golf Club<button class="dark-toggle" onclick="toggleDarkMode()" id="dark-toggle">🌙 Dark</button></div>
+  <div class="hdr-top">Shinnecock Hills Golf Club &nbsp;·&nbsp; Southampton, NY<button class="dark-toggle" onclick="toggleDarkMode()" id="dark-toggle">🌙 Dark</button></div>
   <div class="hdr-bg">
     <div class="hdr-inner">
-      <div class="hdr-lockup">
-        <div class="hdr-host">Brian Sullivan's</div>
-        <!-- TODO: replace Masters_Lockup1A_RGB.png with a 2026 U.S. Open lockup, then update src below and the og:image meta in <head> -->
-        <div class="hdr-flag"><img src="Masters_Lockup1A_RGB.png" alt="The U.S. Open" class="event-logo"></div>
-        <div class="hdr-title">Pool</div>
+      <div class="hdr-host">Brian Sullivan's</div>
+      <div class="usopen-lockup">
+        <div class="usopen-mark">U<span class="dot">.</span>S<span class="dot">.</span>&nbsp;OPEN</div>
+        <div class="usopen-sub">Championship<span class="star">★</span>2026</div>
       </div>
+      <div class="hdr-title">— Pool —</div>
       <div class="hdr-slogan">"The toughest test in golf."</div>
-      <div class="hdr-sub">Opening Round &nbsp;·&nbsp; June 18th, 2026</div>
+      <div class="hdr-course-strip">
+        <span class="hdr-course-item"><strong>Par</strong>70</span>
+        <span class="hdr-course-item"><strong>Yards</strong>7,440</span>
+        <span class="hdr-course-item"><strong>Est.</strong>1891</span>
+        <span class="hdr-course-item"><strong>6th</strong>U.S. Open hosted</span>
+      </div>
+      <div class="hdr-sub">Opening Round &nbsp;·&nbsp; Thursday, June 18, 2026 &nbsp;·&nbsp; First Tee 6:45 AM ET</div>
     </div>
 
   <!-- PILLS + TABS -->
   <div class="pills-tabs">
     <div class="hdr-pills">
-      <div class="pill">Buy-In <strong>$120</strong></div>
+      <div class="pill">Buy-In <strong>$75</strong></div>
       <div class="pill">Entries <strong id="entry-count">—</strong></div>
       <div class="pill">Pot <strong id="pot-total">—</strong></div>
       <div class="pill">Scoring <strong>Most Prize $ Wins</strong></div>
@@ -762,7 +820,7 @@ body.dark-mode .value-badge { background:rgba(26,58,107,0.2); color:#66bb6a; bor
     <div class="lock-box">
       <div class="lock-icon">🔒</div>
       <div class="lock-h">Picks Revealed at First Tee</div>
-      <div class="lock-sub">All picks are sealed — they'll appear here at<br><strong>Thursday June 18, 2026 · 6:45 AM ET</strong></div>
+      <div class="lock-sub">All entries are sealed until play begins at Shinnecock Hills.<br>Picks go live at <strong>Thursday June 18, 2026 · 6:45 AM ET</strong>.</div>
       <div class="cd">
         <div class="cd-unit"><span class="cd-num" id="cd-d">—</span><span class="cd-lbl">Days</span></div>
         <div class="cd-unit"><span class="cd-num" id="cd-h">—</span><span class="cd-lbl">Hours</span></div>
@@ -793,23 +851,31 @@ body.dark-mode .value-badge { background:rgba(26,58,107,0.2); color:#66bb6a; bor
 <div class="signup-wrap">
   <div class="signup-notice">
     <h3>📋 How to Enter Your Picks</h3>
-    <p>Make <strong>23 Selections</strong>: <strong>21 Golfers</strong>, <strong>1 Winner</strong> &amp; <strong>1 Alternate</strong>. Winner MUST be one of your 21 golfers selected. Alternate will serve as a substitute in case of a W/D. Buy-in is <strong>$120</strong> — please pay <strong>Brian or Charlie</strong> before the event starts. <strong>Scoring:</strong> Your team's total is the combined U.S. Open prize money earned by your 21 golfers. <strong>1st place</strong> wins the pot minus $500, <strong>2nd place</strong> wins $500. Check the <strong>🎯 Field &amp; Odds</strong> tab for current lines. <strong>Picks lock before first tee — Thursday June 18, 2026.</strong> Good Luck!</p>
+    <p>Shinnecock is back. The world's best are coming to Southampton — pick the 21 who'll earn the most prize money over four rounds. Make <strong>23 Selections</strong>: <strong>21 Golfers</strong>, <strong>1 Winner</strong> &amp; <strong>1 Alternate</strong>. Winner MUST be one of your 21 golfers. Alternate substitutes if any of your 21 W/Ds. Buy-in is <strong>$75</strong> — please pay <strong>Brian or Charlie</strong> before the event starts. <strong>Scoring:</strong> total U.S. Open prize money earned by your 21 golfers. <strong>1st place</strong> wins the pot minus $500, <strong>2nd place</strong> wins $500. Check <strong>🎯 Field &amp; Odds</strong> for current lines. <strong>Picks lock before first tee — Thursday June 18, 2026.</strong> Good luck.</p>
   </div>
   <!-- Firebase-backed entry form -->
   <div id="entry-form-mount">
-    <!-- AUTH STRIP (visible until user is signed in) -->
+    <!-- AUTH STRIP (visible until user has set up name + PIN) -->
     <div id="entry-auth" class="entry-auth-box">
-      <div class="entry-auth-h">Sign in to submit your picks</div>
-      <div class="entry-auth-sub">Pick your name from the list and set (or enter) your 4-digit PIN. Same PIN works in the Clubhouse chat.</div>
-      <select class="talk-name-select" id="entry-name-select" onchange="onEntryNameChange()">
-        <option value="">Select your name…</option>
-      </select>
-      <div class="talk-pin-row" id="entry-pin-row" style="display:none">
-        <input class="talk-pin" id="entry-pin" type="tel" placeholder="4-digit PIN" maxlength="4" pattern="[0-9]*" inputmode="numeric">
-        <button class="talk-pin-btn" id="entry-pin-btn" onclick="verifyEntryPin()">Go</button>
+      <div class="entry-auth-h">Step 1 — Set up your name &amp; PIN</div>
+      <div class="entry-auth-sub">Before you can pick golfers, claim a name with a 4-digit PIN. The PIN locks your entry so only you can edit it.</div>
+
+      <div class="entry-auth-field">
+        <label class="entry-auth-label" for="entry-name-input">Your name</label>
+        <input type="text" class="entry-auth-input" id="entry-name-input" placeholder="How it'll appear on the leaderboard" oninput="onEntryNameInput()" autocomplete="off">
+        <div class="entry-name-status" id="entry-name-status"></div>
       </div>
-      <div class="talk-pin-msg" id="entry-pin-msg"></div>
-      <div class="entry-auth-foot">First time? Pick a 4-digit PIN — it locks your entry so nobody else can edit it.</div>
+
+      <div class="entry-auth-field" id="entry-pin-field" style="display:none">
+        <label class="entry-auth-label" for="entry-pin"><span id="entry-pin-label">Pick a 4-digit PIN</span></label>
+        <div class="entry-pin-row">
+          <input type="tel" class="entry-auth-input entry-pin-input" id="entry-pin" maxlength="4" pattern="[0-9]*" inputmode="numeric" placeholder="••••" autocomplete="off">
+          <button class="entry-auth-btn" id="entry-pin-btn" onclick="verifyEntryPin()">Continue</button>
+        </div>
+        <div class="talk-pin-msg" id="entry-pin-msg"></div>
+      </div>
+
+      <div class="entry-auth-foot">Picks lock at first tee — <strong>Thursday June 18, 2026 · 6:45 AM ET</strong>. Until then, you can edit anytime by signing back in with the same name &amp; PIN.</div>
     </div>
 
     <!-- FORM (visible once signed in) -->
@@ -1541,8 +1607,6 @@ function listenToEntries(){
     liveParts = parts;
     if(isRevealed()){ renderStandings(); renderStats(); }
     else updateLockedNames();
-    // Keep the entry-form name dropdown fresh
-    populateEntryNameSelect();
   }, err=>{
     console.warn('[US Open Pool] Firestore entries listener error:', err);
   });
@@ -1554,9 +1618,9 @@ function renderStandings(){
   const el=document.getElementById('standings-container');
   const ranked=liveParts.map(p=>{const{t,ua}=calcTeam(p);return{...p,total:t,ua};}).sort((a,b)=>b.total-a.total);
   document.getElementById('entry-count').textContent=ranked.length;
-  const pot=ranked.length*120;const payout1st=pot-500;const payout2nd=500;
-  document.getElementById('pot-total').textContent='$'+pot;
-  document.getElementById('payout-1st').textContent='$'+payout1st.toLocaleString();
+  const pot=ranked.length*75;const payout1st=pot-500;const payout2nd=500;
+  document.getElementById('pot-total').textContent=ranked.length>0?'$'+pot:'—';
+  document.getElementById('payout-1st').textContent=ranked.length>0?'$'+payout1st.toLocaleString():'—';
   const myName=getSavedTalkName();
   let h='<table class="t"><thead><tr><th style="width:50px">Pos</th><th class="L">Participant</th><th>Prize $</th><th>Score</th><th>Win %</th></tr></thead><tbody>';
   ranked.forEach((p,i)=>{
@@ -2161,7 +2225,7 @@ function updateLockedNames(){
   const el=document.getElementById('locked-names');if(!el||liveParts.length===0)return;
   el.innerHTML='<div style="font-size:0.66rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:8px">Entries Locked In</div>'+liveParts.map(p=>`<span class="lname">${esc(p.name)}</span>`).join('');
   document.getElementById('entry-count').textContent=liveParts.length;
-  const pot=liveParts.length*120;
+  const pot=liveParts.length*75;
   document.getElementById('pot-total').textContent='$'+pot;
   document.getElementById('payout-1st').textContent='$'+(pot-500).toLocaleString();
 }
@@ -2616,17 +2680,62 @@ function getGolferField(){
 }
 
 // ── Auth UI for entry form ────────────────────────────────
-function onEntryNameChange(){
-  // (Kept for parity with chat dropdown; current entry-auth uses a free-text name input.)
+// Reactive name lookup — as the user types, check Firestore for an existing pins/{name}
+// doc and reveal Step 2 (PIN) with copy + button label tailored to whether they're
+// claiming a new name or signing back in.
+let _entryNameLookupTO = null;
+let _entryNameExists   = false;
+
+function onEntryNameInput(){
+  const input = document.getElementById('entry-name-input');
+  const status = document.getElementById('entry-name-status');
+  const pinField = document.getElementById('entry-pin-field');
+  const pinLabel = document.getElementById('entry-pin-label');
+  const pinBtn = document.getElementById('entry-pin-btn');
+  const name = (input.value||'').trim();
+
+  clearTimeout(_entryNameLookupTO);
+  if(name.length < 2){
+    status.textContent = '';
+    status.className = 'entry-name-status';
+    pinField.style.display = 'none';
+    return;
+  }
+  status.textContent = 'Checking…';
+  status.className = 'entry-name-status';
+
+  _entryNameLookupTO = setTimeout(async () => {
+    if(!db){ status.textContent = 'Database not configured yet — check firebaseConfig.'; return; }
+    try{
+      const doc = await db.collection('pins').doc(name).get();
+      pinField.style.display = 'block';
+      if(doc.exists){
+        _entryNameExists = true;
+        status.innerHTML = `Welcome back, <strong>${esc(name)}</strong>. Enter your PIN to continue.`;
+        status.className = 'entry-name-status exists';
+        pinLabel.textContent = 'Your 4-digit PIN';
+        pinBtn.textContent = 'Sign in';
+      }else{
+        _entryNameExists = false;
+        status.innerHTML = `<strong>${esc(name)}</strong> is available. Pick a 4-digit PIN to claim it.`;
+        status.className = 'entry-name-status avail';
+        pinLabel.textContent = 'Choose a 4-digit PIN';
+        pinBtn.textContent = 'Claim name & continue';
+      }
+    }catch(e){
+      console.warn('[Entry] Name lookup failed:', e);
+      status.textContent = 'Could not reach the database. Try again.';
+    }
+  }, 350);
 }
 
 async function verifyEntryPin(){
   if(!db){ setEntryPinMsg('Firestore not initialized. Check firebaseConfig.', 'err'); return; }
-  const nameEl = document.getElementById('entry-name-select');
+  const nameEl = document.getElementById('entry-name-input');
   const pinEl  = document.getElementById('entry-pin');
   const name   = (nameEl.value||'').trim();
   const pin    = (pinEl.value||'').trim();
-  if(!name){ setEntryPinMsg('Pick or type your name first.', 'err'); return; }
+  if(!name){ setEntryPinMsg('Type your name first.', 'err'); return; }
   if(!/^\d{4}$/.test(pin)){ setEntryPinMsg('PIN must be exactly 4 digits.', 'err'); return; }
   try{
     const ref = db.collection('pins').doc(name);
@@ -2635,7 +2744,6 @@ async function verifyEntryPin(){
       if(doc.data().pin === pin){
         setAuthed(name, pin);
         setEntryPinMsg('', '');
-        showEntryForm();
       }else{
         setEntryPinMsg('Wrong PIN. Try again.', 'err');
         pinEl.value = '';
@@ -2645,8 +2753,7 @@ async function verifyEntryPin(){
       await ref.set({ pin, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
       setAuthed(name, pin);
       setEntryPinMsg('', '');
-      showToast('PIN set — this name is yours now.');
-      showEntryForm();
+      showToast('PIN set — your entry is locked to this name.');
     }
   }catch(e){
     console.error('[Entry] PIN verify failed:', e);
@@ -2682,33 +2789,7 @@ function refreshEntryAuthUI(){
   }else{
     authBox.style.display = 'block';
     form.style.display = 'none';
-    populateEntryNameSelect();
   }
-}
-
-function populateEntryNameSelect(){
-  // Populate the dropdown with existing entry names + a "New entry…" placeholder.
-  const sel = document.getElementById('entry-name-select');
-  if(!sel) return;
-  const existing = (liveParts||[]).map(p=>p.name);
-  sel.innerHTML = '<option value="">Select your name or type a new one…</option>'
-    + existing.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('')
-    + '<option value="__new__">+ New entry…</option>';
-  sel.onchange = () => {
-    if(sel.value === '__new__'){
-      const typed = prompt('Enter your name as you want it shown:');
-      if(typed && typed.trim()){
-        const opt = document.createElement('option');
-        opt.value = typed.trim();
-        opt.textContent = typed.trim();
-        sel.appendChild(opt);
-        sel.value = typed.trim();
-      }else{
-        sel.value = '';
-      }
-    }
-    document.getElementById('entry-pin-row').style.display = sel.value ? 'flex' : 'none';
-  };
 }
 
 async function loadEntryForAuthedUser(){
@@ -3067,9 +3148,7 @@ init=async function(){
   await _origInit();
   populateTalkNames();
   listenToMessages();
-  // Entry form bootstrap
-  populateEntryNameSelect();
-  // If we have stored auth, auto-load the entry form for that user
+  // Entry form bootstrap — if we have stored auth, auto-load the entry form for that user
   try{
     const saved = localStorage.getItem('usopen-talk-auth');
     if(saved){
