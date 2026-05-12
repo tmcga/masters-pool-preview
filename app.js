@@ -89,8 +89,31 @@ const FALLBACK_ODDS = {
   "Rasmus Neergaard-Petersen":"+32500","Johnny Keefer":"+34000",
   "Michael Kim":"+40000","Andrew Novak":"+40000","Aldrich Potgieter":"+41000",
   "Michael Brennan":"+42500","Sami Välimäki":"+52500","Davis Riley":"+57500",
+  // Past major champions returning via various exemptions
+  "Padraig Harrington":"+100000",
+  // Amateurs confirmed in the U.S. Open field via Mid-Am / Latin Am / U.S. Amateur exemptions
+  "Mason Howell":"+250000","Mateo Pulcini":"+300000","Jackson Herrington":"+300000",
+  "Brandon Holtz":"+300000","Ethan Fang":"+250000",
+  "Hamilton Coleman":"+250000","Jackson Koivun":"+200000",
   "Brian Campbell":"+250000"
 };
+
+// Past U.S. Open champions currently in the 2026 field. Source: usopen.com/2026/players.html
+// (championshipLogo badge). Used to render a ★ badge in the entry form pick list and
+// elsewhere. Keys are normName() form to bypass diacritic / punctuation differences.
+const PAST_USO_CHAMPS = new Set([
+  'wyndham clark',      // 2023
+  'bryson dechambeau',  // 2020, 2024
+  'matt fitzpatrick',   // 2022
+  'dustin johnson',     // 2016
+  'brooks koepka',      // 2017, 2018
+  'rory mcilroy',       // 2011
+  'jon rahm',           // 2021
+  'justin rose',        // 2013
+  'jj spaun',           // 2025
+  'gary woodland',      // 2019
+]);
+const isPastUSOChamp = name => PAST_USO_CHAMPS.has(normName(name));
 let ODDS = {...FALLBACK_ODDS};
 // Sync odds for name variants
 if(!ODDS["Sungjae Im"]&&ODDS["Im Sung-jae"])ODDS["Sungjae Im"]=ODDS["Im Sung-jae"];
@@ -925,7 +948,8 @@ function renderOdds(){
     entries.forEach((e,i)=>{
       const img=e.headshot?`<img class="odds-headshot" src="${e.headshot}" alt="" loading="lazy">`:'';
       const fl=e.flag?`<img class="odds-flag" src="${e.flag}" alt="${esc(e.country)}" title="${esc(e.country)}" loading="lazy">`:'';
-      h+=`<div class="odds-item"><span class="odds-pos">${i+1}</span>${img}<span class="odds-name">${esc(e.n)}</span>${fl}<span class="odds-thru">${esc(e.thru||'')}</span><span class="odds-val ${oddsColor(e.o)}">${esc(e.o)}</span>${e.score!==null?`<span style="margin-left:8px">${fmt(e.score)}</span>`:''}</div>`;
+      const champBadge = isPastUSOChamp(e.n) ? '<span class="uso-champ-badge" title="Past U.S. Open champion">★</span>' : '';
+      h+=`<div class="odds-item"><span class="odds-pos">${i+1}</span>${img}<span class="odds-name">${champBadge}${esc(e.n)}</span>${fl}<span class="odds-thru">${esc(e.thru||'')}</span><span class="odds-val ${oddsColor(e.o)}">${esc(e.o)}</span>${e.score!==null?`<span style="margin-left:8px">${fmt(e.score)}</span>`:''}</div>`;
     });
     document.getElementById('odds-board').innerHTML=h+'</div>';
     return;
@@ -1155,7 +1179,8 @@ function renderOdds(){
     h+=`<td class="fc-pos">${pos}</td>`;
     h+=`<td class="hide-tab">${mvHtml}</td>`;
     const amTag=s&&s.amateur?' <span class="amateur-tag">(a)</span>':'';
-    h+=`<td class="L"><div class="fc-player">${img}<span class="fc-name">${esc(e.n)}${star}${amTag}</span>${fl}</div></td>`;
+    const champBadge = isPastUSOChamp(e.n) ? '<span class="uso-champ-badge" title="Past U.S. Open champion">★</span>' : '';
+    h+=`<td class="L"><div class="fc-player">${img}<span class="fc-name">${champBadge}${esc(e.n)}${star}${amTag}</span>${fl}</div></td>`;
     h+=`<td class="hide-m">${ownTxt}</td>`;
     h+=`<td class="fc-score">${scoreHtml}</td>`;
     h+=`<td>${todayHtml}</td>`;
@@ -2231,7 +2256,8 @@ function renderEntryFieldList(){
   for(const n of rows){
     const isPicked = entryPicksSet.has(normName(n));
     const o = ODDS[n] || getOdds(n) || '';
-    h += `<div class="entry-field-item ${isPicked?'picked':''}" onclick="toggleEntryPick(${JSON.stringify(n).replace(/"/g,'&quot;')})"><span>${esc(n)}</span><span class="entry-field-odds">${esc(o)}</span></div>`;
+    const champBadge = isPastUSOChamp(n) ? '<span class="uso-champ-badge" title="Past U.S. Open champion">★</span>' : '';
+    h += `<div class="entry-field-item ${isPicked?'picked':''}" onclick="toggleEntryPick(${JSON.stringify(n).replace(/"/g,'&quot;')})"><span>${champBadge}${esc(n)}</span><span class="entry-field-odds">${esc(o)}</span></div>`;
   }
   listEl.innerHTML = h;
   document.getElementById('entry-pick-count').textContent = entryPicksSet.size;

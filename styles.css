@@ -730,6 +730,9 @@ body.dark-mode .pos-chg.down { color:#ef9a9a; background:rgba(239,154,154,0.15);
 .amateur-tag { font-size:0.62rem; color:#888; font-style:italic; font-family:Arial,sans-serif; margin-left:3px; font-weight:400; }
 body.dark-mode .amateur-tag { color:#aaa; }
 
+/* ★ badge: past U.S. Open champion in the current field */
+.uso-champ-badge { display:inline-block; color:var(--gold); font-size:0.78rem; margin-right:5px; font-weight:700; text-shadow:0 0 6px rgba(242,197,92,0.4); vertical-align:baseline; cursor:help; }
+
 /* ══ MOMENTUM CHART ═════════════════════════════════════ */
 .momentum-wrap { position:relative; width:100%; overflow-x:auto; padding:16px; }
 .momentum-canvas { width:100%; height:320px; display:block; }
